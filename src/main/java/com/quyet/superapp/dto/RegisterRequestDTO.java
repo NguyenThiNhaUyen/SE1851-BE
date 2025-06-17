@@ -18,7 +18,7 @@ public class RegisterRequestDTO {
     private String firstName;
     private String lastName;
     private String phone;
-    private String address;
+    private AddressDTO address;
     private LocalDate dob;
     private String gender;
     private String role;

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity // ✅ THÊM DÒNG NÀY
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
@@ -63,11 +65,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // tắt CSRF và bật CORS
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // phân quyền endpoint
+                // ✅ Gắn Provider để xử lý xác thực username/password
+                .authenticationProvider(authenticationProvider())
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(MEMBER_ENDPOINTS).hasAnyRole("MEMBER", "ADMIN")
@@ -76,10 +79,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // thêm JWT filter trước UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-                // (tuỳ chọn) debug log header
                 .addFilterAfter((request, response, chain) -> {
                     HttpServletRequest req = (HttpServletRequest) request;
                     System.out.println("🔑 Authorization header: " + req.getHeader("Authorization"));
@@ -90,6 +91,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/**",
@@ -103,19 +105,23 @@ public class SecurityConfig {
             "/api/user/**",
             "/api/profile",
             "/api/donation/**",
+            "/api/profile/**",
             "/api/request/**",
             "/api/transfusion/history",
             "/api/blood/**",
             "/api/vnpay/**"
     };
     private static final String[] STAFF_ENDPOINTS = {
-            "/api/staff/**"
+            "/api/staff/**",
+            "/api/staff/requests/**",
+            "/api/blood-requests/**"
     };
     private static final String[] ADMIN_ENDPOINTS = {
             "/api/admin",
             "/api/dashboard",
             "/api/users/**",
             "/api/roles/**",
-            "/api/notifications/**"
+            "/api/notifications/**",
+            "/api/admin/**" // ✅ cho phép các API con như /admin/blood-requests/*
     };
 }

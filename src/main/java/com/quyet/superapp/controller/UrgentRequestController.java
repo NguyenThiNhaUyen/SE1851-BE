@@ -1,6 +1,7 @@
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.UrgentRequestDTO;
+import com.quyet.superapp.enums.RequestStatus;
 import com.quyet.superapp.service.UrgentRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -43,6 +44,20 @@ public class UrgentRequestController {
     @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
     public ResponseEntity<List<UrgentRequestDTO>> getByStatus(
             @PathVariable String status) {
-        return ResponseEntity.ok(service.getByStatus(status));
+        RequestStatus enumStatus = RequestStatus.valueOf(status);
+        return ResponseEntity.ok(service.getByStatus(enumStatus));
     }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UrgentRequestDTO> updateStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+
+        RequestStatus newStatus = RequestStatus.valueOf(status);
+        UrgentRequestDTO updated = service.updateStatus(id, newStatus);
+        return ResponseEntity.ok(updated);
+    }
+
+
 }

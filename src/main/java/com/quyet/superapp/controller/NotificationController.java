@@ -16,8 +16,8 @@ public class NotificationController {
     private final NotificationService service;
 
     @GetMapping
-    public List<Notification> getAll() {
-        return service.getAll();
+    public ResponseEntity<List<Notification>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
@@ -27,9 +27,21 @@ public class NotificationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/create")
-    public Notification create(@RequestBody Notification notification) {
-        return service.create(notification);
+    // ✅ Lấy tất cả thông báo theo user
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Notification>> getByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(service.getByUserId(userId));
+    }
+
+    // ✅ Lấy các thông báo CHƯA ĐỌC theo user
+    @GetMapping("/user/{userId}/unread")
+    public ResponseEntity<List<Notification>> getUnreadByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(service.getUnreadByUserId(userId));
+    }
+
+    @PostMapping
+    public ResponseEntity<Notification> create(@RequestBody Notification notification) {
+        return ResponseEntity.ok(service.create(notification));
     }
 
     @PutMapping("/{id}")
@@ -39,7 +51,8 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

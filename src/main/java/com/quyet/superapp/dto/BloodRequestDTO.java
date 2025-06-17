@@ -16,5 +16,8 @@ public class BloodRequestDTO {
     private String urgencyLevel;
     private String status;
     private LocalDateTime createdAt;
+    private Integer confirmedVolumeMl;
+
+
 }
 

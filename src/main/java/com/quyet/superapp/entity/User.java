@@ -1,52 +1,41 @@
-    package com.quyet.superapp.entity;
+package com.quyet.superapp.entity;
 
-    import jakarta.persistence.*;
-    import lombok.*;
-    import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
-    @Entity
-    @Table(name = "Users")
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class User {
+@Entity
+@Table(name = "Users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "User_Id")
+    private Long userId;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "User_Id")
-        private Long userId;
+    @Column(name = "UserName", columnDefinition = "VARCHAR(100)", nullable = false)
+    private String username;
 
-        @Column(name = "UserName", columnDefinition = "VARCHAR(100)", nullable = false)
-        private String username;
+    @Column(name = "Password", columnDefinition = "VARCHAR(255)", nullable = false)
+    private String password;
 
-        @Column(name = "Password", columnDefinition = "VARCHAR(255)", nullable = false)
-        private String password; // đủ dài cho BCrypt nếu sau này dùng
-
-        @Column(name = "IsEnable")
-        private boolean isEnable;
-
-        @ManyToOne(fetch = FetchType.LAZY) // mặc định sẽ load role luôn khi truy vấn user
-        @JoinColumn(name = "Role_Id") //Khóa ngoại của bảng Users
-        private Role role;
-
+    @Column(name = "IsEnable")
+    private boolean isEnable;
 
     @Column(name = "Email", columnDefinition = "VARCHAR(50)", nullable = false, unique = true)
     private String email;
 
-
-    @OneToOne(mappedBy = "user",     cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH
-    }, fetch = FetchType.LAZY, orphanRemoval = true)
-    private UserDetail userDetail;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Role_Id")
+    private Role role;
 
     @OneToOne(mappedBy = "user", cascade = {
             CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH
     }, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore // ✅ TRÁNH vòng lặp khi trả về user → profile → user...
     private UserProfile userProfile;
-
 }
-
-

@@ -1,7 +1,10 @@
 package com.quyet.superapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.quyet.superapp.entity.address.Address;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -19,33 +22,35 @@ public class UserProfile {
     @OneToOne
     @MapsId
     @JoinColumn(name = "User_Id")
+    @JsonIgnore // ✅ Ngăn profile → user → profile → ...
     private User user;
 
-    @Column(name = "full_name", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "full_name", columnDefinition = "NVARCHAR(50)")
     private String fullName;
 
-    @Column(name = "dob", columnDefinition = "DATE")
+    @Column(name = "dob")
     private LocalDate dob;
 
     @Column(name = "gender", columnDefinition = "NVARCHAR(20)")
     private String gender;
 
-    @Column(name = "blood_type", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "blood_type", columnDefinition = "NVARCHAR(10)")
     private String bloodType;
 
-    @Column(name = "address", columnDefinition = "NVARCHAR(20)")
-    private String address;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
 
     @Column(name = "phone", columnDefinition = "VARCHAR(10)")
     private String phone;
 
-    @Column(name = "last_donation_date", columnDefinition = "DATE")
+    @Column(name = "last_donation_date")
     private LocalDate lastDonationDate;
 
     @Column(name = "recovery_time")
     private Integer recoveryTime;
 
-    @Column(name = "location", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
     private String location;
 
     @Column(name = "latitude")

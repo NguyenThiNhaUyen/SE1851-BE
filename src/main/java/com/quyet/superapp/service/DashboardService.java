@@ -1,8 +1,10 @@
 package com.quyet.superapp.service;
 
 import com.quyet.superapp.dto.DashboardResponseDTO;
-import com.quyet.superapp.repository.DonationRepository;
+import com.quyet.superapp.dto.GroupStat;
+import com.quyet.superapp.enums.RequestStatus;
 import com.quyet.superapp.repository.BloodInventoryRepository;
+import com.quyet.superapp.repository.DonationRepository;
 import com.quyet.superapp.repository.UrgentRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,17 +24,27 @@ public class DashboardService {
     public DashboardResponseDTO getDashboardStats() {
         long donorsToday = donationRepository.countByDonationDate(LocalDate.now());
         long totalUnits  = bloodInventoryRepository.sumAllUnits();
-        long urgentReqs  = urgentRequestRepository.countByStatus("Pending");
 
-        List<DashboardResponseDTO.GroupStat> groupStats =
+        long pendingReqs  = urgentRequestRepository.countByStatus(RequestStatus.PENDING);
+        long approvedReqs = urgentRequestRepository.countByStatus(RequestStatus.APPROVED);
+        long rejectedReqs = urgentRequestRepository.countByStatus(RequestStatus.REJECTED);
+
+        List<GroupStat> groupStats =
                 bloodInventoryRepository.findGroupCounts()
                         .stream()
-                        .map(arr -> new DashboardResponseDTO.GroupStat(
+                        .map(arr -> new GroupStat(
                                 (String) arr[0],
                                 ((Number) arr[1]).longValue()
                         ))
                         .collect(Collectors.toList());
 
-        return new DashboardResponseDTO(donorsToday, totalUnits, urgentReqs, groupStats);
+        return new DashboardResponseDTO(
+                donorsToday,
+                totalUnits,
+                pendingReqs,
+                approvedReqs,
+                rejectedReqs,
+                groupStats
+        );
     }
 }

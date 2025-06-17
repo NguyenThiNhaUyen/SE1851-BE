@@ -37,6 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Lấy UserDetails từ DB qua username
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
+                System.out.println("🧪 TOKEN: " + token);
+                System.out.println("🧪 USERNAME from token: " + username);
+                System.out.println("🧪 USER_ID from token: " + userId);
+                System.out.println("🧪 ROLE: " + userDetails.getAuthorities());
+
                 // Tạo principal với userId
                 UserPrincipal principal = new UserPrincipal(
                         userId,

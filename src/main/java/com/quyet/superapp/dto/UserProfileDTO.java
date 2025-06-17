@@ -1,22 +1,18 @@
 package com.quyet.superapp.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.time.LocalDate;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserProfileDTO {
     private Long userId;
-    private String fullName;         // nếu cần tách có thể dùng firstName + lastName
-    private LocalDate dob;
+    private String fullName;
+    private String dob; // Chuỗi dd-MM-yyyy
     private String gender;
     private String bloodType;
-    private String address;
     private String phone;
-    private LocalDate lastDonationDate;
-    private Integer recoveryTime;    // ngày hồi phục
-    private String location;
-    private Float latitude;
-    private Float longitude;
+    private String addressFull; // VD: "12 Nguyễn Trãi, Phường 1, Quận 5, TP Hồ Chí Minh"
 }
-
