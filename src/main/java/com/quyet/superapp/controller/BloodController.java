@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/blood")
@@ -19,7 +20,7 @@ public class BloodController {
 
     @GetMapping("/inventory")
     public List<BloodInventory> getAllInventory(@RequestParam(required = false) String type) {
-        return type != null ? bloodService.searchBloodByType(type) : bloodService.getInventory();
+        return type != null ? bloodService.searchBloodByTypeAndComponent(type) : bloodService.getInventory();
     }
 
     @GetMapping("/inventory/{id}")

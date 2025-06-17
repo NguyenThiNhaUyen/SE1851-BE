@@ -20,6 +20,21 @@ public class BloodComponent {
     @Column(name = "NameBloodComponent", columnDefinition = "NVARCHAR(50)")
     private String name;
 
+    @Column(name = "Code", columnDefinition = "VARCHAR(10)")
+    private String code; // PRC, FFP, PLT...
+
+    @Column(name = "StorageTemp", columnDefinition = "VARCHAR(20)")
+    private String storageTemp; // ví dụ "2-6°C"
+
+    @Column(name = "StorageDays")
+    private Integer storageDays; // ví dụ 42
+
+    @Column(name = "Usage", columnDefinition = "NVARCHAR(200)")
+    private String usage; // mục đích sử dụng, như "truyền thiếu máu"
+
+    @Column(name = "ApheresisCompatible")
+    private Boolean isApheresisCompatible;
+
     @OneToMany(mappedBy = "component")
     @JsonIgnore
     private List<CompatibilityRule> compatibilityRules;

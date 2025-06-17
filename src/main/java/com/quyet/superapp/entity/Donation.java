@@ -33,7 +33,6 @@
         @JoinColumn(name = "component_id")
         private BloodComponent component;
 
-
         @Column(name = "donation_date", columnDefinition = "DATE")
         private LocalDate donationDate;
 

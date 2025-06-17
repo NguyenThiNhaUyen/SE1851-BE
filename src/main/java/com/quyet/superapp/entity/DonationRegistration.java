@@ -1,5 +1,6 @@
 package com.quyet.superapp.entity;
 
+import com.quyet.superapp.enums.DonationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -16,7 +17,6 @@ public class DonationRegistration {
     @Column(name = "Registration_Id")
     private Long registrationId;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "User_Id")
     private User user;
@@ -24,6 +24,14 @@ public class DonationRegistration {
     @Column(name = "ready_date", columnDefinition = "DATE")
     private LocalDate readyDate;
 
-    @Column(name = "status", columnDefinition = "NVARCHAR(20)")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Status", length = 20)
+    private DonationStatus status;
+
+    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
+    private String location;
+
+    @Column(name = "blood_type", columnDefinition = "NVARCHAR(20)")
+    private String bloodType;
+
 }

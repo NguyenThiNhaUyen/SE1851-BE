@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,8 +32,8 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(userDetailsService); // đã load user từ DB
+        provider.setPasswordEncoder(passwordEncoder()); // dùng BCrypt để so sánh
         return provider;
     }
 
@@ -49,7 +48,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // ⚠️ Đổi đúng port FE của bạn
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Đổi đúng port FE của bạn
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 
@@ -87,7 +86,9 @@ public class SecurityConfig {
             "/api/forgot",
             "/api/change-password",
             "/api/blog/**",
-            "/api/public/**"
+            "/api/public/**",
+            "/api/donation/register/**",
+            "/api/donation/confirm"
     };
 
     private static final String[] MEMBER_ENDPOINTS = {

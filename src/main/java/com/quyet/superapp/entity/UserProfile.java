@@ -10,10 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserProfile {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "User_Id")
     private Long userId;
 
     @OneToOne
@@ -21,36 +18,45 @@ public class UserProfile {
     @JoinColumn(name = "User_Id")
     private User user;
 
-    @Column(name = "full_name", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "full_name", columnDefinition = "NVARCHAR(50)")
     private String fullName;
 
-    @Column(name = "dob", columnDefinition = "DATE")
+    @Column(name = "dob")
     private LocalDate dob;
 
-    @Column(name = "gender", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "gender", columnDefinition = "NVARCHAR(10)")
     private String gender;
 
-    @Column(name = "blood_type", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "blood_type", columnDefinition = "NVARCHAR(10)")
     private String bloodType;
 
-    @Column(name = "address", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "address", columnDefinition = "NVARCHAR(200)")
     private String address;
 
-    @Column(name = "phone", columnDefinition = "VARCHAR(10)")
+    @Column(name = "phone", columnDefinition = "VARCHAR(20)")
     private String phone;
 
-    @Column(name = "last_donation_date", columnDefinition = "DATE")
+    @Column(name = "landline", columnDefinition = "VARCHAR(20)")
+    private String landline;
+
+    @Column(name = "email", columnDefinition = "VARCHAR(100)")
+    private String email;
+
+    @Column(name = "occupation", columnDefinition = "NVARCHAR(50)")
+    private String occupation;
+
+    @Column(name = "donation_date")
     private LocalDate lastDonationDate;
 
     @Column(name = "recovery_time")
     private Integer recoveryTime;
 
-    @Column(name = "location", columnDefinition = "NVARCHAR(20)")
+    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
     private String location;
 
-    @Column(name = "latitude")
-    private Float latitude;
+    @Column(name = "citizen_id", columnDefinition = "VARCHAR(12)", unique = true)
+    private String citizenId;
 
-    @Column(name = "longitude")
-    private Float longitude;
 }
+
+

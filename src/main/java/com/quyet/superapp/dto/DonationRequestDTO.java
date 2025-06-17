@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DonationDTO {
+public class DonationRequestDTO {
     private Long donationId;
     private Long userId;
     private Long registrationId;

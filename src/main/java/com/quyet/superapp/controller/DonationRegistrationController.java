@@ -1,48 +1,44 @@
 package com.quyet.superapp.controller;
 
-import com.quyet.superapp.entity.DonationRegistration;
+import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.service.DonationRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/donationregistrations")
+@RequestMapping("/api/donation")
 @RequiredArgsConstructor
 public class DonationRegistrationController {
 
     private final DonationRegistrationService donationRegistrationService;
 
+    // ✅ Đăng ký hiến máu (chỉ đặt lịch, chưa xác nhận)
+    @PostMapping("/register/{userId}")
+    public ResponseEntity<DonationRegistrationDTO> registerDonation(
+            @PathVariable Long userId,
+            @RequestBody DonationRegistrationDTO dto) {
+        return ResponseEntity.ok(donationRegistrationService.register(userId, dto));
+    }
+
+    // ✅ Lấy tất cả đơn đăng ký hiến máu
     @GetMapping
-    public List<DonationRegistration> getAll() {
-        return donationRegistrationService.getAll();
+    public ResponseEntity<List<DonationRegistrationDTO>> getAllRegistrations() {
+        return ResponseEntity.ok(donationRegistrationService.getAllDTO());
     }
 
+    // ✅ Lấy đơn đăng ký theo ID
     @GetMapping("/{id}")
-    public ResponseEntity<DonationRegistration> getById(@PathVariable Long id) {
-        return donationRegistrationService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DonationRegistrationDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(donationRegistrationService.getDTOById(id));
     }
 
-    @PostMapping("/create")
-    public DonationRegistration create(@RequestBody DonationRegistration obj) {
-        return donationRegistrationService.save(obj);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<DonationRegistration> update(@PathVariable Long id, @RequestBody DonationRegistration obj) {
-        Optional<DonationRegistration> existing = donationRegistrationService.getById(id);
-        return existing.isPresent()
-                ? ResponseEntity.ok(donationRegistrationService.save(obj))
-                : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        donationRegistrationService.deleteById(id);
+    // ✅ Xác nhận đơn đăng ký (chuyển trạng thái -> CONFIRMED)
+    @PutMapping("/confirm")
+    public ResponseEntity<DonationRegistrationDTO> confirmRegistration(
+            @RequestParam("register_id") Long id) {
+        return ResponseEntity.ok(donationRegistrationService.confirm(id));
     }
 }

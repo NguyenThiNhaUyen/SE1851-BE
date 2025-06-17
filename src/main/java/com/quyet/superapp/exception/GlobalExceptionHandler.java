@@ -39,4 +39,11 @@ public class GlobalExceptionHandler {
     }
 
     // ✅ (Tuỳ chọn) 4. Xử lý các exception khác nếu cần (ví dụ: AccessDenied, SQLException...)
+    @ExceptionHandler(MemberException.class)
+    public ResponseEntity<Map<String, String>> handleMemberException(MemberException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("errorCode", ex.getErrorCode());
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

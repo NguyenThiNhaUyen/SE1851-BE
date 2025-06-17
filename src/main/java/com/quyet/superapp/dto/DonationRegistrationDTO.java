@@ -7,9 +7,17 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DonationRegistrationDTO {
-    private Long registrationId;
-    private Long userId;
-    private LocalDate readyDate;
-    private String status;
+    private Long registrationId;          // ✅ thêm để phục vụ confirm/get
+    private LocalDate scheduledDate;
+    private String location;
+    private String bloodType;
+    private String status;                // ✅ thêm trạng thái
+
+    // Thông tin người dùng (chỉ dùng khi POST nếu chưa có hồ sơ)
+    private String fullName;
+    private LocalDate dob;
+    private String gender;
+    private String phone;
+    private String address;
 }
 

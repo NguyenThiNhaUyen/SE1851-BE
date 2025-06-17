@@ -8,4 +8,11 @@ import lombok.*;
 public class BloodComponentDTO {
     private Long bloodComponentId;
     private String name;
+
+    //các feild mới
+    private String code;
+    private String storageTemp;
+    private Integer storageDays;
+    private String usage;
+    private Boolean isApheresisCompatible;
 }

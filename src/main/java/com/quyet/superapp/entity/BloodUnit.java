@@ -17,9 +17,6 @@ public class BloodUnit {
     @Column(name = "unit_id")
     private Long bloodUnitId;
 
-
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BloodType", referencedColumnName = "BloodTypeID")
     private BloodType bloodType;

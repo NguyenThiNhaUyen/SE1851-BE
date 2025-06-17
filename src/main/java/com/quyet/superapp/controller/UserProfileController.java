@@ -1,13 +1,16 @@
 package com.quyet.superapp.controller;
 
+import com.quyet.superapp.dto.UserProfileDTO;
 import com.quyet.superapp.entity.UserProfile;
+import com.quyet.superapp.mapper.UserProfileMapper;
 import com.quyet.superapp.service.UserProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/userprofiles")
@@ -16,33 +19,37 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
 
+    // ✅ [GET] Lấy danh sách tất cả hồ sơ người dùng
     @GetMapping
-    public List<UserProfile> getAll() {
-        return userProfileService.getAll();
+    public ResponseEntity<List<UserProfileDTO>> getAllProfiles() {
+        List<UserProfileDTO> profiles = userProfileService.getAllProfiles()
+                .stream()
+                .map(UserProfileMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(profiles);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserProfile> getById(@PathVariable Long id) {
-        return userProfileService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // ✅ [GET] Lấy thông tin hồ sơ theo userId
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserProfileDTO> getProfileByUserId(@PathVariable Long userId) {
+        UserProfile profile = userProfileService.getProfileByUserId(userId);
+        return ResponseEntity.ok(UserProfileMapper.toDTO(profile));
     }
 
-    @PostMapping("/create")
-    public UserProfile create(@RequestBody UserProfile obj) {
-        return userProfileService.save(obj);
+    // ✅ [POST] Tạo mới hồ sơ người dùng
+    @PostMapping("/{userId}")
+    public ResponseEntity<UserProfileDTO> createProfile(@PathVariable Long userId,
+                                                        @RequestBody @Valid UserProfileDTO dto) {
+        UserProfile createdProfile = userProfileService.createProfile(userId, dto);
+        return ResponseEntity.ok(UserProfileMapper.toDTO(createdProfile));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserProfile> update(@PathVariable Long id, @RequestBody UserProfile obj) {
-        Optional<UserProfile> existing = userProfileService.getById(id);
-        return existing.isPresent()
-                ? ResponseEntity.ok(userProfileService.save(obj))
-                : ResponseEntity.notFound().build();
+    // ✅ [PUT] Cập nhật hồ sơ người dùng
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserProfileDTO> updateProfile(@PathVariable Long userId,
+                                                        @RequestBody @Valid UserProfileDTO dto) {
+        UserProfile updatedProfile = userProfileService.updateProfile(userId, dto);
+        return ResponseEntity.ok(UserProfileMapper.toDTO(updatedProfile));
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        userProfileService.deleteById(id);
-    }
 }

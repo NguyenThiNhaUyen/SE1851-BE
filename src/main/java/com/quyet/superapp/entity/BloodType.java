@@ -2,9 +2,9 @@ package com.quyet.superapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+        import lombok.*;
 
-import java.util.List;
+        import java.util.List;
 
 @Entity
 @Table(name = "BloodTypes")

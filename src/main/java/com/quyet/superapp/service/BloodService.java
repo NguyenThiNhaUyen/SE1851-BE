@@ -1,6 +1,8 @@
 package com.quyet.superapp.service;
 
+import com.quyet.superapp.entity.BloodComponent;
 import com.quyet.superapp.entity.BloodInventory;
+import com.quyet.superapp.entity.BloodType;
 import com.quyet.superapp.repository.BloodInventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class BloodService {
         return bloodRepo.findById(id)
                 .map(blood -> {
                     blood.setBloodType(updated.getBloodType());
+                    blood.setComponent(updated.getComponent());
                     blood.setTotalQuantityMl(updated.getTotalQuantityMl());
                     blood.setLastUpdated(LocalDateTime.now());
                     return bloodRepo.save(blood);
@@ -41,8 +44,8 @@ public class BloodService {
         bloodRepo.deleteById(id);
     }
 
-    public List<BloodInventory> searchBloodByType(String bloodType) {
-        return bloodRepo.findByBloodType_Description(bloodType);
+    public Optional<BloodInventory> searchBloodByTypeAndComponent(BloodType bloodType, BloodComponent component) {
+        return bloodRepo.findByBloodTypeAndComponent(bloodType, component);
     }
-
 }
+

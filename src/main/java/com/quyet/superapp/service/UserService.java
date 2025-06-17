@@ -5,12 +5,11 @@ import com.quyet.superapp.dto.LoginResponseDTO;
 import com.quyet.superapp.dto.RegisterRequestDTO;
 import com.quyet.superapp.entity.Role;
 import com.quyet.superapp.entity.User;
-import com.quyet.superapp.entity.UserDetail;
+import com.quyet.superapp.entity.UserProfile;
 import com.quyet.superapp.repository.RoleRepository;
 import com.quyet.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -86,16 +85,18 @@ public class UserService {
 
         user.setRole(role);
 
-        UserDetail detail = new UserDetail();
-        detail.setFirstname(request.getFirstName());
-        detail.setLastname(request.getLastName());
-        detail.setDob(request.getDob());
-        detail.setGender(request.getGender());
-        detail.setPhone(request.getPhone());
-        detail.setAddress(request.getAddress());
+        UserProfile profile = new UserProfile();
+        profile.setUser(user);
+        profile.setFullName(request.getFirstName() + " " + request.getLastName());
+        profile.setDob(request.getDob());
+        profile.setGender(request.getGender());
+        profile.setPhone(request.getPhone());
+        profile.setCitizenId(request.getCccd());
+        profile.setAddress(request.getAddress());
 
-        detail.setUser(user);
-        user.setUserDetail(detail);
+        // Gán profile vào user
+        user.setUserProfile(profile);
+
 
         userRepository.save(user);
         return ResponseEntity.ok("Đăng ký thành công");

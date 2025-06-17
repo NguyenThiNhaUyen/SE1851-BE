@@ -1,11 +1,11 @@
 package com.quyet.superapp.mapper;
 
-import com.quyet.superapp.dto.DonationDTO;
+import com.quyet.superapp.dto.DonationRequestDTO;
 import com.quyet.superapp.entity.Donation;
 
 public class DonationMapper {
-    public static DonationDTO toDTO(Donation donation) {
-        return new DonationDTO(
+    public static DonationRequestDTO toDTO(Donation donation) {
+        return new DonationRequestDTO(
                 donation.getDonationId(),
                 donation.getUser().getUserId(),
                 donation.getRegistration().getRegistrationId(),
