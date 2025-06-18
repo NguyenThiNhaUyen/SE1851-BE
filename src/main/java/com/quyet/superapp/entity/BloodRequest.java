@@ -39,4 +39,8 @@
 
         @Column(name = "CreatedAt", columnDefinition = "DATETIME")
         private LocalDateTime createdAt;
+
+        @Column(name = "ConfirmedVolumeML")
+        private Integer confirmedVolumeMl;
+
     }

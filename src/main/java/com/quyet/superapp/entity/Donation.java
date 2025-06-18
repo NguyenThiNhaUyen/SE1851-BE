@@ -1,8 +1,8 @@
-        package com.quyet.superapp.entity;
+package com.quyet.superapp.entity;
 
-        import jakarta.persistence.*;
-        import lombok.*;
-        import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
 
         @Entity
         @Table(name = "Donations")
@@ -15,7 +15,6 @@
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "Donation_Id")
         private Long donationId;
-
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "User_Id")

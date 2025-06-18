@@ -7,6 +7,8 @@ import com.quyet.superapp.service.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,4 +54,20 @@ public class UserProfileController {
         return ResponseEntity.ok(UserProfileMapper.toDTO(updatedProfile));
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        userProfileService.deleteById(id);
+    }
+
+    /**
+     * Lấy hồ sơ người dùng hiện tại (dựa vào JWT -> lấy username)
+     */
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('MEMBER', 'STAFF', 'ADMIN')")
+    public ResponseEntity<UserProfileDTO> getMyProfile() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserProfile profile = userProfileService.getByUsername(username);
+        UserProfileDTO dto = UserProfileMapper.toDTO(profile);  // ✅ dùng mapper để format lại
+        return ResponseEntity.ok(dto);                          // ✅ trả về DTO mới
+    }
 }

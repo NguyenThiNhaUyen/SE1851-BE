@@ -1,7 +1,10 @@
 package com.quyet.superapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.quyet.superapp.entity.address.Address;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -16,6 +19,7 @@ public class UserProfile {
     @OneToOne
     @MapsId
     @JoinColumn(name = "User_Id")
+    @JsonIgnore // ✅ Ngăn profile → user → profile → ...
     private User user;
 
     @Column(name = "full_name", columnDefinition = "NVARCHAR(50)")
@@ -30,8 +34,15 @@ public class UserProfile {
     @Column(name = "blood_type", columnDefinition = "NVARCHAR(10)")
     private String bloodType;
 
-    @Column(name = "address", columnDefinition = "NVARCHAR(200)")
-    private String address;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @Column(name = "phone", columnDefinition = "VARCHAR(20)")
     private String phone;
@@ -56,6 +67,9 @@ public class UserProfile {
 
     @Column(name = "citizen_id", columnDefinition = "VARCHAR(12)", unique = true)
     private String citizenId;
+
+    @Column(name = "weight")
+    private Double weight;
 
 }
 

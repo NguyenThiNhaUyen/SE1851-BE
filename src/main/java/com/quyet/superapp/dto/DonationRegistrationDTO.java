@@ -18,6 +18,7 @@ public class DonationRegistrationDTO {
     private LocalDate dob;
     private String gender;
     private String phone;
-    private String address;
+    private Long addressId;
+    private String addressFull;
 }
 

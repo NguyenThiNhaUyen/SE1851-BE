@@ -13,7 +13,7 @@ public class BloodSeparationCalculator {
             int plateletsFixed,
             String method,
             String gender,
-            int weight,
+            Double weight,
             String bloodGroup
     ) {
         int red = (int) (volume * redRatio);

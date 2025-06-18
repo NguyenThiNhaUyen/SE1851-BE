@@ -17,6 +17,7 @@ public class DonationRequestDTO {
     private Integer volumeMl;
     private String location;
     private String notes;
+    private Double weight;
 }
 
 

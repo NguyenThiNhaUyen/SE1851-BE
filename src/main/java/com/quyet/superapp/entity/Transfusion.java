@@ -38,4 +38,7 @@ public class Transfusion {
     @Column(name = "notes", columnDefinition = "NVARCHAR(200)")
     private String notes;
 
+    @Column(name = "volume_taken_ml")
+    private Integer volumeTakenMl;
+
 }

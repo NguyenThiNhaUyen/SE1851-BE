@@ -4,12 +4,14 @@ import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.entity.DonationRegistration;
 import com.quyet.superapp.entity.User;
 import com.quyet.superapp.entity.UserProfile;
+import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.exception.MemberException;
 import com.quyet.superapp.mapper.DonationRegistrationMapper;
 import com.quyet.superapp.repository.DonationRegistrationRepository;
 import com.quyet.superapp.repository.UserProfileRepository;
 import com.quyet.superapp.repository.UserRepository;
+import com.quyet.superapp.repository.address.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ public class DonationRegistrationService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final EmailService emailService; //
+    private final AddressRepository addressRepository;
 
     // Đăng ký hiến máu
     public DonationRegistrationDTO register(Long userId, DonationRegistrationDTO dto) {
@@ -44,7 +47,12 @@ public class DonationRegistrationService {
             profile.setDob(dto.getDob());
             profile.setGender(dto.getGender());
             profile.setBloodType(dto.getBloodType());
-            profile.setAddress(dto.getAddress());
+            // ✅ Dùng addressId để lấy địa chỉ từ DB
+            if (dto.getAddressId() != null) {
+                Address address = addressRepository.findById(dto.getAddressId())
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ với ID: " + dto.getAddressId()));
+                profile.setAddress(address);
+            }
             profile.setPhone(dto.getPhone());
             userProfileRepository.save(profile);
         }

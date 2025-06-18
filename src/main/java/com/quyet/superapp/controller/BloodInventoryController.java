@@ -1,6 +1,10 @@
 package com.quyet.superapp.controller;
 
+
 import com.quyet.superapp.entity.BloodComponent;
+
+import com.quyet.superapp.dto.BloodInventoryDTO;
+
 import com.quyet.superapp.entity.BloodInventory;
 import com.quyet.superapp.entity.BloodType;
 import com.quyet.superapp.service.BloodService;
@@ -18,9 +22,10 @@ public class BloodInventoryController {
     private final BloodService bloodService;
 
     @GetMapping
-    public List<BloodInventory> getAll() {
-        return bloodService.getInventory();
+    public List<BloodInventoryDTO> getAll() {
+        return bloodService.getAllInventoryDTO();
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<BloodInventory> getById(@PathVariable Long id) {

@@ -19,8 +19,8 @@ public class BloodController {
     // --- BLOOD INVENTORY ---
 
     @GetMapping("/inventory")
-    public List<BloodInventory> getAllInventory(@RequestParam(required = false) String type) {
-        return type != null ? bloodService.searchBloodByTypeAndComponent(type) : bloodService.getInventory();
+    public List<BloodInventory> getAllInventory() {
+        return bloodService.getInventory();
     }
 
     @GetMapping("/inventory/{id}")

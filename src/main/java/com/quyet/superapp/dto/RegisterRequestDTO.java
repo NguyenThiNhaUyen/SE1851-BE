@@ -24,5 +24,7 @@ public class RegisterRequestDTO {
     private String cccd;
     private String gender;
     private String phone;
-    private String address;
+    private AddressDTO address;
+
+
 }

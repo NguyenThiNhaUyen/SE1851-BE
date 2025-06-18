@@ -1,5 +1,6 @@
 package com.quyet.superapp.dto;
 
+import com.quyet.superapp.enums.RequestStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ public class UrgentRequestDTO {
     private String bloodType;
     private int units;
     private LocalDate requestDate;
-    private String status;
+    private RequestStatus status;
     private Long requesterId;
 }
 

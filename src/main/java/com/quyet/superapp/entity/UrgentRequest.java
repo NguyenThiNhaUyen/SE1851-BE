@@ -3,6 +3,7 @@ package com.quyet.superapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import com.quyet.superapp.enums.RequestStatus;
 
 @Entity
 @Table(name = "UrgentRequest")
@@ -16,10 +17,6 @@ public class UrgentRequest {
     @Column(name = "UrgentRequest_Id")
     private Long urgentRequestId;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "User_Id")
-//    private User user;
-
     @Column(name = "HospitalName", columnDefinition = "NVARCHAR(100)", nullable = false)
     private String hospitalName;
 
@@ -32,10 +29,10 @@ public class UrgentRequest {
     @Column(name = "RequestDate", columnDefinition = "DATE")
     private LocalDate requestDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "Status", columnDefinition = "NVARCHAR(20)")
-    private String status;
+    private RequestStatus status;
 
-    // ✅ Gắn với người gửi (User)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "User_Id")
     private User requester;
@@ -43,7 +40,10 @@ public class UrgentRequest {
     @PrePersist
     public void setDefaultStatus() {
         if (status == null) {
-            status = "Pending";
+            status = RequestStatus.PENDING;
+        }
+        if (requestDate == null) {
+            requestDate = LocalDate.now();
         }
     }
 }

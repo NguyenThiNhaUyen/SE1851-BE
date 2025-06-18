@@ -1,6 +1,8 @@
 package com.quyet.superapp.controller;
 
+import com.quyet.superapp.dto.AutoSeparationRequestDTO;
 import com.quyet.superapp.dto.BloodSeparationRequestDTO;
+import com.quyet.superapp.dto.BloodSeparationResultDTO;
 import com.quyet.superapp.dto.BloodSeparationSuggestionDTO;
 import com.quyet.superapp.entity.Donation;
 import com.quyet.superapp.entity.SeparationPresetConfig;
@@ -9,6 +11,7 @@ import com.quyet.superapp.service.BloodSeparationService;
 import com.quyet.superapp.service.SeparationPresetService;
 import com.quyet.superapp.util.BloodSeparationCalculator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,10 +25,10 @@ public class BloodSeparationController {
     private final DonationRepository donationRepo;
 
     // 1️⃣ API xử lý lưu phân tách máu
-    @PostMapping
-    public String separateBlood(@RequestBody BloodSeparationRequestDTO dto) {
-        separationService.separateBlood(dto);
-        return "Đã phân tách máu thành công.";
+    @PostMapping("/perform")
+    public ResponseEntity<BloodSeparationResultDTO> separateBlood(@RequestBody BloodSeparationRequestDTO dto) {
+        BloodSeparationResultDTO result = separationService.separateBlood(dto);
+        return ResponseEntity.ok(result);
     }
 
     // 2️⃣ API tính toán gợi ý phân tách từ thông tin hiến máu
@@ -39,7 +42,7 @@ public class BloodSeparationController {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hiến máu"));
 
         String gender = donation.getUser().getUserProfile().getGender();
-        int weight = donation.getUser().getUserProfile().;
+        Double weight = donation.getUser().getUserProfile().getWeight();
         String bloodGroup = donation.getBloodType().getDescription();
 
         SeparationPresetConfig preset = presetService.getPreset(gender, weight, method, leukoreduced);
@@ -54,6 +57,42 @@ public class BloodSeparationController {
                 weight,
                 bloodGroup
         );
+    }
+    // 3️⃣ API tự động tách máu dựa theo preset
+    @PostMapping("/auto-perform")
+    public ResponseEntity<BloodSeparationResultDTO> autoSeparate(@RequestBody AutoSeparationRequestDTO req) {
+        Donation donation = donationRepo.findById(req.getDonationId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hiến máu"));
+
+        String gender = donation.getUser().getUserProfile().getGender();
+        Double weight = donation.getUser().getUserProfile().getWeight();
+        String bloodGroup = donation.getBloodType().getDescription();
+
+        SeparationPresetConfig preset = presetService.getPreset(gender, weight, req.getMethod(), req.isLeukoreduced());
+
+        BloodSeparationSuggestionDTO suggestion = calculator.calculate(
+                donation.getVolumeMl(),
+                preset.getRbcRatio(),
+                preset.getPlasmaRatio(),
+                preset.getPlateletsFixed(),
+                req.getMethod(),
+                gender,
+                weight,
+                bloodGroup
+        );
+
+        BloodSeparationRequestDTO separationRequest = new BloodSeparationRequestDTO(
+                req.getDonationId(),
+                suggestion.getRedCellsMl(),
+                suggestion.getPlasmaMl(),
+                suggestion.getPlateletsMl(),
+                req.getMethod(),
+                req.isLeukoreduced(),
+                req.getStaffId()
+        );
+
+        BloodSeparationResultDTO result = separationService.separateBlood(separationRequest);
+        return ResponseEntity.ok(result);
     }
 
 

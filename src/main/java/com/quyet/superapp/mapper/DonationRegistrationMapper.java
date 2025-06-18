@@ -4,6 +4,10 @@ import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.entity.DonationRegistration;
 import com.quyet.superapp.entity.User;
 import com.quyet.superapp.entity.UserProfile;
+import com.quyet.superapp.entity.address.Address;
+import com.quyet.superapp.entity.address.City;
+import com.quyet.superapp.entity.address.District;
+import com.quyet.superapp.entity.address.Ward;
 
 public class DonationRegistrationMapper {
 
@@ -22,8 +26,28 @@ public class DonationRegistrationMapper {
             dto.setDob(userProfile.getDob());
             dto.setGender(userProfile.getGender());
             dto.setPhone(userProfile.getPhone());
-            dto.setAddress(userProfile.getAddress());
+            // ✅ Gán địa chỉ dạng chuỗi đầy đủ
+            if (userProfile.getAddress() != null) {
+                Address addr = userProfile.getAddress();
+                String full = addr.getAddressStreet();
+
+                Ward ward = addr.getWard();
+                if (ward != null) {
+                    full += ", " + ward.getWardName();
+                    District district = ward.getDistrict();
+                    if (district != null) {
+                        full += ", " + district.getDistrictName();
+                        City city = district.getCity();
+                        if (city != null) {
+                            full += ", " + city.getNameCity();
+                        }
+                    }
+                }
+
+                dto.setAddressFull(full);
+            }
         }
+
         return dto;
     }
 

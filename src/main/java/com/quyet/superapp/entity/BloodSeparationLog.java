@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -48,4 +49,7 @@ public class BloodSeparationLog {
 
     @Column(name = "separation_time")
     private LocalDateTime separatedAt;
+
+    @Column(name = "recovery_time")
+    private LocalDate recoveryTime;
 }

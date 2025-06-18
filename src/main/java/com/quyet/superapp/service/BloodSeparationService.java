@@ -1,11 +1,14 @@
 package com.quyet.superapp.service;
 
 import com.quyet.superapp.dto.BloodSeparationRequestDTO;
+import com.quyet.superapp.dto.BloodSeparationResultDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,12 +25,12 @@ public class BloodSeparationService {
     private final UserRepository userRepo;
 
     @Transactional
-    public void separateBlood(BloodSeparationRequestDTO dto) {
+    public BloodSeparationResultDTO separateBlood(BloodSeparationRequestDTO dto) {
         Donation donation = donationRepo.findById(dto.getDonationId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bản ghi hiến máu"));
 
         if (logRepo.existsByDonation_DonationId(donation.getDonationId())) {
-            throw new RuntimeException("Đã tách máu từ đơn hiến này rồi.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Đơn hiến này đã được xử lý phân tách.");
         }
 
         User staff = userRepo.findById(dto.getStaffId())
@@ -50,6 +53,15 @@ public class BloodSeparationService {
         createBloodUnit(donation, "Hồng cầu", dto.getRedCellsMl());
         createBloodUnit(donation, "Huyết tương", dto.getPlasmaMl());
         createBloodUnit(donation, "Tiểu cầu", dto.getPlateletsMl());
+
+        return new BloodSeparationResultDTO(
+                log.getBloodSeparationLogId(),
+                dto.getRedCellsMl(),
+                dto.getPlasmaMl(),
+                dto.getPlateletsMl(),
+                staff.getUsername(), // hoặc getFullName()
+                log.getSeparatedAt()
+        );
     }
 
     private void createBloodUnit(Donation donation, String componentName, int quantity) {

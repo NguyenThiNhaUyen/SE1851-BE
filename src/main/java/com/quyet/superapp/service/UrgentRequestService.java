@@ -1,7 +1,10 @@
 package com.quyet.superapp.service;
 
+import com.quyet.superapp.dto.UrgentRequestDTO;
 import com.quyet.superapp.entity.UrgentRequest;
 import com.quyet.superapp.entity.User;
+import com.quyet.superapp.enums.RequestStatus;
+import com.quyet.superapp.mapper.UrgentRequestMapper;
 import com.quyet.superapp.repository.UrgentRequestRepository;
 import com.quyet.superapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,56 +12,58 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UrgentRequestService {
     private final UrgentRequestRepository urgentRepo;
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
+    private final UrgentRequestMapper mapper;
 
-    public List<UrgentRequest> getAll() {
-        return urgentRepo.findAll();
+    public UrgentRequestDTO create(UrgentRequestDTO dto) {
+        // 1. Map DTO → Entity
+        UrgentRequest entity = mapper.toEntity(dto);
+
+        // 2. Gán thêm thông tin hệ thống
+        entity.setRequestDate(LocalDate.now());
+        User user = userRepo.findById(dto.getRequesterId())
+                .orElseThrow(() -> new IllegalArgumentException("User không tồn tại: " + dto.getRequesterId()));
+        entity.setRequester(user);
+
+        // 3. Lưu
+        UrgentRequest saved = urgentRepo.save(entity);
+
+        // 4. Map Entity → DTO và trả về
+        return mapper.toDto(saved);
     }
 
-    public Optional<UrgentRequest> getById(Long id) {
-        return urgentRepo.findById(id);
+    public List<UrgentRequestDTO> getAll() {
+        return urgentRepo.findAll()
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    // ✅ Tạo request và gán user
-    public UrgentRequest create(UrgentRequest request, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user với ID: " + userId));
-
-        request.setRequester(user);
-        request.setRequestDate(LocalDate.now());
-
-        return urgentRepo.save(request);
+    public List<UrgentRequestDTO> getByUser(Long userId) {
+        return urgentRepo.findByRequesterUserId(userId)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    // ✅ Lọc yêu cầu theo user
-    public List<UrgentRequest> getByUser(Long userId) {
-        return urgentRepo.findByRequesterUserId(userId);
+    public List<UrgentRequestDTO> getByStatus(RequestStatus status) {
+        return urgentRepo.findByStatus(status)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    public UrgentRequest update(Long id, UrgentRequest updated) {
-        return urgentRepo.findById(id)
-                .map(req -> {
-                    req.setHospitalName(updated.getHospitalName());
-                    req.setBloodType(updated.getBloodType());
-                    req.setUnits(updated.getUnits());
-                    req.setStatus(updated.getStatus());
-                    return urgentRepo.save(req);
-                }).orElse(null);
+    public UrgentRequestDTO updateStatus(Long requestId, RequestStatus status) {
+        UrgentRequest request = urgentRepo.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu: " + requestId));
+        request.setStatus(status);
+        return mapper.toDto(urgentRepo.save(request));
     }
 
-    public void delete(Long id) {
-        urgentRepo.deleteById(id);
-    }
 
-    public List<UrgentRequest> searchByStatus(String status) {
-        return urgentRepo.findByStatus(status);
-    }
 }
-
-

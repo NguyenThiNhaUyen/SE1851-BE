@@ -21,22 +21,27 @@ public class BloodType {
     @Column(name = "Description", columnDefinition = "NVARCHAR(20)")
     private String description;
 
-    @OneToMany(mappedBy = "bloodType")
+    @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Donation> donations;
 
-    @OneToMany(mappedBy = "bloodType")
+    @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<BloodUnit> bloodUnits;
 
-    @OneToMany(mappedBy = "bloodType")
+    @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<BloodInventory> bloodInventories;
 
-    @OneToMany(mappedBy = "bloodType")
+    @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<BloodRequest> bloodRequests;
 
-    @OneToMany(mappedBy = "donorType")
+    @OneToMany(mappedBy = "donorType", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<CompatibilityRule> donorRules;
 
-    @OneToMany(mappedBy = "recipientType")
+    @OneToMany(mappedBy = "recipientType", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<CompatibilityRule> recipientRules;
 }
