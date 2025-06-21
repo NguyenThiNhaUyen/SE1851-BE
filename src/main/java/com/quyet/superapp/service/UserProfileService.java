@@ -43,13 +43,7 @@ public class UserProfileService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
 
-        if (userProfileRepository.existsByCitizenId(dto.getCitizenId())) {
-            throw new IllegalArgumentException("CCCD đã tồn tại trong hệ thống");
-        }
-
-        if (userProfileRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email đã tồn tại trong hệ thống");
-        }
+        validateUniqueFields(dto.getCitizenId(), dto.getEmail(), null);
 
         if (user.getUserProfile() != null) {
             throw new IllegalStateException("Người dùng đã có hồ sơ. Vui lòng cập nhật.");
@@ -57,6 +51,7 @@ public class UserProfileService {
 
         UserProfile profile = mapDTOtoEntity(dto, user);
         return userProfileRepository.save(profile);
+
     }
 
     // ✅ Cập nhật hồ sơ
@@ -70,17 +65,7 @@ public class UserProfileService {
             profile.setUser(user);
         }
 
-        if (dto.getCitizenId() != null &&
-                !dto.getCitizenId().equals(profile.getCitizenId()) &&
-                userProfileRepository.existsByCitizenId(dto.getCitizenId())) {
-            throw new IllegalArgumentException("CCCD đã tồn tại trong hệ thống");
-        }
-
-        if (dto.getEmail() != null &&
-                !dto.getEmail().equals(profile.getEmail()) &&
-                userProfileRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email đã tồn tại trong hệ thống");
-        }
+        validateUniqueFields(dto.getCitizenId(), dto.getEmail(), profile);
 
         updateEntityFromDTO(profile, dto);
         return userProfileRepository.save(profile);
@@ -133,6 +118,15 @@ public class UserProfileService {
 
     // 🔧 Helper: Cập nhật entity từ DTO
     private void updateEntityFromDTO(UserProfile profile, UserProfileDTO dto) {
+        if (dto.getFullName() == null || dto.getFullName().isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không được để trống");
+        }
+        if (dto.getCitizenId() == null || !dto.getCitizenId().matches("\\d{12}")) {
+            throw new IllegalArgumentException("CCCD không hợp lệ (phải gồm 12 chữ số)");
+        }
+        if (dto.getDob() == null) {
+            throw new IllegalArgumentException("Ngày sinh không được để trống");
+        }
         profile.setFullName(dto.getFullName());
         profile.setDob(dto.getDob());
         profile.setGender(dto.getGender());
@@ -148,6 +142,8 @@ public class UserProfileService {
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy phường với ID: " + dto.getAddress().getWardId()));
             Address address = AddressMapper.toEntity(dto.getAddress(), ward);
             profile.setAddress(address);
+        }else {
+            throw new IllegalArgumentException("Địa chỉ không hợp lệ hoặc chưa được chọn đầy đủ");
         }
 
         profile.setPhone(dto.getPhone());
@@ -158,5 +154,14 @@ public class UserProfileService {
         profile.setRecoveryTime(dto.getRecoveryTime());
         profile.setLocation(dto.getLocation());
         profile.setCitizenId(dto.getCitizenId());
+    }
+    private void validateUniqueFields(String citizenId, String email, UserProfile currentProfile) {
+        if (citizenId != null && (currentProfile == null || !citizenId.equals(currentProfile.getCitizenId())) && userProfileRepository.existsByCitizenId(citizenId)) {
+            throw new IllegalArgumentException("CCCD đã tồn tại trong hệ thống");
+        }
+
+        if (email != null && (currentProfile == null || !email.equals(currentProfile.getEmail())) && userProfileRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email đã tồn tại trong hệ thống");
+        }
     }
 }

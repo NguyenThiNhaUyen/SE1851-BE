@@ -71,6 +71,10 @@ public class UserProfile {
     @Column(name = "weight")
     private Double weight;
 
+    @Column(name = "height")
+    private Double height;
+
+
 }
 
 

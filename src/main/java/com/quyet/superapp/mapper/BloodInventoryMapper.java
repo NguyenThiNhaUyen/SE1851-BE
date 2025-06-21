@@ -18,7 +18,9 @@ public class BloodInventoryMapper {
                 inventory.getTotalQuantityMl(),
                 DEFAULT_BAG_SIZE,
                 estimatedBags,
-                inventory.getLastUpdated()
+                inventory.getCreatedAt(),
+                inventory.getLastUpdated(),
+                inventory.getUpdatedAt()
         );
     }
 

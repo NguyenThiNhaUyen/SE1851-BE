@@ -17,6 +17,8 @@ public class BloodInventoryDTO {
     private Integer standardBagSize;    // ✅ size 250ml, 350ml, 450ml
     private Integer estimatedBags;      // ✅ tính từ totalQuantityMl / standardBagSize
     private LocalDateTime lastUpdated;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 
 

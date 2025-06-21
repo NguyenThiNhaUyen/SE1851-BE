@@ -1,7 +1,11 @@
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.DonationRegistrationDTO;
+import com.quyet.superapp.dto.HealthCheckFailureLogDTO;
+import com.quyet.superapp.enums.DonationStatus;
+import com.quyet.superapp.repository.DonationRegistrationRepository;
 import com.quyet.superapp.service.DonationRegistrationService;
+import com.quyet.superapp.service.HealthCheckFailureLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,7 @@ import java.util.List;
 public class DonationRegistrationController {
 
     private final DonationRegistrationService donationRegistrationService;
+    private final HealthCheckFailureLogService healthCheckFailureLogService;
 
     // ✅ Đăng ký hiến máu (chỉ đặt lịch, chưa xác nhận)
     @PostMapping("/register/{userId}")
@@ -41,4 +46,33 @@ public class DonationRegistrationController {
             @RequestParam("register_id") Long id) {
         return ResponseEntity.ok(donationRegistrationService.confirm(id));
     }
+
+    //thêm unhappycase
+    @GetMapping("/pending")
+    public List<DonationRegistrationDTO> getPendingRegistrations() {
+        return donationRegistrationService.getByStatus(DonationStatus.PENDING);
+    }
+
+    @PutMapping("/cancel")
+    public ResponseEntity<DonationRegistrationDTO> cancelRegistration(@RequestParam("register_id") Long id) {
+        return ResponseEntity.ok(donationRegistrationService.markAsCancelled(id));
+    }
+
+
+    // ❌ Đánh dấu đơn không đủ điều kiện sức khỏe và ghi log
+    @PutMapping("/fail-health")
+    public ResponseEntity<DonationRegistrationDTO> failDueToHealth(
+            @RequestParam("register_id") Long id,
+            @RequestParam("reason") String reason,
+            @RequestParam(value = "staff_note", required = false) String staffNote) {
+        return ResponseEntity.ok(donationRegistrationService.markAsFailedHealth(id, reason, staffNote));
+    }
+
+    // ✅ Lấy danh sách log kiểm tra sức khỏe không đạt theo ID đăng ký
+    @GetMapping("/health-log")
+    public ResponseEntity<List<HealthCheckFailureLogDTO>> getHealthLogByRegistration(@RequestParam("register_id") Long registrationId) {
+        return ResponseEntity.ok(healthCheckFailureLogService.getLogsByRegistrationId(registrationId));
+    }
+
+
 }

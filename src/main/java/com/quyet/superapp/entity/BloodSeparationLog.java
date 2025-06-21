@@ -52,4 +52,5 @@ public class BloodSeparationLog {
 
     @Column(name = "recovery_time")
     private LocalDate recoveryTime;
+    
 }

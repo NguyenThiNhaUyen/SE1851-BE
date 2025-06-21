@@ -9,5 +9,4 @@ import java.util.List;
 public interface CompatibilityRuleRepository extends JpaRepository<CompatibilityRule, Long> {
     List<CompatibilityRule> findByRecipientType_DescriptionAndComponent_NameAndIsCompatibleTrue(String recipientTypeDesc, String componentName);
 
-
 }

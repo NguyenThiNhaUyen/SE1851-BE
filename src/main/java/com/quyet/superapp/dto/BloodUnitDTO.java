@@ -17,6 +17,8 @@ public class BloodUnitDTO {
     private LocalDate expirationDate;
     private String status;
     private LocalDateTime storedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 
 

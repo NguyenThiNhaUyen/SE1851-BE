@@ -4,6 +4,8 @@ import com.quyet.superapp.entity.address.Address;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class UrgentDonorResponseDTO {
@@ -13,4 +15,5 @@ public class UrgentDonorResponseDTO {
     private String location;
     private String phone;
     private Address address;
+
 }

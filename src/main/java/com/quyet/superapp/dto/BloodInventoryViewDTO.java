@@ -11,4 +11,6 @@ public class BloodInventoryViewDTO {
     private String componentName;
     private Integer quantity;
     private LocalDateTime lastUpdated;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

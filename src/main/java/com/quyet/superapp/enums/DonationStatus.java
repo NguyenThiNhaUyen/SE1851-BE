@@ -4,5 +4,7 @@ public enum DonationStatus {
     PENDING,       // Chờ xác nhận
     CONFIRMED,     // Đã xác nhận
     DONATED,       // Đã hiến
-    CANCELLED      // Đã huỷ
+    CANCELLED,      // Đã huỷ
+    NO_SHOW,
+    FAILED_HEALTH
 }

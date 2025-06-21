@@ -3,6 +3,7 @@ package com.quyet.superapp.dto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +19,9 @@ public class DonationRequestDTO {
     private String location;
     private String notes;
     private Double weight;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 
 

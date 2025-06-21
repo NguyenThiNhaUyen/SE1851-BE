@@ -21,6 +21,9 @@ public class DonationRegistrationMapper {
         dto.setBloodType(entity.getBloodType());
         dto.setStatus(entity.getStatus().name());
 
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+
         if (userProfile != null) {
             dto.setFullName(userProfile.getFullName());
             dto.setDob(userProfile.getDob());

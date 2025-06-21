@@ -73,6 +73,7 @@ public class UrgentDonorRegistryService {
                             d.getLocation(),
                             profile.getPhone(),
                             profile.getAddress()
+
                     );
                 })
                 .toList();

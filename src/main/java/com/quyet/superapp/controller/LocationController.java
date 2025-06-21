@@ -23,7 +23,6 @@ public class LocationController {
     private final WardRepository wardRepository;
     private final UserProfileRepository userProfileRepository;
 
-
     /**
      * GET /api/locations/cities
      * Lấy toàn bộ danh sách các thành phố

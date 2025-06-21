@@ -10,7 +10,9 @@ public class NotificationMapper {
                 noti.getUser().getUserId(),
                 noti.getContent(),
                 noti.getSentAt(),
-                noti.getIsRead()
+                noti.getIsRead(),
+                noti.getCreatedAt(),    // ✅ mới thêm
+                noti.getUpdatedAt()     // ✅ mới thêm
         );
     }
 }
