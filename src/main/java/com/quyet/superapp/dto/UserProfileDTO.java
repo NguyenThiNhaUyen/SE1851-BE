@@ -37,6 +37,7 @@ public class UserProfileDTO {
     private String citizenId;
 
     private Double weight;
+    private Double height;
 
     private Long addressId;         // ID nếu đã chọn địa chỉ cụ thể
     private String addressFull; // VD: "12 Nguyễn Trãi, Phường 1, Quận 5, TP Hồ Chí Minh"

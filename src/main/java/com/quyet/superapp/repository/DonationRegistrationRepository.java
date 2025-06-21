@@ -17,4 +17,5 @@ public interface DonationRegistrationRepository extends JpaRepository<DonationRe
 
     // ❗ Kiểm tra user có đơn đăng ký nào ở trạng thái PENDING không (để tránh đăng ký trùng)
     boolean existsByUser_UserIdAndStatus(Long userId, DonationStatus status);
+
 }

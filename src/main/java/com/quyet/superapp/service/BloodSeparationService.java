@@ -79,6 +79,7 @@ public class BloodSeparationService {
 
         unitRepo.save(unit);
 
+
         // Cập nhật vào kho máu
         BloodInventory inventory = inventoryRepo
                 .findByBloodTypeAndComponent(donation.getBloodType(), component)
@@ -94,5 +95,7 @@ public class BloodSeparationService {
         inventory.setLastUpdated(LocalDateTime.now());
         inventoryRepo.save(inventory);
     }
+
+
 
 }

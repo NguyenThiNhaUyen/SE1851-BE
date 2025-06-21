@@ -23,9 +23,7 @@ public class UserProfileMapper {
         UserProfileDTO dto = new UserProfileDTO();
         dto.setUserId(profile.getUser() != null ? profile.getUser().getUserId() : null);
         dto.setFullName(profile.getFullName());
-        if (profile.getDob() != null) {
-            dto.setDob(profile.getDob());
-        }
+        dto.setDob(profile.getDob());
         dto.setGender(profile.getGender());
         dto.setBloodType(profile.getBloodType());
         dto.setPhone(profile.getPhone());
@@ -36,6 +34,8 @@ public class UserProfileMapper {
         dto.setRecoveryTime(profile.getRecoveryTime());
         dto.setLocation(profile.getLocation());
         dto.setCitizenId(profile.getCitizenId());
+        dto.setHeight(profile.getHeight());
+        dto.setWeight(profile.getWeight());
 
         // ✅ Build full address
         if (profile.getAddress() != null) {
@@ -56,39 +56,12 @@ public class UserProfileMapper {
 
         return dto;
     }
-    // Chuyển từ DTO sang entity
-    public static UserProfile toEntity(UserProfileDTO dto, User user) {
-        UserProfile profile = new UserProfile();
-        profile.setUser(user);
-        profile.setFullName(dto.getFullName());
-        profile.setDob(dto.getDob());
-
-        if (profile.getAddress() != null) {
-            Address addr = profile.getAddress();
-            Ward ward = addr.getWard();
-            District district = ward.getDistrict();
-            City city = district.getCity();
-
-            String fullAddress = String.format(
-                    "%s, %s, %s, %s",
-                    addr.getAddressStreet(),
-                    ward.getWardName(),
-                    district.getDistrictName(),
-                    city.getNameCity()
-            );
-            dto.setAddressFull(fullAddress);
-        }
-
-        return profile;
-    }
 
     // ✅ DTO → Entity (không còn lỗi NullPointerException)
     public static UserProfile toEntity(UserProfileDTO dto, User user, Address address) {
         UserProfile profile = new UserProfile();
         profile.setUser(user);
-        if (dto.getDob() != null) {
-            profile.setDob(dto.getDob()); // String → LocalDate
-        }
+        profile.setDob(dto.getDob());
         profile.setFullName(dto.getFullName());
         profile.setGender(dto.getGender());
         profile.setBloodType(dto.getBloodType());
@@ -101,6 +74,8 @@ public class UserProfileMapper {
         profile.setLocation(dto.getLocation());
         profile.setCitizenId(dto.getCitizenId());
         profile.setAddress(address);
+        profile.setHeight(dto.getHeight());
+        profile.setWeight(dto.getWeight());
         return profile;
     }
 }

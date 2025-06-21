@@ -13,7 +13,9 @@ public class BloodUnitMapper {
                 unit.getQuantityMl(),
                 unit.getExpirationDate(),
                 unit.getStatus(),
-                unit.getStoredAt()
+                unit.getCreatedAt(),
+                unit.getStoredAt(),
+                unit.getUpdatedAt()
         );
     }
 }

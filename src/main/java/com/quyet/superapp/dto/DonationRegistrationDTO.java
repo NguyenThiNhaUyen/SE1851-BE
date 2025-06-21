@@ -3,6 +3,8 @@ package com.quyet.superapp.dto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,5 +22,7 @@ public class DonationRegistrationDTO {
     private String phone;
     private Long addressId;
     private String addressFull;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 

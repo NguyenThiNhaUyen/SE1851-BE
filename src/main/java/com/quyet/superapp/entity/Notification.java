@@ -28,4 +28,21 @@ public class Notification {
 
     @Column(name = "[read]") // vẫn để SQL nhận đúng tên cột
     private Boolean isRead;  // Java field đổi cho rõ nghĩa
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -4,7 +4,7 @@ import com.quyet.superapp.dto.BloodSeparationSuggestionDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BloodSeparationCalculator {
+public class  BloodSeparationCalculator {
 
     public BloodSeparationSuggestionDTO calculate(
             int volume,
