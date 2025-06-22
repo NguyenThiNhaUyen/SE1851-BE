@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class DashboardService {
     private final UrgentRequestRepository urgentRequestRepository;
 
     public DashboardResponseDTO getDashboardStats() {
-        long donorsToday = donationRepository.countByDonationDate(LocalDate.now());
+        long donorsToday = donationRepository.countByDonationDate(LocalDateTime.now());
         long totalUnits  = bloodInventoryRepository.sumAllUnits();
 
         long pendingReqs  = urgentRequestRepository.countByStatus(RequestStatus.PENDING);

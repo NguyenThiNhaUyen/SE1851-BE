@@ -1,5 +1,6 @@
 package com.quyet.superapp.dto;
 
+import com.quyet.superapp.enums.DonationStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ public class DonationRequestDTO {
     private String location;
     private String notes;
     private Double weight;
+    private DonationStatus status;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

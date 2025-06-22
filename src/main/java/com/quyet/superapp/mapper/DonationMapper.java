@@ -10,8 +10,6 @@ public class DonationMapper {
 
         if (donation.getUser() != null) {
             dto.setUserId(donation.getUser().getUserId());
-
-            // Nếu có profile => lấy cân nặng
             if (donation.getUser().getUserProfile() != null) {
                 dto.setWeight(donation.getUser().getUserProfile().getWeight());
             }
@@ -26,13 +24,13 @@ public class DonationMapper {
         if (donation.getComponent() != null)
             dto.setComponentId(donation.getComponent().getBloodComponentId());
 
-        dto.setDonationDate(donation.getDonationDate());
+        dto.setDonationDate(donation.getDonationDate().toLocalDate());
         dto.setVolumeMl(donation.getVolumeMl());
         dto.setLocation(donation.getLocation());
         dto.setNotes(donation.getNotes());
         dto.setCreatedAt(donation.getCreatedAt());
         dto.setUpdatedAt(donation.getUpdatedAt());
-
+        dto.setStatus(donation.getStatus());
         return dto;
     }
 }

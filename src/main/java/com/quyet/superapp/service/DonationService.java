@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class DonationService {
     }
 
     // ✅ Đếm số lượt hiến máu theo ngày
-    public long countByDate(LocalDate date) {
+    public long countByDate(LocalDateTime date) {
         return repository.countByDonationDate(date);
     }
 

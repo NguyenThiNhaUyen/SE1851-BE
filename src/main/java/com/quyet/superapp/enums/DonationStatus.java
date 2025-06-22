@@ -6,5 +6,6 @@ public enum DonationStatus {
     DONATED,       // Đã hiến
     CANCELLED,      // Đã huỷ
     NO_SHOW,
-    FAILED_HEALTH
+    FAILED_HEALTH,
+    FAILED_TEST
 }

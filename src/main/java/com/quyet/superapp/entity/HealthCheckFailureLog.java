@@ -28,4 +28,9 @@ public class HealthCheckFailureLog {
 
     private LocalDateTime createdAt;
 
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }

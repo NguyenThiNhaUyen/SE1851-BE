@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DonationRegistrationDTO {
     private Long registrationId;          // ✅ thêm để phục vụ confirm/get
-    private LocalDate scheduledDate;
+    private LocalDateTime scheduledDate;
     private String location;
     private String bloodType;
     private String status;                // ✅ thêm trạng thái
@@ -24,5 +24,8 @@ public class DonationRegistrationDTO {
     private String addressFull;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long userId;
+    private String email;
+
 }
 

@@ -13,6 +13,8 @@ public class DonationRegistrationMapper {
 
     //convert từ Entity -> DTO(để trà về front end)
     public static DonationRegistrationDTO toDTO(DonationRegistration entity) {
+        User user = entity.getUser();
+        //UserProfile userProfile = user.getUserProfile();
         UserProfile userProfile = entity.getUser().getUserProfile();
         DonationRegistrationDTO dto = new DonationRegistrationDTO();
         dto.setRegistrationId(entity.getRegistrationId());
@@ -24,11 +26,17 @@ public class DonationRegistrationMapper {
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
 
+        // ✅ Thêm userId và email
+        dto.setUserId(user.getUserId());
+        dto.setEmail(user.getEmail());
+
+        // ✅ Thêm thông tin người dùng nếu có profile
         if (userProfile != null) {
             dto.setFullName(userProfile.getFullName());
             dto.setDob(userProfile.getDob());
             dto.setGender(userProfile.getGender());
             dto.setPhone(userProfile.getPhone());
+
             // ✅ Gán địa chỉ dạng chuỗi đầy đủ
             if (userProfile.getAddress() != null) {
                 Address addr = userProfile.getAddress();

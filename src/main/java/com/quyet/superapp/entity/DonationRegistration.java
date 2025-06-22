@@ -22,8 +22,8 @@ public class DonationRegistration {
     @JoinColumn(name = "User_Id")
     private User user;
 
-    @Column(name = "ready_date", columnDefinition = "DATE")
-    private LocalDate readyDate;
+    @Column(name = "ready_date")
+    private LocalDateTime readyDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Status", length = 20)

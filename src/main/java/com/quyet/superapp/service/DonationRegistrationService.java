@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,25 +21,24 @@ public class DonationRegistrationService {
     private final DonationRegistrationRepository donationRegistrationRepository;
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
-    private final EmailService emailService; //
+    private final EmailService emailService;
     private final AddressRepository addressRepository;
     private final DonationRepository donationRepository;
     private final BloodTypeRepository bloodTypeRepository;
-    private final HealthCheckFailureLogService healthCheckFailureLogService; //moi
+    private final HealthCheckFormRepository healthCheckFormRepository;
+    private final HealthCheckFailureLogService healthCheckFailureLogService;
 
-
-    // Đăng ký hiến máu
+    // ✅ Đăng ký hiến máu
     public DonationRegistrationDTO register(Long userId, DonationRegistrationDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy User với ID: " + userId));
 
-        // Kiểm tra trùng đăng ký (trạng thái đang chờ)
+        // Kiểm tra trùng đăng ký (đang chờ xác nhận)
         if (donationRegistrationRepository.existsByUser_UserIdAndStatus(userId, DonationStatus.PENDING)) {
             throw new MemberException("DUPLICATE_PENDING", "Bạn đã có một đơn đăng ký đang chờ xác nhận.");
         }
 
-
-        // ✅ Nếu chưa có UserProfile thì tạo mới
+        // Tạo hoặc cập nhật UserProfile nếu chưa có
         if (user.getUserProfile() == null) {
             UserProfile profile = new UserProfile();
             profile.setUser(user);
@@ -48,7 +46,6 @@ public class DonationRegistrationService {
             profile.setDob(dto.getDob());
             profile.setGender(dto.getGender());
             profile.setBloodType(dto.getBloodType());
-            // ✅ Dùng addressId để lấy địa chỉ từ DB
             if (dto.getAddressId() != null) {
                 Address address = addressRepository.findById(dto.getAddressId())
                         .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ với ID: " + dto.getAddressId()));
@@ -61,7 +58,6 @@ public class DonationRegistrationService {
         // Tạo đơn đăng ký mới
         DonationRegistration registration = DonationRegistrationMapper.toEntity(dto, user);
         registration.setStatus(DonationStatus.PENDING);
-
         return DonationRegistrationMapper.toDTO(donationRegistrationRepository.save(registration));
     }
 
@@ -72,7 +68,6 @@ public class DonationRegistrationService {
                 .collect(Collectors.toList());
     }
 
-
     // ✅ Lấy đơn đăng ký theo ID
     public DonationRegistrationDTO getDTOById(Long id) {
         return donationRegistrationRepository.findById(id)
@@ -80,7 +75,7 @@ public class DonationRegistrationService {
                 .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký"));
     }
 
-    // ✅ Xác nhận đơn đăng ký
+    // ✅ Xác nhận đơn đăng ký (chưa tạo Donation)
     public DonationRegistrationDTO confirm(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
@@ -91,59 +86,78 @@ public class DonationRegistrationService {
         }
 
         reg.setStatus(DonationStatus.CONFIRMED);
-        DonationRegistration saved = donationRegistrationRepository.save(reg);
-
-        // ✅ Cập nhật UserProfile (nhóm máu, ngày hiến gần nhất...)
-        User user = reg.getUser();
-        UserProfile profile = user.getUserProfile();
-        String bloodTypeFromReg = reg.getBloodType();
-
-        if ((profile.getBloodType() == null || profile.getBloodType().isBlank()) &&
-                bloodTypeFromReg != null && !bloodTypeFromReg.isBlank()) {
-            profile.setBloodType(bloodTypeFromReg);
-        }
-
-        profile.setLastDonationDate(reg.getReadyDate());
-        profile.setRecoveryTime(90);
-        userProfileRepository.save(profile);
+        donationRegistrationRepository.save(reg);
 
         // ✅ Gửi email xác nhận
         String subject = "Xác nhận hiến máu thành công";
         String content = String.format(
                 "<h3>Chào %s</h3><p>Đơn đăng ký hiến máu của bạn vào ngày <b>%s</b> đã được xác nhận.</p><p>Cảm ơn bạn vì nghĩa cử cao đẹp!</p>",
-                user.getUsername(), reg.getReadyDate());
-        emailService.sendEmail(user, subject, content, "XÁC NHẬN");
+                reg.getUser().getUsername(), reg.getReadyDate());
+        emailService.sendEmail(reg.getUser(), subject, content, "XÁC NHẬN");
 
-        // ✅ Truy xuất BloodType entity từ mô tả
-        BloodType bloodTypeEntity = bloodTypeRepository.findByDescription(saved.getBloodType())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm máu: " + saved.getBloodType()));
-
-        // ✅ Tạo bản ghi hiến máu
-        Donation donation = new Donation();
-        donation.setUser(user);
-        donation.setRegistration(saved);
-        donation.setVolumeMl(450);
-        donation.setBloodType(bloodTypeEntity);
-        donation.setDonationDate(saved.getReadyDate());
-        donationRepository.save(donation);
-        return DonationRegistrationMapper.toDTO(saved);
+        return DonationRegistrationMapper.toDTO(reg);
     }
 
-    //cập nhật trạng thái cho staff
+    // ✅ Tạo bản ghi hiến máu nếu đạt sức khỏe
+    public Donation createDonationIfEligible(Long registrationId) {
+        DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký."));
+
+        if (reg.getStatus() != DonationStatus.CONFIRMED) {
+            throw new MemberException("INVALID_STATUS", "Chỉ tạo bản ghi hiến máu khi đơn đã được xác nhận.");
+        }
+
+        // Kiểm tra phiếu khám
+        HealthCheckForm form = healthCheckFormRepository.findByRegistration_RegistrationId(registrationId);
+        if (form == null || !Boolean.TRUE.equals(form.getIsEligible())) {
+            throw new MemberException("NOT_ELIGIBLE", "Người hiến máu không đạt yêu cầu sức khỏe.");
+        }
+
+        // Tránh trùng bản ghi
+        if (donationRepository.existsByRegistration_RegistrationId(registrationId)) {
+            throw new MemberException("DUPLICATE_DONATION", "Đã tồn tại bản ghi hiến máu cho đơn này.");
+        }
+
+        BloodType bloodType = bloodTypeRepository.findByDescription(reg.getBloodType())
+                .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy nhóm máu: " + reg.getBloodType()));
+
+        Donation donation = new Donation();
+        donation.setUser(reg.getUser());
+        donation.setRegistration(reg);
+        donation.setVolumeMl(450);
+        donation.setBloodType(bloodType);
+        donation.setDonationDate(reg.getReadyDate());
+
+        donationRepository.save(donation);
+
+        // Cập nhật hồ sơ
+        UserProfile profile = reg.getUser().getUserProfile();
+        profile.setLastDonationDate(reg.getReadyDate());
+        profile.setRecoveryTime(90);
+        userProfileRepository.save(profile);
+
+        // ✅ Cập nhật trạng thái: đã hiến máu thành công
+        reg.setStatus(DonationStatus.DONATED);
+        donationRegistrationRepository.save(reg);
+
+        return donation;
+    }
+
+    // ✅ Lọc đơn theo trạng thái
     public List<DonationRegistrationDTO> getByStatus(DonationStatus status) {
         return donationRegistrationRepository.findByStatus(status).stream()
                 .map(DonationRegistrationMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // ❌ Người hiến máu không đến => Staff đánh dấu là HỦY
+    // ✅ Đánh dấu đơn là HỦY (người hiến không đến)
     public DonationRegistrationDTO markAsCancelled(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
                         "Không tìm thấy đơn đăng ký có ID = " + registrationId));
 
         if (reg.getStatus() != DonationStatus.CONFIRMED) {
-            throw new MemberException("INVALID_STATUS", "Chỉ có thể hủy đơn đã được xác nhận.");
+            throw new MemberException("INVALID_STATUS", "Chỉ có thể hủy đơn đã xác nhận.");
         }
 
         reg.setStatus(DonationStatus.CANCELLED);
@@ -151,6 +165,7 @@ public class DonationRegistrationService {
         return DonationRegistrationMapper.toDTO(reg);
     }
 
+    // ✅ Đánh dấu KHÔNG ĐẠT sức khỏe
     public DonationRegistrationDTO markAsFailedHealth(Long registrationId, String reason, String staffNote) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND", "Không tìm thấy đơn đăng ký có ID = " + registrationId));
@@ -162,10 +177,9 @@ public class DonationRegistrationService {
         reg.setStatus(DonationStatus.FAILED_HEALTH);
         donationRegistrationRepository.save(reg);
 
-        // Ghi log
-        healthCheckFailureLogService.createLog(registrationId, reason, staffNote);
+        // ✅ Ghi log
+        healthCheckFailureLogService.saveLog(registrationId, reason, staffNote);
 
         return DonationRegistrationMapper.toDTO(reg);
     }
-
 }

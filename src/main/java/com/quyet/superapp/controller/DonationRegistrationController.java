@@ -53,6 +53,7 @@ public class DonationRegistrationController {
         return donationRegistrationService.getByStatus(DonationStatus.PENDING);
     }
 
+    //hủy đơn nếu không đến
     @PutMapping("/cancel")
     public ResponseEntity<DonationRegistrationDTO> cancelRegistration(@RequestParam("register_id") Long id) {
         return ResponseEntity.ok(donationRegistrationService.markAsCancelled(id));
@@ -72,6 +73,12 @@ public class DonationRegistrationController {
     @GetMapping("/health-log")
     public ResponseEntity<List<HealthCheckFailureLogDTO>> getHealthLogByRegistration(@RequestParam("register_id") Long registrationId) {
         return ResponseEntity.ok(healthCheckFailureLogService.getLogsByRegistrationId(registrationId));
+    }
+
+    @PostMapping("/confirm-donation")
+    public ResponseEntity<String> confirmDonation(@RequestParam("register_id") Long regId) {
+        donationRegistrationService.createDonationIfEligible(regId);
+        return ResponseEntity.ok("Đã tạo bản ghi hiến máu thành công.");
     }
 
 

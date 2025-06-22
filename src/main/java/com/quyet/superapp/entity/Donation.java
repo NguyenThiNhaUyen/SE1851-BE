@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Donation {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +21,7 @@ public class Donation {
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "User_Id")
-        private User user;
+        private User user; // ❓ Optional nếu đã có trong registration
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "registration_id")
@@ -32,15 +33,15 @@ public class Donation {
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "component_id")
-        private BloodComponent component;
+        private BloodComponent component; // ❓ Optional nếu chưa phân tách
 
-        @Column(name = "donation_date", columnDefinition = "DATE")
-        private LocalDate donationDate;
+        @Column(name = "donation_time")
+        private LocalDateTime donationDate; // ✅ Thay vì chỉ có ngày
 
         @Column(name = "volume_ml")
         private Integer volumeMl;
 
-        @Column(name = "location", columnDefinition = "NVARCHAR(20)")
+        @Column(name = "location", columnDefinition = "NVARCHAR(50)")
         private String location;
 
         @Column(name = "notes", columnDefinition = "NVARCHAR(200)")
@@ -52,17 +53,6 @@ public class Donation {
         @Column(name = "updated_at")
         private LocalDateTime updatedAt;
 
-        @PrePersist
-        protected void onCreate() {
-                this.createdAt = LocalDateTime.now();
-                this.updatedAt = LocalDateTime.now();
-        }
-
-        @PreUpdate
-        protected void onUpdate() {
-                this.updatedAt = LocalDateTime.now();
-        }
-
         @Enumerated(EnumType.STRING)
         @Column(name = "status", columnDefinition = "NVARCHAR(20)")
         private DonationStatus status;
@@ -72,5 +62,19 @@ public class Donation {
 
         @OneToMany(mappedBy = "donation")
         private List<BloodUnit> bloodUnits;
+
+        @PrePersist
+        protected void onCreate() {
+                this.createdAt = LocalDateTime.now();
+                this.updatedAt = LocalDateTime.now();
+                if (this.donationDate == null) {
+                        this.donationDate = LocalDateTime.now();
+                }
+        }
+
+        @PreUpdate
+        protected void onUpdate() {
+                this.updatedAt = LocalDateTime.now();
+        }
 
         }

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "UserProfile")
@@ -57,7 +58,7 @@ public class UserProfile {
     private String occupation;
 
     @Column(name = "donation_date")
-    private LocalDate lastDonationDate;
+    private LocalDateTime lastDonationDate;
 
     @Column(name = "recovery_time")
     private Integer recoveryTime;
