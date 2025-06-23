@@ -80,7 +80,11 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+<<<<<<< HEAD
                         .requestMatchers(MEMBER_ENDPOINTS).hasAnyRole("MEMBER", "ADMIN", "STAFF")
+=======
+                        .requestMatchers(MEMBER_ENDPOINTS).hasAnyRole("MEMBER", "ADMIN","STAFF")
+>>>>>>> 946951e (update login jwt)
                         .requestMatchers(STAFF_ENDPOINTS).hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -123,6 +127,8 @@ public class SecurityConfig {
     private static final String[] STAFF_ENDPOINTS = {
             "/api/staff/**",
             "/api/staff/requests/**",
+            "/api/donation/**",
+
             "/api/blood-requests/**",
             "/api/donation/confirm",
             "/api/separation/**",// ✅ Thêm dòng này

@@ -3,19 +3,23 @@ package com.quyet.superapp.dto;
 import lombok.*;
 
 import java.time.LocalDate;
+
 import java.time.LocalDateTime;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DonationRegistrationDTO {
-    private Long registrationId;          // ✅ thêm để phục vụ confirm/get
-    private LocalDateTime scheduledDate;
+
+    private Long registrationId;          // ✅ phục vụ confirm/get
+    private LocalDate scheduledDate;
     private String location;
     private String bloodType;
-    private String status;                // ✅ thêm trạng thái
+    private String status;                // ✅ trạng thái
+     // ✅ thêm để hỗ trợ mapping từ entity
 
-    // Thông tin người dùng (chỉ dùng khi POST nếu chưa có hồ sơ)
+    // Thông tin người dùng (hiển thị ở bảng confirm)
     private String fullName;
     private LocalDate dob;
     private String gender;
@@ -28,4 +32,3 @@ public class DonationRegistrationDTO {
     private String email;
 
 }
-
