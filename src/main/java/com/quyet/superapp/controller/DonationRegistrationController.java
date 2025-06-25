@@ -89,6 +89,14 @@ public class DonationRegistrationController {
     public ResponseEntity<List<DonationRegistrationDTO>> getHistoryByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(donationRegistrationService.getByUserId(userId));
     }
+    @PutMapping("/mark-donated")
+    public ResponseEntity<DonationRegistrationDTO> markAsDonated(@RequestParam("register_id") Long id) {
+        return ResponseEntity.ok(donationRegistrationService.markAsDonated(id));
+    }
+    @PutMapping("/cancel")
+    public ResponseEntity<DonationRegistrationDTO> cancelRegistration(@RequestParam("register_id") Long id) {
+        return ResponseEntity.ok(donationRegistrationService.cancel(id));
+    }
 
 >>>>>>> 946951e (update login jwt)
 }

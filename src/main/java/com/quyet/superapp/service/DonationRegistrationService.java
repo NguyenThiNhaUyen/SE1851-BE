@@ -205,4 +205,31 @@ public class DonationRegistrationService {
         return donationRegistrationMapper.toDTO(saved);
 >>>>>>> 946951e (update login jwt)
     }
+    public DonationRegistrationDTO markAsDonated(Long registrationId) {
+        DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
+                        "Không tìm thấy đơn đăng ký có ID = " + registrationId));
+
+        if (reg.getStatus() != DonationStatus.CONFIRMED) {
+            throw new MemberException("INVALID_STATUS", "Chỉ những đơn đã xác nhận mới được đánh dấu là đã hiến.");
+        }
+
+        reg.setStatus(DonationStatus.DONATED);
+        DonationRegistration saved = donationRegistrationRepository.save(reg);
+
+        return donationRegistrationMapper.toDTO(saved);
+    }
+    public DonationRegistrationDTO cancel(Long registrationId) {
+        DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
+                        "Không tìm thấy đơn đăng ký có ID = " + registrationId));
+
+        if (reg.getStatus() == DonationStatus.CANCELLED || reg.getStatus() == DonationStatus.DONATED) {
+            throw new MemberException("INVALID_STATUS", "Không thể hủy đơn ở trạng thái hiện tại.");
+        }
+
+        reg.setStatus(DonationStatus.CANCELLED);
+        return donationRegistrationMapper.toDTO(donationRegistrationRepository.save(reg));
+    }
+
 }
