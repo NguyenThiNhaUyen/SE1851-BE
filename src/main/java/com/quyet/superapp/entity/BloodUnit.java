@@ -1,5 +1,6 @@
 package com.quyet.superapp.entity;
 
+import com.quyet.superapp.enums.BloodUnitStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -21,14 +22,20 @@ public class BloodUnit {
     @JoinColumn(name = "BloodType", referencedColumnName = "BloodTypeID")
     private BloodType bloodType;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "component_id")
     private BloodComponent component;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "donation_id")
-    private Donation donation;
+    @JoinColumn(name = "blood_bag_id")
+    private BloodBag bloodBag;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "separation_order_id")
+    private SeparationOrder separationOrder;
+
+    @Column(name = "unit_code", unique = true, length = 20)
+    private String unitCode;
 
     @Column(name = "quantity_ml")
     private Integer quantityMl;
@@ -36,8 +43,9 @@ public class BloodUnit {
     @Column(name = "expiration_date", columnDefinition = "DATE")
     private LocalDate expirationDate;
 
-    @Column(name = "status", columnDefinition = "NVARCHAR(20)")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "VARCHAR(20)")
+    private BloodUnitStatus status;
 
     @Column(name = "stored_at", columnDefinition = "DATETIME")
     private LocalDateTime storedAt;
@@ -58,4 +66,8 @@ public class BloodUnit {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+    @ManyToOne
+    @JoinColumn(name = "donation_id") // tên cột foreign key trong bảng blood_unit
+    private Donation donation;
+
 }

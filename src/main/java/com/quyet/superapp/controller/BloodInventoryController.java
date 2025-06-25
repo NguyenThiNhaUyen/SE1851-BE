@@ -63,4 +63,10 @@ public class BloodInventoryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/store/{bloodUnitId}")
+    public ResponseEntity<Void> storeBlood(@PathVariable Long bloodUnitId) {
+        bloodService.storeBloodUnit(bloodUnitId);
+        return ResponseEntity.ok().build();
+    }
+
 }

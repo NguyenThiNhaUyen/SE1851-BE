@@ -36,4 +36,7 @@ public class SeparationPresetConfig {
     @Column(name = "platelets_fixed")
     private int plateletsFixed;
 
+    @Column(name = "Version")
+    private String version;
+
 }

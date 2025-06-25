@@ -44,4 +44,6 @@ public class BloodType {
     @OneToMany(mappedBy = "recipientType", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CompatibilityRule> recipientRules;
+
+
 }

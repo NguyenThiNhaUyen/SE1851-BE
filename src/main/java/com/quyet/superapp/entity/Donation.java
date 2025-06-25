@@ -57,10 +57,8 @@ public class Donation {
         @Column(name = "status", columnDefinition = "NVARCHAR(20)")
         private DonationStatus status;
 
-        @OneToOne(mappedBy = "donation", fetch = FetchType.LAZY)
-        private BloodSeparationLog bloodSeparationLog;
 
-        @OneToMany(mappedBy = "donation")
+        @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL)
         private List<BloodUnit> bloodUnits;
 
         @PrePersist

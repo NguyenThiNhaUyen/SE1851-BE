@@ -23,5 +23,4 @@ ORDER BY s.minWeight DESC
                                                     @Param("gender") String gender,
                                                     @Param("isEmergency") boolean isEmergency);
 
-
 }

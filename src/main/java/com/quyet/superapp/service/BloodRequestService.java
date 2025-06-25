@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BloodRequestService {
+public class    BloodRequestService {
     private final BloodRequestRepository requestRepo;
     private final UserRepository userRepo;
     private final BloodTypeRepository bloodTypeRepo;
