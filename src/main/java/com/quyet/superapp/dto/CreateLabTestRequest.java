@@ -1,5 +1,6 @@
 package com.quyet.superapp.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateLabTestRequest {
-    private Long bloodUnitId;    // ID của đơn vị máu cần xét nghiệm
+    @NotNull(message = "ID đơn vị máu không được để trống")
+    private Long bloodUnitId;
+
+    @NotNull(message = "ID nhân viên thực hiện xét nghiệm không được để trống")
     private Long testedById;     // ID của nhân viên thực hiện xét nghiệm
 
     // Các kết quả từng bệnh

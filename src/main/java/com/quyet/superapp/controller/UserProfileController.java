@@ -1,6 +1,8 @@
 package com.quyet.superapp.controller;
 
-import com.quyet.superapp.dto.UserProfileDTO;
+import com.quyet.superapp.dto.UserProfileCreateDTO;
+import com.quyet.superapp.dto.UserProfileUpdateDTO;
+import com.quyet.superapp.dto.UserProfileResponseDTO;
 import com.quyet.superapp.entity.UserProfile;
 import com.quyet.superapp.mapper.UserProfileMapper;
 import com.quyet.superapp.service.UserProfileService;
@@ -9,67 +11,68 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/userprofiles")
+@RequestMapping("/api/userprofile")
 @RequiredArgsConstructor
+@Validated
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
 
     // ✅ [GET] Lấy danh sách tất cả hồ sơ người dùng
     @GetMapping
-    public ResponseEntity<List<UserProfileDTO>> getAllProfiles() {
-        List<UserProfileDTO> profiles = userProfileService.getAllProfiles()
+    public ResponseEntity<List<UserProfileResponseDTO>> getAllProfiles() {
+        List<UserProfileResponseDTO> profiles = userProfileService.getAllProfiles()
                 .stream()
-                .map(UserProfileMapper::toDTO)
+                .map(UserProfileMapper::toResponseDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(profiles);
     }
 
     // ✅ [GET] Lấy thông tin hồ sơ theo userId
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileDTO> getProfileByUserId(@PathVariable Long userId) {
+    @GetMapping("/user-id")
+    public ResponseEntity<UserProfileResponseDTO> getProfileByUserId(@RequestParam Long userId) {
         UserProfile profile = userProfileService.getProfileByUserId(userId);
-        return ResponseEntity.ok(UserProfileMapper.toDTO(profile));
+        return ResponseEntity.ok(UserProfileMapper.toResponseDTO(profile));
     }
 
     // ✅ [POST] Tạo mới hồ sơ người dùng
-    @PostMapping("/{userId}")
-    public ResponseEntity<UserProfileDTO> createProfile(@PathVariable Long userId,
-                                                        @RequestBody @Valid UserProfileDTO dto) {
-        UserProfile createdProfile = userProfileService.createProfile(userId, dto);
-        return ResponseEntity.ok(UserProfileMapper.toDTO(createdProfile));
+    @PostMapping
+    public ResponseEntity<UserProfileResponseDTO> createProfile(
+            @RequestParam Long userId,
+            @RequestBody @Valid UserProfileCreateDTO dto) {
+        UserProfile created = userProfileService.createProfile(userId, dto);
+        return ResponseEntity.ok(UserProfileMapper.toResponseDTO(created));
     }
 
     // ✅ [PUT] Cập nhật hồ sơ người dùng
-    @PutMapping("/{userId}")
-    public ResponseEntity<UserProfileDTO> updateProfile(@PathVariable Long userId,
-                                                        @RequestBody @Valid UserProfileDTO dto) {
-        UserProfile updatedProfile = userProfileService.updateProfile(userId, dto);
-        return ResponseEntity.ok(UserProfileMapper.toDTO(updatedProfile));
+    @PutMapping
+    public ResponseEntity<UserProfileResponseDTO> updateProfile(
+            @RequestParam Long userId,
+            @RequestBody @Valid UserProfileUpdateDTO dto) {
+        UserProfile updated = userProfileService.updateProfile(userId, dto);
+        return ResponseEntity.ok(UserProfileMapper.toResponseDTO(updated));
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    // ✅ [DELETE] Xóa hồ sơ theo ID
+    @DeleteMapping("/by-id")
+    public ResponseEntity<Void> delete(@RequestParam Long id) {
         userProfileService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Lấy hồ sơ người dùng hiện tại (dựa vào JWT -> lấy username)
-     */
+    // ✅ [GET] Lấy hồ sơ của người đang đăng nhập
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('MEMBER', 'STAFF', 'ADMIN')")
-    public ResponseEntity<UserProfileDTO> getMyProfile() {
+    public ResponseEntity<UserProfileResponseDTO> getMyProfile() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserProfile profile = userProfileService.getByUsername(username);
-        UserProfileDTO dto = UserProfileMapper.toDTO(profile);  // ✅ dùng mapper để format lại
-        return ResponseEntity.ok(dto);                          // ✅ trả về DTO mới
+        return ResponseEntity.ok(UserProfileMapper.toResponseDTO(profile));
     }
-
-
 }

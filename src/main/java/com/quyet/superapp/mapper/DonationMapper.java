@@ -24,7 +24,7 @@ public class DonationMapper {
         if (donation.getComponent() != null)
             dto.setComponentId(donation.getComponent().getBloodComponentId());
 
-        dto.setDonationDate(donation.getDonationDate().toLocalDate());
+        dto.setDonationDate(donation.getDonationDate());
         dto.setVolumeMl(donation.getVolumeMl());
         dto.setLocation(donation.getLocation());
         dto.setNotes(donation.getNotes());

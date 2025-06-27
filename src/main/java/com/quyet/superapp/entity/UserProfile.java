@@ -14,68 +14,52 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserProfile {
+
     @Id
     private Long userId;
 
     @OneToOne
     @MapsId
     @JoinColumn(name = "User_Id")
-    @JsonIgnore // ✅ Ngăn profile → user → profile → ...
+    @JsonIgnore
     private User user;
 
-    @Column(name = "full_name", columnDefinition = "NVARCHAR(50)")
+    @Column(name = "full_name", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String fullName;
 
-    @Column(name = "dob")
+    @Column(name = "dob", nullable = false)
     private LocalDate dob;
 
-    @Column(name = "gender", columnDefinition = "NVARCHAR(10)")
+    @Column(name = "gender", nullable = false, columnDefinition = "NVARCHAR(10)")
     private String gender;
 
-    @Column(name = "blood_type", columnDefinition = "NVARCHAR(10)")
-    private String bloodType;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-    @Column(name = "latitude")
-    private Double latitude;
-
-    @Column(name = "longitude")
-    private Double longitude;
-
-    @Column(name = "phone", columnDefinition = "VARCHAR(20)")
+    @Column(name = "phone", nullable = false, columnDefinition = "VARCHAR(20)")
     private String phone;
 
-    @Column(name = "landline", columnDefinition = "VARCHAR(20)")
-    private String landline;
-
-    @Column(name = "email", columnDefinition = "VARCHAR(100)")
+    @Column(name = "email", nullable = false, columnDefinition = "VARCHAR(100)")
     private String email;
 
     @Column(name = "occupation", columnDefinition = "NVARCHAR(50)")
     private String occupation;
 
-    @Column(name = "donation_date")
-    private LocalDateTime lastDonationDate;
-
-    @Column(name = "recovery_time")
-    private Integer recoveryTime;
-
-    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
-    private String location;
-
-    @Column(name = "citizen_id", columnDefinition = "VARCHAR(12)", unique = true)
+    @Column(name = "citizen_id", nullable = false, columnDefinition = "VARCHAR(12)", unique = true)
     private String citizenId;
 
-    @Column(name = "weight")
+    // ✅ Các trường y tế – tùy chọn
+    private String bloodType;
     private Double weight;
-
-    @Column(name = "height")
     private Double height;
-
-
+    private LocalDate lastDonationDate;
+    private Integer recoveryTime;
+    private String location;
+    private Double latitude;
+    private Double longitude;
 }
+
+
 
 

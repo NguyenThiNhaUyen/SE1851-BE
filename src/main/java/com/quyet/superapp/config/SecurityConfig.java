@@ -125,11 +125,12 @@ public class SecurityConfig {
             "/api/staff/requests/**",
             "/api/blood-requests/**",
             "/api/donation/confirm",
-            "/api/separation/**",// ✅ Thêm dòng này
+            //"/api/separation/**",// ✅ Thêm dòng này
             "/api/urgent-requests/**",
             "/api/blood-inventory/**",
             "/api/blood/**",
-            "/api/separation/logs/**"
+            "/api/separation/logs/**",
+            "/api/separation-orders/**"
     };
     private static final String[] ADMIN_ENDPOINTS = {
             "/api/admin",

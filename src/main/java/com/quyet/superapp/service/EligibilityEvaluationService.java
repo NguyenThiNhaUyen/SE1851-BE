@@ -14,6 +14,7 @@ import com.quyet.superapp.repository.PreDonationTestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -64,7 +65,7 @@ public class EligibilityEvaluationService {
                 .registration(registration)
                 .user(registration.getUser())
                 .bloodType(test.getBloodType())
-                .donationDate(LocalDateTime.now())
+                .donationDate(LocalDate.now())
                 .volumeMl(450) // hoặc lấy từ preset
                 .status(DonationStatus.DONATED)
                 .build();

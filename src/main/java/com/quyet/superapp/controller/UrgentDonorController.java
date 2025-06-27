@@ -4,8 +4,10 @@ import com.quyet.superapp.dto.UrgentDonorRegistrationDTO;
 import com.quyet.superapp.dto.UrgentDonorResponseDTO;
 import com.quyet.superapp.entity.UrgentDonorRegistry;
 import com.quyet.superapp.service.UrgentDonorRegistryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/urgent-donors")
 @RequiredArgsConstructor
+@Validated
 public class UrgentDonorController {
 
     private final UrgentDonorRegistryService urgentDonorRegistryService;

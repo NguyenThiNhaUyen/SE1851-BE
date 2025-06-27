@@ -24,8 +24,8 @@ public class BloodInventoryController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BloodInventory> getById(@PathVariable Long id) {
+    @GetMapping("/by-id")
+    public ResponseEntity<BloodInventory> getById(@RequestParam Long id) {
         return bloodService.getInventoryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -36,14 +36,14 @@ public class BloodInventoryController {
         return bloodService.addBlood(inventory);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BloodInventory> update(@PathVariable Long id, @RequestBody BloodInventory inventory) {
+    @PutMapping("/update")
+    public ResponseEntity<BloodInventory> update(@RequestParam Long id, @RequestBody BloodInventory inventory) {
         BloodInventory updated = bloodService.updateBlood(id, inventory);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> delete(@RequestParam Long id) {
         bloodService.deleteInventory(id);
         return ResponseEntity.noContent().build();
     }
@@ -63,8 +63,8 @@ public class BloodInventoryController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/store/{bloodUnitId}")
-    public ResponseEntity<Void> storeBlood(@PathVariable Long bloodUnitId) {
+    @PostMapping("/store")
+    public ResponseEntity<Void> storeBlood(@RequestParam Long bloodUnitId) {
         bloodService.storeBloodUnit(bloodUnitId);
         return ResponseEntity.ok().build();
     }
