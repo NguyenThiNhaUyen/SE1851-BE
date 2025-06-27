@@ -45,4 +45,5 @@ public class User {
 
     @JsonIgnore // ✅ TRÁNH vòng lặp khi trả về user → profile → user...
     private UserProfile userProfile;
+
 }

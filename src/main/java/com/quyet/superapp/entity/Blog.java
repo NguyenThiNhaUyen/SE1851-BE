@@ -1,41 +1,61 @@
 package com.quyet.superapp.entity;
 
+import com.quyet.superapp.enums.BlogStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "Blog")
+@Table(name = "blogs") // tên bảng nên dùng snake_case và số nhiều
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Blog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Blog_Id")
     private Long blogId;
 
-    @Column(name = "Title", columnDefinition = "NVARCHAR(200)")
+    @Column(nullable = false, length = 200)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "User_Id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User author;
 
-    @Column(name = "Content", columnDefinition = "NVARCHAR(200)")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "Created_at", columnDefinition = "DATETIME")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private BlogStatus status;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "Status", columnDefinition = "NVARCHAR(20)")
-    private String status;
+    @Column
+    private LocalDateTime updatedAt;
+
+    @Column
+    private String thumbnailUrl;
+
+    @ElementCollection
+    private List<String> tags;
+
+    @Column
+    private Integer viewCount;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+        this.viewCount = 0;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

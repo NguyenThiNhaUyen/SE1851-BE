@@ -1,56 +1,60 @@
-package com.quyet.superapp.service;
+    package com.quyet.superapp.service;
+    
+    import com.quyet.superapp.dto.BlogDTO;
+    import com.quyet.superapp.dto.BlogRequestDTO;
+    import com.quyet.superapp.dto.BlogResponseDTO;
+    import com.quyet.superapp.entity.Blog;
+    import com.quyet.superapp.entity.User;
+    import com.quyet.superapp.mapper.BlogMapper;
+    import com.quyet.superapp.repository.BlogRepository;
+    import com.quyet.superapp.repository.UserRepository;
+    import lombok.RequiredArgsConstructor;
+    import org.springframework.stereotype.Service;
+    
+    import java.time.LocalDateTime;
+    import java.util.List;
 
-import com.quyet.superapp.dto.BlogDTO;
-import com.quyet.superapp.entity.Blog;
-import com.quyet.superapp.entity.User;
-import com.quyet.superapp.mapper.BlogMapper;
-import com.quyet.superapp.repository.BlogRepository;
-import com.quyet.superapp.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+    @Service
+    @RequiredArgsConstructor
+    public class BlogService {
 
-import java.time.LocalDateTime;
-import java.util.List;
+        private final BlogRepository blogRepository;
+        private final UserRepository userRepository;
+        private final BlogMapper blogMapper;
 
-@Service
-@RequiredArgsConstructor
-public class BlogService {
+        public BlogResponseDTO getById(Long id) {
+            Blog blog = blogRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bài viết với ID: " + id));
+            return blogMapper.toResponseDto(blog);
+        }
 
-    private final BlogRepository blogRepository;
-    private final UserRepository userRepository;
-    private final BlogMapper blogMapper;
+        public List<BlogResponseDTO> getAll() {
+            return blogRepository.findAll().stream()
+                    .map(blogMapper::toResponseDto)
+                    .toList();
+        }
 
-    public BlogDTO getById(Long id) {
-        Blog blog = blogRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bài viết với ID: " + id));
-        return blogMapper.toDto(blog);
-    }
+        public BlogResponseDTO save(BlogRequestDTO dto) {
+            Blog blog = blogMapper.toEntity(dto);
 
-    public List<BlogDTO> getAll() {
-        return blogRepository.findAll().stream()
-                .map(blogMapper::toDto)
-                .toList();
-    }
+            User author = userRepository.findById(dto.getAuthorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tác giả với ID: " + dto.getAuthorId()));
 
-    public BlogDTO save(BlogDTO dto) {
-        Blog blog = blogMapper.toEntity(dto);
-        User author = userRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tác giả với ID: " + dto.getAuthorId()));
-        blog.setAuthor(author);
-        if (blog.getCreatedAt() == null) {
+            blog.setAuthor(author);
             blog.setCreatedAt(LocalDateTime.now());
-        }
-        return blogMapper.toDto(blogRepository.save(blog));
-    }
 
-    public void deleteById(Long id) {
-        if (!blogRepository.existsById(id)) {
-            throw new IllegalArgumentException("Không tìm thấy blog để xóa với ID: " + id);
+            Blog saved = blogRepository.save(blog);
+            return blogMapper.toResponseDto(saved);
         }
-        blogRepository.deleteById(id);
-    }
 
-    public long countActiveBlogs() {
-        return blogRepository.countByStatus("Active");
+        public void deleteById(Long id) {
+            if (!blogRepository.existsById(id)) {
+                throw new IllegalArgumentException("Không tìm thấy blog để xóa với ID: " + id);
+            }
+            blogRepository.deleteById(id);
+        }
+
+        public long countActiveBlogs() {
+            return blogRepository.countByStatus("PUBLISHED"); // Nếu dùng enum
+        }
     }
-}

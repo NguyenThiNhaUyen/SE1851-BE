@@ -1,7 +1,10 @@
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.BlogDTO;
+import com.quyet.superapp.dto.BlogRequestDTO;
+import com.quyet.superapp.dto.BlogResponseDTO;
 import com.quyet.superapp.service.BlogService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,17 +19,17 @@ public class BlogController {
     private final BlogService blogService;
 
     @GetMapping
-    public ResponseEntity<List<BlogDTO>> getAllBlogs() {
+    public ResponseEntity<List<BlogResponseDTO>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BlogDTO> getBlogById(@PathVariable Long id) {
+    public ResponseEntity<BlogResponseDTO> getBlogById(@PathVariable Long id) {
         return ResponseEntity.ok(blogService.getById(id));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<BlogDTO> createBlog(@RequestBody BlogDTO blogDto) {
+    public ResponseEntity<BlogResponseDTO> createBlog(@RequestBody @Valid BlogRequestDTO blogDto) {
         return ResponseEntity.ok(blogService.save(blogDto));
     }
 
@@ -36,4 +39,3 @@ public class BlogController {
         return ResponseEntity.noContent().build();
     }
 }
-

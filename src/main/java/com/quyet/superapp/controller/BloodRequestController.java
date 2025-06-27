@@ -1,6 +1,8 @@
 package com.quyet.superapp.controller;
 
+import com.quyet.superapp.dto.ApproveBloodRequestDTO;
 import com.quyet.superapp.dto.BloodRequestDTO;
+import com.quyet.superapp.dto.CreateBloodRequestDTO;
 import com.quyet.superapp.entity.BloodRequest;
 import com.quyet.superapp.mapper.BloodRequestMapper;
 import com.quyet.superapp.service.BloodRequestService;
@@ -14,18 +16,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/blood-requests")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173") // Cho phép frontend truy cập từ cổng 5173
 public class BloodRequestController {
 
     private final BloodRequestService requestService;
 
+    /**
+     * STAFF gửi yêu cầu máu mới (thường hoặc khẩn cấp/cấp cứu)
+     * Nếu là BÌNH THƯỜNG, hệ thống tự duyệt dựa theo tồn kho
+     */
     @PostMapping
     @PreAuthorize("hasRole('STAFF')")
-    public ResponseEntity<BloodRequestDTO> create(@RequestBody BloodRequestDTO dto) {
+    public ResponseEntity<BloodRequestDTO> createBloodRequest(@RequestBody CreateBloodRequestDTO dto) {
         BloodRequest created = requestService.createRequest(dto);
         return ResponseEntity.ok(BloodRequestMapper.toDTO(created));
     }
 
+    /**
+     * ADMIN lấy danh sách tất cả yêu cầu máu
+     * Dùng cho màn hình dashboard để xử lý hoặc theo dõi
+     */
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BloodRequestDTO>> getAllRequestsForAdmin() {
@@ -33,4 +43,35 @@ public class BloodRequestController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * ADMIN duyệt yêu cầu máu theo cấp độ khẩn
+     * Hỗ trợ duyệt hoàn toàn, duyệt 1 phần, hoặc từ chối
+     */
+    @PutMapping("/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BloodRequestDTO> approveBloodRequest(@RequestBody ApproveBloodRequestDTO dto) {
+        BloodRequest approved = requestService.approveRequest(dto);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(approved));
+    }
+
+    /**
+     * Lấy chi tiết yêu cầu máu theo ID (dành cho ADMIN hoặc STAFF)
+     */
+    // ✅ Controller
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<BloodRequestDTO> getRequestById(@PathVariable Long id) {
+        BloodRequestDTO dto = requestService.getById(id); // đúng kiểu rồi
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * (Optional) Cập nhật nhanh trạng thái (APPROVED / REJECTED / PENDING / ... )
+     */
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BloodRequestDTO> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        BloodRequest updated = requestService.updateStatus(id, status);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
+    }
 }
