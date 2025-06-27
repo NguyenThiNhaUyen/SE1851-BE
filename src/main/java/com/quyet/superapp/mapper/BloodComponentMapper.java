@@ -3,7 +3,7 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.BloodComponentDTO;
 import com.quyet.superapp.entity.BloodComponent;
 
-public class BloodComponentMapper {
+public class BloodComponentMapper { //chưa sử dụng
     public static BloodComponentDTO toDTO(BloodComponent entity) {
         return new BloodComponentDTO(
                 entity.getBloodComponentId(),

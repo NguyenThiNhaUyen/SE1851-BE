@@ -8,7 +8,7 @@ import com.quyet.superapp.entity.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SeparationResultMapper {
+public class SeparationResultMapper { //chưa sử dụng luoôn
     public static SeparationResultDTO toDTO(
             SeparationResult entity,
             BloodSeparationSuggestion suggestion,

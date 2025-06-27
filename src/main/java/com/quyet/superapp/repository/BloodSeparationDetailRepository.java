@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BloodSeparationDetailRepository extends JpaRepository<BloodSeparationDetail,Long> {
+public interface BloodSeparationDetailRepository extends JpaRepository<BloodSeparationDetail,Long> { //chưa sử dụng
     List<BloodSeparationDetail> findByResult_SeparationResultId(Long resultId);
     List<BloodSeparationDetail> findByComponentType(BloodComponentType componentType);
 

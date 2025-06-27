@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SeparationResultRepository extends JpaRepository<SeparationResult,Long> {
+public interface SeparationResultRepository extends JpaRepository<SeparationResult,Long> { //chưa sử dụng
     List<SeparationResult> findByProcessedBy_UserId(Long userId);
     List<SeparationResult> findByCompletedAtBetween(LocalDateTime start, LocalDateTime end);
     Optional<SeparationResult> findByOrder_SeparationOrderId(Long orderId);

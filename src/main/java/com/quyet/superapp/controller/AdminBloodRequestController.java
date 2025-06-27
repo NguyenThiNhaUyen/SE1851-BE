@@ -29,7 +29,7 @@ public class AdminBloodRequestController {
     // ✅ Duyệt yêu cầu
     @PutMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BloodRequestDTO> approveRequest(@PathVariable Long id) {
+    public ResponseEntity<BloodRequestDTO> approveRequest(@PathVariable("id") Long id) {
         BloodRequest updated = service.updateStatus(id, "APPROVED");
         return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
     }
@@ -37,7 +37,7 @@ public class AdminBloodRequestController {
     // ✅ Từ chối yêu cầu
     @PutMapping("/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BloodRequestDTO> rejectRequest(@PathVariable Long id) {
+    public ResponseEntity<BloodRequestDTO> rejectRequest(@PathVariable("id") Long id) {
         BloodRequest updated = service.updateStatus(id, "REJECTED");
         return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
     }

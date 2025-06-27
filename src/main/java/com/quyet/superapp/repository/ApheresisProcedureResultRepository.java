@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ApheresisProcedureResultRepository extends JpaRepository<ApheresisProcedureResult, Long> {
+public interface ApheresisProcedureResultRepository extends JpaRepository<ApheresisProcedureResult, Long> { //chưa sử dụng
     List<ApheresisProcedureResult> findByPerformedBy_UserId(Long userId);
     List<ApheresisProcedureResult> findByDonation_DonationId(Long donationId);
     List<ApheresisProcedureResult> findByProcedureStartBetween(LocalDateTime start, LocalDateTime end);

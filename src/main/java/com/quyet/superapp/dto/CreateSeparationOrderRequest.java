@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateSeparationOrderRequest {
+public class CreateSeparationOrderRequest { //chưa sử dụng
     @NotNull(message = "ID túi máu không được để trống")
     private Long bloodBagId;
 

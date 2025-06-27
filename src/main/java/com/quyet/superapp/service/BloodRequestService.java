@@ -1,6 +1,8 @@
 package com.quyet.superapp.service;
 
+import com.quyet.superapp.dto.ApproveBloodRequestDTO;
 import com.quyet.superapp.dto.BloodRequestDTO;
+import com.quyet.superapp.dto.CreateBloodRequestDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.mapper.BloodRequestMapper;
 import com.quyet.superapp.repository.*;
@@ -35,7 +37,11 @@ public class    BloodRequestService {
     @Autowired
     private UrgentDonorContactLogRepository contactLogRepo;
 
-    public BloodRequest createRequest(BloodRequestDTO dto) {
+    @Autowired
+    private InventoryService inventoryService;
+
+
+    public BloodRequest createRequest(CreateBloodRequestDTO dto) {
         User staff = userRepo.findById(dto.getRequesterId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người gửi"));
 
@@ -46,11 +52,23 @@ public class    BloodRequestService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thành phần máu"));
 
         BloodRequest entity = BloodRequestMapper.toEntity(dto, staff, bloodType, component);
-        entity.setStatus("PENDING");
         entity.setCreatedAt(LocalDateTime.now());
+
+        String urgency = dto.getUrgencyLevel();
+        if ("BÌNH THƯỜNG".equalsIgnoreCase(urgency)) {
+            if (inventoryService.hasEnough(dto.getBloodTypeId(), dto.getComponentId(), dto.getQuantityMl())) {
+                entity.setStatus("APPROVED");
+                entity.setConfirmedVolumeMl(dto.getQuantityMl());
+            } else {
+                entity.setStatus("REJECTED");
+            }
+        } else {
+            entity.setStatus("PENDING"); // khẩn cấp hoặc cấp cứu → admin xử lý
+        }
 
         return requestRepo.save(entity);
     }
+
 
     public List<BloodRequestDTO> getAllRequests() {
         return requestRepo.findAll().stream()
@@ -116,4 +134,38 @@ public class    BloodRequestService {
 
         return requestRepo.save(request);
     }
+
+    public BloodRequest approveRequest(ApproveBloodRequestDTO dto) {
+        BloodRequest request = requestRepo.findById(dto.getBloodRequestId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+
+        request.setStatus(dto.getStatus());
+        request.setConfirmedVolumeMl(dto.getConfirmedVolumeMl());
+        request.setEmergencyNote(dto.getEmergencyNote());
+        request.setApprovedBy(dto.getApprovedBy());
+        request.setApprovedAt(LocalDateTime.now());
+        request.setIsUnmatched(dto.getIsUnmatched());
+
+        // Trừ máu trong kho nếu đủ
+        BloodInventory inventory = inventoryRepo.findByTypeAndComponent(
+                request.getBloodType().getBloodTypeId(),
+                request.getComponent().getBloodComponentId()
+        ).orElse(null);
+
+        if (inventory != null && dto.getStatus().startsWith("APPROVED")) {
+            int remain = inventory.getTotalQuantityMl() - dto.getConfirmedVolumeMl();
+            inventory.setTotalQuantityMl(Math.max(0, remain));
+            inventory.setLastUpdated(LocalDateTime.now());
+            inventoryRepo.save(inventory);
+        }
+
+        return requestRepo.save(request);
+    }
+
+    public BloodRequestDTO getById(Long id) {
+        BloodRequest entity = requestRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu máu với ID: " + id));
+        return BloodRequestMapper.toDTO(entity);
+    }
+
 }

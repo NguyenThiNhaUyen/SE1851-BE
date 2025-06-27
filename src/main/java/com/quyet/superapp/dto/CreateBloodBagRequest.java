@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateBloodBagRequest {
+public class CreateBloodBagRequest { //chưa sử dụng
     @NotBlank
     private String bagCode;
 

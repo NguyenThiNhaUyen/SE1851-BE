@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class TransfusionConfirmDTO {
+public class TransfusionConfirmDTO { //chưa sử dụng
     private Long transfusionConfirmId;
     private String recipientName;
     private String bloodType;

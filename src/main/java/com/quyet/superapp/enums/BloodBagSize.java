@@ -1,6 +1,6 @@
 package com.quyet.superapp.enums;
 
-public enum BloodBagSize {
+public enum BloodBagSize { //chưa sử dụng
     SIZE_50(50),
     SIZE_100(100),
     SIZE_150(150),

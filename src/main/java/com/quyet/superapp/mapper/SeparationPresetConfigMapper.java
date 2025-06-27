@@ -3,7 +3,7 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.SeparationPresetConfigDTO;
 import com.quyet.superapp.entity.SeparationPresetConfig;
 
-public class SeparationPresetConfigMapper {
+public class SeparationPresetConfigMapper { //chưa sử dụng
 
     public static SeparationPresetConfigDTO toDTO(SeparationPresetConfig entity) {
         return new SeparationPresetConfigDTO(

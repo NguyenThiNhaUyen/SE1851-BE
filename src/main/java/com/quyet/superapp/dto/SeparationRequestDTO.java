@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SeparationRequestDTO {
+public class SeparationRequestDTO { //chưa sử dụng
     @NotNull(message = "Blood Bag ID không thể null")
     private Long bloodBagId;
 
