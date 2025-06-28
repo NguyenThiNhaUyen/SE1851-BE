@@ -46,18 +46,11 @@ public class DonationRegistrationController {
             @RequestParam("register_id") Long id) {
         return ResponseEntity.ok(donationRegistrationService.confirm(id));
     }
-<<<<<<< HEAD
 
     //thêm unhappycase
     @GetMapping("/pending")
     public List<DonationRegistrationDTO> getPendingRegistrations() {
         return donationRegistrationService.getByStatus(DonationStatus.PENDING);
-    }
-
-    //hủy đơn nếu không đến
-    @PutMapping("/cancel")
-    public ResponseEntity<DonationRegistrationDTO> cancelRegistration(@RequestParam("register_id") Long id) {
-        return ResponseEntity.ok(donationRegistrationService.markAsCancelled(id));
     }
 
 
@@ -83,7 +76,6 @@ public class DonationRegistrationController {
     }
 
 
-=======
     // ✅ Lấy lịch sử hiến máu theo userId
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<DonationRegistrationDTO>> getHistoryByUserId(@PathVariable Long userId) {
@@ -98,5 +90,4 @@ public class DonationRegistrationController {
         return ResponseEntity.ok(donationRegistrationService.cancel(id));
     }
 
->>>>>>> 946951e (update login jwt)
 }

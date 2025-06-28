@@ -25,12 +25,9 @@ public class DonationRegistrationService {
     private final AddressRepository addressRepository;
     private final DonationRepository donationRepository;
     private final BloodTypeRepository bloodTypeRepository;
-<<<<<<< HEAD
     private final HealthCheckFormRepository healthCheckFormRepository;
     private final HealthCheckFailureLogService healthCheckFailureLogService;
-=======
-    private final DonationRegistrationMapper donationRegistrationMapper; // ⬅️ thêm dòng này
->>>>>>> 946951e (update login jwt)
+    private final DonationRegistrationMapper donationRegistrationMapper;
 
     // ✅ Đăng ký hiến máu
     public DonationRegistrationDTO register(Long userId, DonationRegistrationDTO dto) {
@@ -61,14 +58,9 @@ public class DonationRegistrationService {
 
         // Tạo đơn đăng ký mới
         DonationRegistration registration = donationRegistrationMapper.toEntity(dto, user);
-
         registration.setStatus(DonationStatus.PENDING);
-<<<<<<< HEAD
-        return DonationRegistrationMapper.toDTO(donationRegistrationRepository.save(registration));
-=======
 
         return donationRegistrationMapper.toDTO(donationRegistrationRepository.save(registration));
->>>>>>> 946951e (update login jwt)
     }
 
     // ✅ Lấy danh sách tất cả đơn đăng ký
@@ -84,17 +76,13 @@ public class DonationRegistrationService {
                 .map(donationRegistrationMapper::toDTO)
                 .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký"));
     }
-<<<<<<< HEAD
 
-    // ✅ Xác nhận đơn đăng ký (chưa tạo Donation)
-=======
     public List<DonationRegistrationDTO> getByUserId(Long userId) {
         List<DonationRegistration> list = donationRegistrationRepository.findByUser_UserId(userId);
         return list.stream().map(donationRegistrationMapper::toDTO).toList();
     }
 
     // ✅ Xác nhận đơn đăng ký
->>>>>>> 946951e (update login jwt)
     public DonationRegistrationDTO confirm(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
@@ -114,7 +102,7 @@ public class DonationRegistrationService {
                 reg.getUser().getUsername(), reg.getReadyDate());
         emailService.sendEmail(reg.getUser(), subject, content, "XÁC NHẬN");
 
-        return DonationRegistrationMapper.toDTO(reg);
+        return donationRegistrationMapper.toDTO(reg);
     }
 
     // ✅ Tạo bản ghi hiến máu nếu đạt sức khỏe
@@ -148,7 +136,6 @@ public class DonationRegistrationService {
         donation.setDonationDate(reg.getReadyDate());
 
         donationRepository.save(donation);
-<<<<<<< HEAD
 
         // Cập nhật hồ sơ
         UserProfile profile = reg.getUser().getUserProfile();
@@ -166,7 +153,7 @@ public class DonationRegistrationService {
     // ✅ Lọc đơn theo trạng thái
     public List<DonationRegistrationDTO> getByStatus(DonationStatus status) {
         return donationRegistrationRepository.findByStatus(status).stream()
-                .map(DonationRegistrationMapper::toDTO)
+                .map(donationRegistrationMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -182,7 +169,7 @@ public class DonationRegistrationService {
 
         reg.setStatus(DonationStatus.CANCELLED);
         donationRegistrationRepository.save(reg);
-        return DonationRegistrationMapper.toDTO(reg);
+        return donationRegistrationMapper.toDTO(reg);
     }
 
     // ✅ Đánh dấu KHÔNG ĐẠT sức khỏe
@@ -200,11 +187,9 @@ public class DonationRegistrationService {
         // ✅ Ghi log
         healthCheckFailureLogService.saveLog(registrationId, reason, staffNote);
 
-        return DonationRegistrationMapper.toDTO(reg);
-=======
-        return donationRegistrationMapper.toDTO(saved);
->>>>>>> 946951e (update login jwt)
+        return donationRegistrationMapper.toDTO(reg);
     }
+
     public DonationRegistrationDTO markAsDonated(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
@@ -219,6 +204,7 @@ public class DonationRegistrationService {
 
         return donationRegistrationMapper.toDTO(saved);
     }
+
     public DonationRegistrationDTO cancel(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
@@ -231,5 +217,4 @@ public class DonationRegistrationService {
         reg.setStatus(DonationStatus.CANCELLED);
         return donationRegistrationMapper.toDTO(donationRegistrationRepository.save(reg));
     }
-
 }

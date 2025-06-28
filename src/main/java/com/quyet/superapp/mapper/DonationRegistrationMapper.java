@@ -16,7 +16,7 @@ public class DonationRegistrationMapper {
         DonationRegistrationDTO dto = new DonationRegistrationDTO();
 
         dto.setRegistrationId(entity.getRegistrationId());
-        dto.setScheduledDate(entity.getReadyDate());
+        dto.setScheduledDate(entity.getReadyDate().toLocalDate());
         dto.setLocation(entity.getLocation());
         dto.setBloodType(entity.getBloodType());
         dto.setStatus(entity.getStatus() != null ? entity.getStatus().name() : null);
@@ -68,7 +68,7 @@ public class DonationRegistrationMapper {
     public DonationRegistration toEntity(DonationRegistrationDTO dto, User user) {
         DonationRegistration entity = new DonationRegistration();
         entity.setUser(user);
-        entity.setReadyDate(dto.getScheduledDate());
+        entity.setReadyDate(dto.getScheduledDate().atStartOfDay());
         entity.setLocation(dto.getLocation());
         entity.setBloodType(dto.getBloodType());
         return entity;

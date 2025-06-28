@@ -9,9 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,27 +23,25 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableMethodSecurity // ✅ THÊM DÒNG NÀY
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService); // đã load user từ DB
-        provider.setPasswordEncoder(passwordEncoder()); // dùng BCrypt để so sánh
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
-    // Nếu cần dùng AuthenticationManager ở chỗ khác (ví dụ login), bạn có thể expose nó
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         var builder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -57,11 +53,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Đổi đúng port FE của bạn
-
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         var source = new UrlBasedCorsConfigurationSource();
@@ -74,24 +66,15 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // ✅ Gắn Provider để xử lý xác thực username/password
                 .authenticationProvider(authenticationProvider())
-
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-<<<<<<< HEAD
                         .requestMatchers(MEMBER_ENDPOINTS).hasAnyRole("MEMBER", "ADMIN", "STAFF")
-=======
-                        .requestMatchers(MEMBER_ENDPOINTS).hasAnyRole("MEMBER", "ADMIN","STAFF")
->>>>>>> 946951e (update login jwt)
                         .requestMatchers(STAFF_ENDPOINTS).hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-
                 .addFilterAfter((request, response, chain) -> {
                     HttpServletRequest req = (HttpServletRequest) request;
                     System.out.println("🔑 Authorization header: " + req.getHeader("Authorization"));
@@ -103,7 +86,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/**",
             "/api/verify-otp",
@@ -111,8 +93,8 @@ public class SecurityConfig {
             "/api/change-password",
             "/api/blog/**",
             "/api/public/**",
-            
     };
+
     private static final String[] MEMBER_ENDPOINTS = {
             "/api/user/**",
             "/api/donation/register/**",
@@ -124,19 +106,20 @@ public class SecurityConfig {
             "/api/blood/**",
             "/api/vnpay/**"
     };
+
     private static final String[] STAFF_ENDPOINTS = {
             "/api/staff/**",
             "/api/staff/requests/**",
             "/api/donation/**",
-
             "/api/blood-requests/**",
             "/api/donation/confirm",
-            "/api/separation/**",// ✅ Thêm dòng này
+            "/api/separation/**",
             "/api/urgent-requests/**",
             "/api/blood-inventory/**",
             "/api/blood/**",
             "/api/separation/logs/**"
     };
+
     private static final String[] ADMIN_ENDPOINTS = {
             "/api/admin",
             "/api/admin/**",
@@ -150,6 +133,5 @@ public class SecurityConfig {
             "/api/donation/**",
             "/api/transfusion/**",
             "/api/urgent-requests/**"
-
     };
 }
