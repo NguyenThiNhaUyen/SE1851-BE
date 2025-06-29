@@ -2,9 +2,11 @@ package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.ApheresisMachineDTO;
 import com.quyet.superapp.service.ApheresisMachineService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/apheresis-machines")
+@Validated
 public class ApheresisMachineController {
 
     private final ApheresisMachineService apheresisMachineService;
@@ -24,8 +27,8 @@ public class ApheresisMachineController {
     }
 
     // ✅ Lấy chi tiết máy theo ID
-    @GetMapping("/{id}")
-    public ResponseEntity<ApheresisMachineDTO> getById(@PathVariable Long id) {
+    @GetMapping("/by-id")
+    public ResponseEntity<ApheresisMachineDTO> getById(@RequestParam Long id) {
         return apheresisMachineService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -33,20 +36,20 @@ public class ApheresisMachineController {
 
     // ✅ Tạo máy mới
     @PostMapping
-    public ResponseEntity<ApheresisMachineDTO> create(@RequestBody ApheresisMachineDTO dto) {
+    public ResponseEntity<ApheresisMachineDTO> create( @RequestBody ApheresisMachineDTO dto) {
         return ResponseEntity.ok(apheresisMachineService.create(dto));
     }
 
     // ✅ Cập nhật máy
-    @PutMapping("/{id}")
-    public ResponseEntity<ApheresisMachineDTO> update(@PathVariable Long id,
+    @PutMapping
+    public ResponseEntity<ApheresisMachineDTO> update(@RequestParam  Long id,
                                                       @RequestBody ApheresisMachineDTO dto) {
         return ResponseEntity.ok(apheresisMachineService.update(id, dto));
     }
 
     // ✅ Xoá máy theo ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam  Long id) {
         apheresisMachineService.delete(id);
         return ResponseEntity.noContent().build();
     }

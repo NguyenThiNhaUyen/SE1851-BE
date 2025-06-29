@@ -2,20 +2,23 @@ package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.HealthCheckFormDTO;
 import com.quyet.superapp.service.HealthCheckFormService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/health-check")
 @RequiredArgsConstructor
+@Validated
 public class HealthCheckFormController {
 
     private final HealthCheckFormService healthCheckFormService;
 
     // ✅ Gửi phiếu khám sức khỏe (tự động đánh giá pass/fail)
     @PostMapping("/submit")
-    public ResponseEntity<HealthCheckFormDTO> submit(@RequestBody HealthCheckFormDTO dto) {
+    public ResponseEntity<HealthCheckFormDTO> submit(@Valid @RequestBody HealthCheckFormDTO dto) {
         HealthCheckFormDTO result = healthCheckFormService.submit(dto);
         return ResponseEntity.ok(result);
     }

@@ -13,4 +13,5 @@ public class SeparationResultDTO {
     private Long separationOrderId;
     private BloodSeparationSuggestionDTO suggestion;
     private List<BloodUnitDTO> createdUnits;
+    private String note;
 }

@@ -30,10 +30,16 @@ public class Blog {
 
     @Column(name = "Created_at", columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
-
+    @Column(name = "Updated_at", columnDefinition = "DATETIME")
+    private LocalDateTime updatedAt; // ✅ Bổ sung
     @Column(name = "Status", columnDefinition = "NVARCHAR(20)")
     private String status;
+    @Column(name = "Thumbnail_Url", columnDefinition = "VARCHAR(255)")
+    private String thumbnailUrl; // ✅ Bổ sung
+    private List<String> tags; // ✅ Bổ sung
 
+    @Column(name = "View_Count")
+    private Integer viewCount; // ✅ Bổ sung
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

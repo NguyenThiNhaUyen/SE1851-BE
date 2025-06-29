@@ -23,7 +23,7 @@ public class DonationRegistration {
     private User user;
 
     @Column(name = "ready_date")
-    private LocalDateTime readyDate;
+    private LocalDate readyDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Status", length = 20)
@@ -40,6 +40,10 @@ public class DonationRegistration {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "confirmed_by")
+    private User confirmedBy;
 
     @PrePersist
     protected void onCreate() {

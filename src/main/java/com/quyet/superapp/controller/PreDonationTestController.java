@@ -2,14 +2,19 @@ package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.PreDonationTestDTO;
 import com.quyet.superapp.service.PreDonationTestService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/pre-donation-tests")
+@RequiredArgsConstructor
+@Validated
 public class PreDonationTestController {
 
     @Autowired
@@ -28,28 +33,28 @@ public class PreDonationTestController {
     }
 
     // 📌 Lấy xét nghiệm theo ID
-    @GetMapping("/{id}") // id của người hiến máu
-    public ResponseEntity<PreDonationTestDTO> getById(@PathVariable Long id) {
+    @GetMapping("/by-id") // id của người hiến máu
+    public ResponseEntity<PreDonationTestDTO> getById(@RequestParam Long id) {
         return ResponseEntity.ok(preDonationTestService.getById(id));
     }
 
     // 📌 Cập nhật xét nghiệm
-    @PutMapping("/{id}")
-    public ResponseEntity<PreDonationTestDTO> update(@PathVariable Long id, @RequestBody PreDonationTestDTO dto) {
+    @PutMapping("/update")
+    public ResponseEntity<PreDonationTestDTO> update(@RequestParam Long id, @RequestBody PreDonationTestDTO dto) {
         dto.setPreDonationTestId(id);
         return ResponseEntity.ok(preDonationTestService.update(dto));
     }
 
     // 📌 Xoá xét nghiệm
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> delete(@RequestParam Long id) {
         preDonationTestService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     // 📌 Kiểm tra 1 đơn hiến máu đã có xét nghiệm chưa
-    @GetMapping("/exists/{donationId}")
-    public ResponseEntity<Boolean> existsByDonationId(@PathVariable Long donationId) {
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> existsByDonationId(@RequestParam Long donationId) {
         return ResponseEntity.ok(preDonationTestService.existsByDonationId(donationId));
     }
 }

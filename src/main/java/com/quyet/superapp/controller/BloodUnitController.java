@@ -29,8 +29,8 @@ public class BloodUnitController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BloodUnitDTO> getById(@PathVariable Long id) {
+    @GetMapping("/by-id")
+    public ResponseEntity<BloodUnitDTO> getById(@RequestParam Long id) {
         BloodUnit unit = service.getById(id);
         return ResponseEntity.ok(BloodUnitMapper.toDTO(unit));
     }
@@ -41,24 +41,24 @@ public class BloodUnitController {
         BloodUnit saved = service.save(entity, dto.getBloodTypeId(), dto.getComponentId(), dto.getBloodBagId());
         return ResponseEntity.ok(BloodUnitMapper.toDTO(saved));
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<BloodUnitDTO> update(@PathVariable Long id, @RequestBody BloodUnitDTO dto) {
+    //cập nhật
+    @PutMapping
+    public ResponseEntity<BloodUnitDTO> update(@RequestParam  Long id, @RequestBody BloodUnitDTO dto) {
         BloodUnit existing = service.getById(id);
         BloodUnit updated = BloodUnitMapper.fromDTO(dto);
         updated.setBloodUnitId(id);
         BloodUnit saved = service.save(updated, dto.getBloodTypeId(), dto.getComponentId(), dto.getBloodBagId());
         return ResponseEntity.ok(BloodUnitMapper.toDTO(saved));
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    //xóa
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam Long id) {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<BloodUnitDTO>> findByStatus(@PathVariable BloodUnitStatus status) {
+    @GetMapping("/by-status")
+    public ResponseEntity<List<BloodUnitDTO>> findByStatus(@RequestParam BloodUnitStatus status) {
         List<BloodUnitDTO> result = service.findByStatus(status).stream()
                 .map(BloodUnitMapper::toDTO)
                 .collect(Collectors.toList());
@@ -74,8 +74,8 @@ public class BloodUnitController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/code/{code}")
-    public ResponseEntity<BloodUnitDTO> findByUnitCode(@PathVariable String code) {
+    @GetMapping("/by-code")
+    public ResponseEntity<BloodUnitDTO> findByUnitCode(@RequestParam String code) {
         BloodUnit unit = service.findByUnitCode(code);
         return ResponseEntity.ok(BloodUnitMapper.toDTO(unit));
     }

@@ -43,4 +43,26 @@
         @Column(name = "ConfirmedVolumeML")
         private Integer confirmedVolumeMl;
 
+        @Column(name = "Reason", columnDefinition = "NVARCHAR(255)")
+        private String reason;
+
+        @Column(name = "IsUnmatched")
+        private Boolean isUnmatched;
+
+        @Column(name = "TriageLevel", columnDefinition = "NVARCHAR(20)")
+        private String triageLevel;
+
+        @Column(name = "CodeRedID")
+        private Long codeRedId;
+
+        @Column(name = "EmergencyNote", columnDefinition = "NVARCHAR(255)")
+        private String emergencyNote;
+
+        @Column(name = "ApprovedBy", columnDefinition = "NVARCHAR(50)")
+        private String approvedBy;
+
+        @Column(name = "ApprovedAt")
+        private LocalDateTime approvedAt;
+
+
     }

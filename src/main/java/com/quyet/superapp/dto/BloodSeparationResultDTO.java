@@ -5,15 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BloodSeparationResultDTO {
     private Long separationId;
-    private int redCells;
-    private int plasma;
-    private int platelets;
+    private List<BloodSeparationDetailDTO> components;
     private String performedBy;
     private LocalDateTime separatedAt;
 }

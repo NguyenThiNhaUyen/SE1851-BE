@@ -33,17 +33,17 @@ public class UrgentRequestController {
         return ResponseEntity.ok(service.getAll());
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user")
     @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
     public ResponseEntity<List<UrgentRequestDTO>> getByUser(
-            @PathVariable Long userId) {
+            @RequestParam Long userId) {
         return ResponseEntity.ok(service.getByUser(userId));
     }
 
-    @GetMapping("/status/{status}")
+    @GetMapping("/status")
     @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
     public ResponseEntity<List<UrgentRequestDTO>> getByStatus(
-            @PathVariable String status) {
+            @RequestParam String status) {
         RequestStatus enumStatus = RequestStatus.valueOf(status);
         return ResponseEntity.ok(service.getByStatus(enumStatus));
     }
@@ -51,7 +51,7 @@ public class UrgentRequestController {
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UrgentRequestDTO> updateStatus(
-            @PathVariable Long id,
+            @RequestParam Long id,
             @RequestParam String status) {
 
         RequestStatus newStatus = RequestStatus.valueOf(status);

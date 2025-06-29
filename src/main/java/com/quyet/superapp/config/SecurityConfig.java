@@ -113,11 +113,14 @@ public class SecurityConfig {
             "/api/donation/**",
             "/api/blood-requests/**",
             "/api/donation/confirm",
+
             "/api/separation/**",
+
             "/api/urgent-requests/**",
             "/api/blood-inventory/**",
             "/api/blood/**",
-            "/api/separation/logs/**"
+            "/api/separation/logs/**",
+            "/api/separation-orders/**"
     };
 
     private static final String[] ADMIN_ENDPOINTS = {

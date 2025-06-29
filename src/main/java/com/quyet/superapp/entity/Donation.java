@@ -36,7 +36,7 @@ public class Donation {
         private BloodComponent component; // ❓ Optional nếu chưa phân tách
 
         @Column(name = "donation_time")
-        private LocalDateTime donationDate; // ✅ Thay vì chỉ có ngày
+        private LocalDate donationDate; // ✅ Thay vì chỉ có ngày
 
         @Column(name = "volume_ml")
         private Integer volumeMl;
@@ -66,7 +66,7 @@ public class Donation {
                 this.createdAt = LocalDateTime.now();
                 this.updatedAt = LocalDateTime.now();
                 if (this.donationDate == null) {
-                        this.donationDate = LocalDateTime.now();
+                        this.donationDate = LocalDate.now();
                 }
         }
 

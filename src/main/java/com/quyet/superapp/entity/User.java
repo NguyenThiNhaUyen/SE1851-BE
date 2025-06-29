@@ -17,7 +17,6 @@ public class User {
     @Column(name = "User_Id")
     private Long userId;
 
-
     @Column(name = "UserName", columnDefinition = "VARCHAR(100)", nullable = false, unique = true)
     private String username;
 
@@ -29,7 +28,6 @@ public class User {
 
     @Column(name = "Email", columnDefinition = "VARCHAR(50)", nullable = false, unique = true)
     private String email;
-
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,4 +43,5 @@ public class User {
 
     @JsonIgnore // ✅ TRÁNH vòng lặp khi trả về user → profile → user...
     private UserProfile userProfile;
+
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class StatResponseDTO {
+public class StatResponseDTO { //chưa sử dụng
     private int totalUsers;
     private int totalBloodUnits;
     private int pendingUrgentRequests;

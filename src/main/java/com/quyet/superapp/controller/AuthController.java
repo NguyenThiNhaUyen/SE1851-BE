@@ -18,13 +18,13 @@ public class AuthController {
     private final UserService userService;
 
 
-     @PostMapping("/login")
-     public ResponseEntity<?> Login(@RequestBody LoginRequestDTO loginRequest){
-         return userService.login(loginRequest);
-     }
+    @PostMapping("/login")
+    public ResponseEntity<?> Login(@RequestBody LoginRequestDTO loginRequest){
+        return userService.login(loginRequest);
+    }
 
-     @PostMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequestDTO registerRequest){
-         return userService.register(registerRequest);
-     }
+        return userService.register(registerRequest);
+    }
 }

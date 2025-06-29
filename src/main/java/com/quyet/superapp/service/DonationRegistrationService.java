@@ -139,7 +139,7 @@ public class DonationRegistrationService {
 
         // Cập nhật hồ sơ
         UserProfile profile = reg.getUser().getUserProfile();
-        profile.setLastDonationDate(reg.getReadyDate());
+        profile.setLastDonationDate(reg.getReadyDate().atStartOfDay());
         profile.setRecoveryTime(90);
         userProfileRepository.save(profile);
 
