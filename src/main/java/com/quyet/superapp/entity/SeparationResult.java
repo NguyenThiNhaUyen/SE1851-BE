@@ -36,4 +36,8 @@ public class SeparationResult {
 
     @Column(name = "note")
     private String note;
+
+    @ManyToOne
+    @JoinColumn(name = "suggestion_id")
+    private BloodSeparationSuggestion suggestion;
 }

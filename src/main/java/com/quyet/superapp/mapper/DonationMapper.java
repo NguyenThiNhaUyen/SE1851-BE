@@ -11,7 +11,7 @@ public class DonationMapper {
         if (donation.getUser() != null) {
             dto.setUserId(donation.getUser().getUserId());
             if (donation.getUser().getUserProfile() != null) {
-                dto.setWeight(donation.getUser().getUserProfile().getWeight());
+                dto.setWeight(donation.getUser().getUserProfile().getWeightKg());
             }
         }
 

@@ -36,6 +36,10 @@ public class HealthCheckFormDTO {
     @Max(value = 200, message = "Cân nặng phải dưới 200 kg")
     private Double weightKg;
 
+    @DecimalMin(value = "130.0", message = "Chiều cao tối thiểu là 130cm")
+    private Double HeightCm;
+
+
     private Boolean hasFever;
     private Boolean tookAntibioticsRecently;
     private Boolean hasChronicIllness;

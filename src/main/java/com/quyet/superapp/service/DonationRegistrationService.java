@@ -9,11 +9,14 @@ import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.event.EmailNotificationEvent;
 import com.quyet.superapp.exception.MemberException;
+import com.quyet.superapp.exception.ResourceNotFoundException;
 import com.quyet.superapp.mapper.DonationRegistrationMapper;
 import com.quyet.superapp.repository.*;
 import com.quyet.superapp.repository.address.AddressRepository;
 import com.quyet.superapp.validator.DonationRegistrationValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DonationRegistrationService {
 
     private final DonationRegistrationRepository donationRegistrationRepository;
@@ -37,6 +41,7 @@ public class DonationRegistrationService {
     private final HealthCheckFailureLogService healthCheckFailureLogService;
     private final ApplicationEventPublisher eventPublisher;
     private final DonationRegistrationValidator donationRegistrationValidator;
+    private final DonationSlotService donationSlotService;
 
     public ResponseEntity<?> register(Long userId, DonationRegistrationDTO dto) {
         User user = userRepository.findById(userId)
@@ -188,5 +193,32 @@ public class DonationRegistrationService {
         healthCheckFailureLogService.saveLog(registrationId, reason, staffNote);
 
         return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_FAILED_HEALTH, DonationRegistrationMapper.toDTO(reg)));
+    }
+
+    public void assignSlotToRegistration(Long registrationId, Long slotId) {
+        DonationRegistration registration = donationRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.DONATION_REGISTRATION_NOT_FOUND));
+
+        donationSlotService.assignSlotToRegistration(registration, slotId);
+    }
+
+    public List<DonationRegistrationDTO> getBySlotId(Long slotId) {
+        return donationRegistrationRepository.findBySlot_SlotId(slotId).stream()
+                .map(DonationRegistrationMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<?> markAsDonated(Long registrationId) {
+        DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký"));
+
+        if (!donationRepository.existsByRegistration_RegistrationId(registrationId)) {
+            throw new MemberException("NOT_YET_DONATED", "Chưa có bản ghi hiến máu tương ứng");
+        }
+
+        reg.setStatus(DonationStatus.DONATED);
+        donationRegistrationRepository.save(reg);
+
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Cập nhật trạng thái DONATED thành công", DonationRegistrationMapper.toDTO(reg)));
     }
 }

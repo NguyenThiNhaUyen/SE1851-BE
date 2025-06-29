@@ -29,8 +29,8 @@ public class UserProfileMapper {
         dto.setRecoveryTime(profile.getRecoveryTime());
         dto.setLocation(profile.getLocation());
         dto.setCitizenId(profile.getCitizenId());
-        dto.setWeight(profile.getWeight());
-        dto.setHeight(profile.getHeight());
+        dto.setWeight(profile.getWeightKg());
+        dto.setHeight(profile.getHeightCm());
         dto.setLatitude(profile.getLatitude());
         dto.setLongitude(profile.getLongitude());
 
@@ -83,8 +83,8 @@ public class UserProfileMapper {
         if (dto.getRecoveryTime() != null) profile.setRecoveryTime(dto.getRecoveryTime());
         if (dto.getLocation() != null) profile.setLocation(dto.getLocation());
         if (dto.getCitizenId() != null) profile.setCitizenId(dto.getCitizenId());
-        if (dto.getWeight() != null) profile.setWeight(dto.getWeight());
-        if (dto.getHeight() != null) profile.setHeight(dto.getHeight());
+        if (dto.getWeight() != null) profile.setWeightKg(dto.getWeight());
+        if (dto.getHeight() != null) profile.setHeightCm(dto.getHeight());
         if (dto.getLatitude() != null) profile.setLatitude(dto.getLatitude());
         if (dto.getLongitude() != null) profile.setLongitude(dto.getLongitude());
 

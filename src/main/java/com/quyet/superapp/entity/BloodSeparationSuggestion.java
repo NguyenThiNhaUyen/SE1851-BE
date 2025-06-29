@@ -34,4 +34,25 @@ public class BloodSeparationSuggestion {
     @ManyToOne
     @JoinColumn(name = "generated_by_user_id")
     private User generatedBy;
+
+    @Column(name = "red_cells")
+    private Integer redCells;
+
+    @Column(name = "plasma")
+    private Integer plasma;
+
+    @Column(name = "platelets")
+    private Integer platelets;
+
+    @Column(name = "red_cells_code")
+    private String redCellsCode;
+
+    @Column(name = "plasma_code")
+    private String plasmaCode;
+
+    @Column(name = "platelets_code")
+    private String plateletsCode;
+
+    @Column(name = "description")
+    private String description;
 }

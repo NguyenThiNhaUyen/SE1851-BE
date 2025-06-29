@@ -1,5 +1,7 @@
 package com.quyet.superapp.controller;
 
+import com.quyet.superapp.dto.ApiResponseDTO;
+import com.quyet.superapp.dto.DonationHistoryDTO;
 import com.quyet.superapp.dto.DonationRequestDTO;
 import com.quyet.superapp.entity.Donation;
 import com.quyet.superapp.mapper.DonationMapper;
@@ -8,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,5 +92,14 @@ public class DonationController {
                 .map(DonationMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
+    }
+
+    //xem lịch sử hiến máu
+    @GetMapping("/history")
+    @PreAuthorize("hasAnyRole('STAFF')")
+    public ResponseEntity<ApiResponseDTO<List<DonationHistoryDTO>>> getHistory(
+            @RequestParam("userId") Long userId) {
+        List<DonationHistoryDTO> history = donationService.getHistoryByUserId(userId);
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Lịch sử hiến máu", history));
     }
 }

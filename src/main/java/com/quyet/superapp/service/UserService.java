@@ -136,8 +136,8 @@ public class UserService {
             profile.setEmail(request.getContactInfo().getEmail());
             profile.setCitizenId(request.getCccd());
             profile.setOccupation(request.getOccupation());
-            profile.setWeight(request.getWeight());
-            profile.setHeight(request.getHeight());
+            profile.setWeightKg(request.getWeight());
+            profile.setHeightCm(request.getHeight());
             profile.setAddress(address);
             profile.setLocation(address != null ? address.getAddressStreet() : null);
 

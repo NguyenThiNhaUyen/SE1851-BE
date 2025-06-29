@@ -39,6 +39,9 @@ public class HealthCheckForm {
     @Column(name = "weight_kg")
     private Double weightKg;     // Cân nặng (kg)
 
+    @Column(name = "height_cm")
+    private Double heightCm;
+
     // 🚫 Câu hỏi loại trừ
     @Column(name = "has_fever")
     private Boolean hasFever;

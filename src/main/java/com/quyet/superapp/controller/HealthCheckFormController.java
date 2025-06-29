@@ -5,6 +5,7 @@ import com.quyet.superapp.service.HealthCheckFormService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ public class HealthCheckFormController {
     private final HealthCheckFormService healthCheckFormService;
 
     // ✅ Gửi phiếu khám sức khỏe (tự động đánh giá pass/fail)
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @PostMapping("/submit")
     public ResponseEntity<HealthCheckFormDTO> submit(@Valid @RequestBody HealthCheckFormDTO dto) {
         HealthCheckFormDTO result = healthCheckFormService.submit(dto);
@@ -30,6 +32,7 @@ public class HealthCheckFormController {
     }
 
     // ❌ Nếu cho phép cập nhật lại (có thể bỏ qua nếu không cần)
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<HealthCheckFormDTO> update(@RequestBody HealthCheckFormDTO dto) {
         return ResponseEntity.ok(healthCheckFormService.update(dto));

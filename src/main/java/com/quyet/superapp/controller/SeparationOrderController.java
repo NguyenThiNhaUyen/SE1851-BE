@@ -1,21 +1,15 @@
 package com.quyet.superapp.controller;
 
-import com.quyet.superapp.dto.BloodSeparationSuggestionDTO;
-import com.quyet.superapp.dto.CreateSeparationWithSuggestionRequest;
-import com.quyet.superapp.dto.SeparationOrderDTO;
-import com.quyet.superapp.dto.SeparationResultDTO;
-import com.quyet.superapp.entity.SeparationOrder;
+import com.quyet.superapp.dto.*;
+
 import com.quyet.superapp.enums.SeparationMethod;
 import com.quyet.superapp.mapper.SeparationOrderMapper;
 import com.quyet.superapp.service.SeparationOrderService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -126,4 +120,13 @@ public class SeparationOrderController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/with-units")
+    public ResponseEntity<SeparationOrderFullDTO> getFullOrderWithUnits(@RequestParam Long id) {
+        return ResponseEntity.ok(separationOrderService.getFullOrderWithUnits(id));
+    }
+
+
+
+
 }

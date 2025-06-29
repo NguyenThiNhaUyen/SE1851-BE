@@ -55,4 +55,9 @@ public class DonationRegistration {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // Trong DonationRegistration entity
+    @ManyToOne
+    @JoinColumn(name = "slot_id")
+    private DonationSlot slot;
 }

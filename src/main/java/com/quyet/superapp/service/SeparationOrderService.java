@@ -3,13 +3,17 @@ package com.quyet.superapp.service;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.*;
+import com.quyet.superapp.mapper.BloodSeparationSuggestionMapper;
 import com.quyet.superapp.mapper.BloodUnitMapper;
+import com.quyet.superapp.mapper.SeparationOrderFullMapper;
+import com.quyet.superapp.mapper.SeparationResultMapper;
 import com.quyet.superapp.repository.*;
 import com.quyet.superapp.util.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,11 +30,16 @@ public class SeparationOrderService {
     private final BloodSeparationCalculator calculator;
     private final BloodComponentRepository bloodComponentRepository;
     private final BloodUnitRepository bloodUnitRepository;
+    private final SeparationResultRepository separationResultRepository;
+    private final BloodSeparationSuggestionRepository bloodSeparationSuggestionRepository;
+    private final BloodInventorySyncService bloodInventorySyncService;
 
     // ✅ Dùng trong tạo nhanh (manual) có sinh đơn vị máu
     @Transactional
-    public SeparationResultDTO createSeparationOrderEntity(Long bloodBagId, Long operatorId,
-                                                           Long machineId, SeparationMethod type, String note) {
+    public SeparationResultDTO createSeparationOrderEntity(
+            Long bloodBagId, Long operatorId,
+            Long machineId, SeparationMethod type, String note
+    ) {
         BloodBag bag = getBloodBagValidated(bloodBagId);
         checkNotSeparated(bag);
         User operator = getOperator(operatorId);
@@ -45,42 +54,83 @@ public class SeparationOrderService {
         int plasma = (int) (total * 0.42);
         int platelets = total - red - plasma;
 
-        BloodSeparationSuggestionDTO suggestion = new BloodSeparationSuggestionDTO(
-                red, plasma, platelets,
-                "PRC-" + bag.getBloodType().getDescription(),
-                "FFP-" + bag.getBloodType().getDescription(),
-                "PLT-" + bag.getBloodType().getDescription(),
-                String.format("Manual separation: %.0f/%.0f/%.0f", 48.0, 42.0, 10.0)
-        );
+        // 👇 Tạo entity BloodSeparationSuggestion
+        BloodSeparationSuggestion suggestion = new BloodSeparationSuggestion();
+        suggestion.setRedCells(red);
+        suggestion.setPlasma(plasma);
+        suggestion.setPlatelets(platelets);
+        suggestion.setRedCellsCode("PRC-" + bag.getBloodType().getDescription());
+        suggestion.setPlasmaCode("FFP-" + bag.getBloodType().getDescription());
+        suggestion.setPlateletsCode("PLT-" + bag.getBloodType().getDescription());
+        suggestion.setDescription("Manual separation: 48% / 42% / 10%");
+        suggestion.setCreatedAt(LocalDateTime.now());
+        suggestion.setGeneratedBy(operator);
+        bloodSeparationSuggestionRepository.save(suggestion);
 
+        // 👇 Sinh đơn vị máu từ suggestion entity
         createBloodUnitsFromSuggestion(suggestion, bag, order);
-        List<BloodUnitDTO> dtoUnits = getDTOUnits(order);
+        List<BloodUnit> units = bloodUnitRepository.findBySeparationOrder(order);
 
-        return new SeparationResultDTO(order.getSeparationOrderId(), suggestion, dtoUnits, note);
+        // 👇 Lưu SeparationResult có liên kết với suggestion entity
+        SeparationResult result = new SeparationResult();
+        result.setOrder(order);
+        result.setProcessedBy(operator);
+        result.setCompletedAt(LocalDateTime.now());
+        result.setNote(note);
+        result.setSuggestion(suggestion);
+        separationResultRepository.save(result);
+
+        return SeparationResultMapper.toDTO(
+                result,
+                BloodSeparationSuggestionMapper.toDTO(suggestion), // convert entity -> DTO
+                units
+        );
     }
+
 
     // ✅ Tạo từ gợi ý preset
     @Transactional
     public SeparationResultDTO createWithSuggestion(CreateSeparationWithSuggestionRequest request) {
         BloodBag bag = getBloodBagValidated(request.getBloodBagId());
         User operator = getOperator(request.getOperatorId());
-        ApheresisMachine machine = (request.getType() == SeparationMethod.MACHINE) ?
-                getMachine(request.getMachineId()) : null;
+        ApheresisMachine machine = (request.getType() == SeparationMethod.MACHINE)
+                ? getMachine(request.getMachineId()) : null;
 
+        // 👇 Lấy preset và tính toán gợi ý entity
         SeparationPresetConfig preset = presetService.getPreset(
-                request.getGender(), request.getWeight(), request.getType().name(), request.isLeukoreduced()
+                request.getGender(),
+                request.getWeight(),
+                request.getType().name(),
+                request.isLeukoreduced()
         );
-        BloodSeparationSuggestionDTO suggestion = calculator.calculateFromPreset(bag, preset);
+
+        BloodSeparationSuggestion suggestion = calculator.calculateFromPreset(bag, preset);
+        suggestion.setCreatedAt(LocalDateTime.now());
+        suggestion.setGeneratedBy(operator);
+        bloodSeparationSuggestionRepository.save(suggestion);
 
         SeparationOrder order = buildAndSaveOrder(bag, operator, machine, request.getType(), request.getNote());
         bag.setStatus(BloodBagStatus.SEPARATED);
         bloodBagRepository.save(bag);
 
         createBloodUnitsFromSuggestion(suggestion, bag, order);
-        List<BloodUnitDTO> dtoUnits = getDTOUnits(order);
+        List<BloodUnit> units = bloodUnitRepository.findBySeparationOrder(order);
 
-        return new SeparationResultDTO(order.getSeparationOrderId(), suggestion, dtoUnits, request.getNote());
+        SeparationResult result = new SeparationResult();
+        result.setOrder(order);
+        result.setProcessedBy(operator);
+        result.setCompletedAt(LocalDateTime.now());
+        result.setNote(request.getNote());
+        result.setSuggestion(suggestion);
+        separationResultRepository.save(result);
+
+        return SeparationResultMapper.toDTO(
+                result,
+                BloodSeparationSuggestionMapper.toDTO(suggestion), // convert entity -> DTO
+                units
+        );
     }
+
 
     // ✅ Tạo bản ghi lệnh tách đơn giản, không sinh đơn vị máu
     @Transactional
@@ -133,11 +183,11 @@ public class SeparationOrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy máy tách máu"));
     }
 
-    private void createBloodUnitsFromSuggestion(BloodSeparationSuggestionDTO suggestion,
+    private void createBloodUnitsFromSuggestion(BloodSeparationSuggestion suggestion,
                                                 BloodBag bloodBag, SeparationOrder order) {
-        createUnit(suggestion.getRedCellsMl(), "HỒNG CẦU", bloodBag, order);
-        createUnit(suggestion.getPlasmaMl(), "HUYẾT TƯƠNG", bloodBag, order);
-        createUnit(suggestion.getPlateletsMl(), "TIỂU CẦU", bloodBag, order);
+        createUnit(suggestion.getRedCells(), "HỒNG CẦU", bloodBag, order);
+        createUnit(suggestion.getPlasma(), "HUYẾT TƯƠNG", bloodBag, order);
+        createUnit(suggestion.getPlatelets(), "TIỂU CẦU", bloodBag, order);
     }
 
     private void createUnit(int volume, String componentName,
@@ -164,6 +214,7 @@ public class SeparationOrderService {
         unit.setUnitCode(unitCode);
 
         bloodUnitRepository.save(unit);
+        bloodInventorySyncService.syncInventory(unit);
     }
 
     private List<BloodUnitDTO> getDTOUnits(SeparationOrder order) {
@@ -171,6 +222,14 @@ public class SeparationOrderService {
                 .map(BloodUnitMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    public SeparationOrderFullDTO getFullOrderWithUnits(Long orderId) {
+        SeparationOrder order = separationOrderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lệnh tách"));
+        List<BloodUnitDTO> units = getDTOUnits(order);
+        return SeparationOrderFullMapper.toFullDTO(order, units);
+    }
+
+
 
     // --------------------------------------------
     // 🔍 Truy vấn đơn giản

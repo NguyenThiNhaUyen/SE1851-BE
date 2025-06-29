@@ -51,8 +51,8 @@ public class UserProfile {
 
     // ✅ Các trường y tế – tùy chọn
     private String bloodType;
-    private Double weight;
-    private Double height;
+    private Double WeightKg;
+    private Double HeightCm;
     private LocalDate lastDonationDate;
     private Integer recoveryTime;
     private String location;

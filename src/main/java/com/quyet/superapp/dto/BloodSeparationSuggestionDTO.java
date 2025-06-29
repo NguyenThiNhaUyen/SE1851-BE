@@ -29,4 +29,6 @@ public class BloodSeparationSuggestionDTO {
     private String plateletsLabel;
 
     private String note;
+
+
 }

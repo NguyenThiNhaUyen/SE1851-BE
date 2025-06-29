@@ -1,5 +1,6 @@
 package com.quyet.superapp.service;
 
+import com.quyet.superapp.dto.DonationHistoryDTO;
 import com.quyet.superapp.entity.Donation;
 import com.quyet.superapp.repository.DonationRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,19 @@ public class DonationService {
                 .filter(d -> d.getDonationId() != null) // cần để mapping
                 .filter(d -> d.getRegistration() != null) // đã qua đăng ký
                 .filter(d -> d.getComponent().getCode() != null) // có code thì mới phân tách
+                .collect(Collectors.toList());
+    }
+
+    public List<DonationHistoryDTO> getHistoryByUserId(Long userId) {
+        return repository.findByUser_UserId(userId).stream()
+                .map(d -> DonationHistoryDTO.builder()
+                        .donationDate(d.getDonationDate())
+                        .location(d.getLocation())
+                        .volumeMl(d.getVolumeMl())
+                        .bloodGroup(d.getBloodType() != null ? d.getBloodType().getDescription() : "Chưa rõ")
+                        .component(d.getComponent() != null ? d.getComponent().getName() : "Chưa tách")
+                        .status(d.getStatus() != null ? d.getStatus().name() : "Không rõ")
+                        .build())
                 .collect(Collectors.toList());
     }
 }

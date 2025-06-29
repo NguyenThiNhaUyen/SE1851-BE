@@ -3,9 +3,11 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.HealthCheckFormDTO;
 import com.quyet.superapp.entity.DonationRegistration;
 import com.quyet.superapp.entity.HealthCheckForm;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HealthCheckFormMapper {
-    public static HealthCheckForm toEntity(HealthCheckFormDTO dto, DonationRegistration reg, boolean isEligible) {
+    public  HealthCheckForm toEntity(HealthCheckFormDTO dto, DonationRegistration reg, boolean isEligible) {
         return HealthCheckForm.builder()
                 .registration(reg)
                 .bodyTemperature(dto.getBodyTemperature())
@@ -13,6 +15,7 @@ public class HealthCheckFormMapper {
                 .bloodPressureSys(dto.getBloodPressureSys())
                 .bloodPressureDia(dto.getBloodPressureDia())
                 .weightKg(dto.getWeightKg())
+                .heightCm(dto.getHeightCm())
                 .hasFever(dto.getHasFever())
                 .tookAntibioticsRecently(dto.getTookAntibioticsRecently())
                 .hasChronicIllness(dto.getHasChronicIllness())
@@ -24,7 +27,7 @@ public class HealthCheckFormMapper {
                 .build();
     }
 
-    public static HealthCheckFormDTO toDTO(HealthCheckForm entity) {
+    public HealthCheckFormDTO toDTO(HealthCheckForm entity) {
         HealthCheckFormDTO dto = new HealthCheckFormDTO();
         dto.setId(entity.getId());
         dto.setRegistrationId(entity.getRegistration().getRegistrationId());
@@ -33,6 +36,7 @@ public class HealthCheckFormMapper {
         dto.setBloodPressureSys(entity.getBloodPressureSys());
         dto.setBloodPressureDia(entity.getBloodPressureDia());
         dto.setWeightKg(entity.getWeightKg());
+        dto.setHeightCm(entity.getHeightCm());
         dto.setHasFever(entity.getHasFever());
         dto.setTookAntibioticsRecently(entity.getTookAntibioticsRecently());
         dto.setHasChronicIllness(entity.getHasChronicIllness());

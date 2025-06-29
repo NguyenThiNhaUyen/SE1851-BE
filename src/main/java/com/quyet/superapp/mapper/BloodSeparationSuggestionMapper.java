@@ -8,51 +8,31 @@ import java.time.LocalDateTime;
 
 public class BloodSeparationSuggestionMapper {
     public static BloodSeparationSuggestionDTO toDTO(BloodSeparationSuggestion entity) {
-        if (entity == null || entity.getSuggestedConfig() == null) return null;
-
-        String[] parts = entity.getSuggestedConfig().split(";");
-        int rbc = 0, plasma = 0, platelet = 0;
-        for (String p : parts) {
-            if (p.startsWith("RBC=")) rbc = Integer.parseInt(p.substring(4));
-            else if (p.startsWith("PLASMA=")) plasma = Integer.parseInt(p.substring(7));
-            else if (p.startsWith("PLT=")) platelet = Integer.parseInt(p.substring(4));
-        }
-
         BloodSeparationSuggestionDTO dto = new BloodSeparationSuggestionDTO();
-        dto.setRedCellsMl(rbc);
-        dto.setPlasmaMl(plasma);
-        dto.setPlateletsMl(platelet);
-
-        dto.setRedCellLabel("Hồng cầu: " + rbc + "ml");
-        dto.setPlasmaLabel("Huyết tương: " + plasma + "ml");
-        dto.setPlateletsLabel("Tiểu cầu: " + platelet + "ml");
-        dto.setNote("Đề xuất tự động • Độ tin cậy: " + entity.getConfidenceScore());
+        dto.setRedCellsMl(entity.getRedCells());
+        dto.setPlasmaMl(entity.getPlasma());
+        dto.setPlateletsMl(entity.getPlatelets());
+        dto.setRedCellLabel(entity.getRedCellsCode());
+        dto.setPlasmaLabel(entity.getPlasmaCode());
+        dto.setPlateletsLabel(entity.getPlateletsCode());
+        dto.setNote(entity.getDescription());
         return dto;
     }
 
     /**
      * Tạo entity từ DTO + dữ liệu hệ thống
      */
-    public static BloodSeparationSuggestion fromDTO(
-            BloodSeparationSuggestionDTO dto,
-            double confidenceScore,
-            String inputSummary,
-            User generatedBy
-    ) {
+    public static BloodSeparationSuggestion fromDTO(BloodSeparationSuggestionDTO dto, User generatedBy) {
         BloodSeparationSuggestion entity = new BloodSeparationSuggestion();
-        entity.setCreatedAt(LocalDateTime.now());
+        entity.setRedCells(dto.getRedCellsMl());
+        entity.setPlasma(dto.getPlasmaMl());
+        entity.setPlatelets(dto.getPlateletsMl());
+        entity.setRedCellsCode(dto.getRedCellLabel());
+        entity.setPlasmaCode(dto.getPlasmaLabel());
+        entity.setPlateletsCode(dto.getPlateletsLabel());
+        entity.setDescription(dto.getNote());
         entity.setGeneratedBy(generatedBy);
-        entity.setConfidenceScore(confidenceScore);
-        entity.setInputDataSummary(inputSummary);
-
-        // Tạo cấu hình đề xuất theo format: RBC=xxx;PLASMA=xxx;PLT=xxx
-        String config = String.format("RBC=%d;PLASMA=%d;PLT=%d",
-                dto.getRedCellsMl(),
-                dto.getPlasmaMl(),
-                dto.getPlateletsMl()
-        );
-        entity.setSuggestedConfig(config);
-
+        entity.setCreatedAt(LocalDateTime.now());
         return entity;
     }
 }

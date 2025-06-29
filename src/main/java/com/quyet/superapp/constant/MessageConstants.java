@@ -26,4 +26,9 @@ public class MessageConstants {
     public static final String HEALTH_NOT_ELIGIBLE = "Người hiến máu không đạt yêu cầu sức khỏe";
     public static final String INVALID_REGISTRATION_STATUS = "Trạng thái đơn đăng ký không hợp lệ";
     public static final String GET_REGISTRATION_SUCCESS = "Lấy thông tin đơn đăng ký thành công";
+
+    //đặt lịch hiến máu
+    public static final String SLOT_ASSIGNED_SUCCESS = "Gán slot hiến máu thành công";
+    public static final String SLOT_FULL = "Slot đã đầy, không thể gán thêm người";
+    public static final String SLOT_NOT_FOUND = "Không tìm thấy slot hiến máu";
 }
