@@ -71,4 +71,8 @@ public class HealthCheckForm {
     @ManyToOne
     @JoinColumn(name = "donation_id")
     private Donation donation;
+
+    // ✅ Liên kết với xét nghiệm máu
+    @OneToOne(mappedBy = "healthCheckForm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private PreDonationTest preDonationTest;
 }

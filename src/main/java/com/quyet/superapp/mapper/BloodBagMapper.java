@@ -5,11 +5,12 @@ import com.quyet.superapp.entity.BloodBag;
 import com.quyet.superapp.entity.BloodType;
 
 public class BloodBagMapper {
+
     public static BloodBagDTO toDTO(BloodBag entity) {
         return new BloodBagDTO(
                 entity.getBloodBagId(),
                 entity.getBagCode(),
-                entity.getBloodType() != null ? String.valueOf(entity.getBloodType().getBloodTypeId()) : null,
+                entity.getBloodType() != null ? entity.getBloodType().getDescription() : null, // ✅ đẹp hơn
                 entity.getRh(),
                 entity.getVolume(),
                 entity.getHematocrit(),
@@ -25,7 +26,7 @@ public class BloodBagMapper {
         BloodBag entity = new BloodBag();
         entity.setBloodBagId(dto.getBloodBagId());
         entity.setBagCode(dto.getBagCode());
-        entity.setBloodType(bloodType);
+        entity.setBloodType(bloodType); // ✅ cần truyền vào đúng BloodType entity
         entity.setRh(dto.getRh());
         entity.setVolume(dto.getVolume());
         entity.setHematocrit(dto.getHematocrit());

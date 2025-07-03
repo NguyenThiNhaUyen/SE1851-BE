@@ -75,4 +75,8 @@ public class Donation {
                 this.updatedAt = LocalDateTime.now();
         }
 
+        @OneToOne
+        @JoinColumn(name = "blood_bag_id")
+        private BloodBag bloodBag;
+
         }

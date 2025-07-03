@@ -83,30 +83,38 @@ public class UserService {
     @Transactional
     public ResponseEntity<ApiResponseDTO<?>> register(RegisterRequestDTO request) {
         try {
-            // Kiểm tra trùng thông tin
+            // 1. Kiểm tra thông tin liên hệ
+            var contact = request.getContactInfo();
+            if (contact == null) {
+                log.warn("Thiếu thông tin liên hệ trong request đăng ký");
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponseDTO<>(false, "Thiếu thông tin liên hệ"));
+            }
+
+            // 2. Kiểm tra trùng lặp
             if (userRepository.existsByUsername(request.getUsername())) {
                 log.warn("Tên đăng nhập đã tồn tại: {}", request.getUsername());
                 return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, MessageConstants.USERNAME_EXISTS));
             }
-            if (userRepository.existsByEmail(request.getContactInfo().getEmail())) {
-                log.warn("Email đã tồn tại (User): {}", request.getContactInfo().getEmail());
+            if (userRepository.existsByEmail(contact.getEmail())) {
+                log.warn("Email đã tồn tại (User): {}", contact.getEmail());
                 return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, MessageConstants.EMAIL_EXISTS));
             }
             if (userProfileRepository.existsByCitizenId(request.getCccd())) {
                 log.warn("CCCD đã tồn tại: {}", request.getCccd());
                 return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, MessageConstants.CCCD_EXISTS));
             }
-            if (userProfileRepository.existsByEmail(request.getContactInfo().getEmail())) {
-                log.warn("Email đã tồn tại (Profile): {}", request.getContactInfo().getEmail());
+            if (userProfileRepository.existsByEmail(contact.getEmail())) {
+                log.warn("Email đã tồn tại (Profile): {}", contact.getEmail());
                 return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, MessageConstants.EMAIL_PROFILE_EXISTS));
             }
 
-            // Tìm vai trò
+            // 3. Tìm role
             Role role = roleRepository.findByName(
                     Optional.ofNullable(request.getRole()).map(String::toUpperCase).orElse("MEMBER")
             ).orElseThrow(() -> new RuntimeException(MessageConstants.ROLE_NOT_FOUND));
 
-            // Tạo địa chỉ nếu có
+            // 4. Tạo địa chỉ nếu có
             Address address = null;
             if (request.getAddress() != null && request.getAddress().getWardId() != null) {
                 Ward ward = wardRepository.findById(request.getAddress().getWardId())
@@ -118,22 +126,22 @@ public class UserService {
                 addressRepository.save(address);
             }
 
-            // Tạo user
+            // 5. Tạo User
             User user = new User();
             user.setUsername(request.getUsername());
-            user.setEmail(request.getContactInfo().getEmail());
+            user.setEmail(contact.getEmail());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setEnable(true);
             user.setRole(role);
 
-            // Tạo profile
+            // 6. Tạo UserProfile
             UserProfile profile = new UserProfile();
             profile.setUser(user);
             profile.setFullName(request.getFullName());
             profile.setDob(request.getDob());
             profile.setGender(request.getGender());
-            profile.setPhone(request.getContactInfo().getPhone());
-            profile.setEmail(request.getContactInfo().getEmail());
+            profile.setPhone(contact.getPhone());
+            profile.setEmail(contact.getEmail());
             profile.setCitizenId(request.getCccd());
             profile.setOccupation(request.getOccupation());
             profile.setWeightKg(request.getWeight());
@@ -144,13 +152,14 @@ public class UserService {
             user.setUserProfile(profile);
             userRepository.save(user);
 
-            log.info("Đăng ký thành công cho username: {}", request.getUsername());
+            log.info("✅ Đăng ký thành công cho user: {}", request.getUsername());
             return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.REGISTER_SUCCESS));
 
         } catch (Exception e) {
-            log.error("Đăng ký thất bại cho username [{}]: {}", request.getUsername(), e.getMessage());
+            log.error("❌ Đăng ký thất bại cho [{}]: {}", request.getUsername(), e.getMessage(), e);
             return ResponseEntity.internalServerError()
                     .body(new ApiResponseDTO<>(false, MessageConstants.REGISTER_FAILED));
         }
     }
+
 }

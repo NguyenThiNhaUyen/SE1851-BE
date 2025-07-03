@@ -4,9 +4,11 @@ import com.quyet.superapp.dto.BloodBagDTO;
 import com.quyet.superapp.dto.UpdateBloodBagRequest;
 import com.quyet.superapp.entity.BloodBag;
 import com.quyet.superapp.entity.BloodType;
+import com.quyet.superapp.entity.Donation;
 import com.quyet.superapp.mapper.BloodBagMapper;
 import com.quyet.superapp.repository.BloodBagRepository;
 import com.quyet.superapp.repository.BloodTypeRepository;
+import com.quyet.superapp.repository.DonationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BloodBagService {
+
     private final BloodBagRepository bloodBagRepository;
     private final BloodTypeRepository bloodTypeRepository;
+    private final DonationRepository donationRepository;
 
     public List<BloodBagDTO> getAll() {
         return bloodBagRepository.findAll()
@@ -34,11 +38,30 @@ public class BloodBagService {
         return BloodBagMapper.toDTO(bag);
     }
 
-    public BloodBagDTO create(BloodBagDTO dto) {
-        BloodType bloodType = bloodTypeRepository.findById(Long.parseLong(dto.getBloodType()))
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhóm máu ID " + dto.getBloodType()));
+    /**
+     * ✅ Tạo túi máu từ DTO + donationId
+     * - Nếu không có bloodTypeId → tự lấy từ donation hoặc registration
+     */
+    public BloodBagDTO createFromDonation(BloodBagDTO dto, Long donationId) {
+        Donation donation = donationRepository.findById(donationId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy donation ID " + donationId));
+
+        // Lấy BloodType từ donation hoặc từ registration
+        BloodType bloodType = donation.getBloodType();
+        if (bloodType == null) {
+            if (donation.getRegistration() != null && donation.getRegistration().getBloodType() != null) {
+                bloodType = donation.getRegistration().getBloodType();
+                donation.setBloodType(bloodType); // gán lại vào donation
+                donationRepository.save(donation);
+            } else {
+                throw new IllegalArgumentException("Không xác định được nhóm máu từ Donation hoặc Registration.");
+            }
+        }
+
         BloodBag bag = BloodBagMapper.fromDTO(dto, bloodType);
-        return BloodBagMapper.toDTO(bloodBagRepository.save(bag));
+        bag.setDonation(donation); // gán mối liên hệ
+        BloodBag saved = bloodBagRepository.save(bag);
+        return BloodBagMapper.toDTO(saved);
     }
 
     @Transactional
@@ -66,5 +89,4 @@ public class BloodBagService {
         return bloodBagRepository.findByBagCode(code)
                 .map(BloodBagMapper::toDTO);
     }
-
 }

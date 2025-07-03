@@ -1,6 +1,8 @@
     package com.quyet.superapp.service;
 
+    import com.quyet.superapp.dto.FullHealthCheckDTO;
     import com.quyet.superapp.dto.HealthCheckFormDTO;
+    import com.quyet.superapp.dto.PreDonationTestDTO;
     import com.quyet.superapp.entity.Donation;
     import com.quyet.superapp.entity.DonationRegistration;
     import com.quyet.superapp.entity.HealthCheckForm;
@@ -8,6 +10,7 @@
     import com.quyet.superapp.enums.DonationStatus;
     import com.quyet.superapp.exception.MemberException;
     import com.quyet.superapp.mapper.HealthCheckFormMapper;
+    import com.quyet.superapp.mapper.PreDonationTestMapper;
     import com.quyet.superapp.repository.DonationRegistrationRepository;
     import com.quyet.superapp.repository.DonationRepository;
     import com.quyet.superapp.repository.HealthCheckFormRepository;
@@ -29,6 +32,7 @@
         private final UserProfileRepository userProfileRepository;
         private final DonationRepository donationRepository;
         private final HealthCheckFormMapper healthCheckFormMapper;
+        private final PreDonationTestMapper preDonationTestMapper;
 
         public HealthCheckFormDTO submit(HealthCheckFormDTO dto) {
             if (formRepository.existsByRegistration_RegistrationId(dto.getRegistrationId())) {
@@ -153,5 +157,20 @@
             dto.setIsEligible(eligible);
             return dto;
         }
+        public FullHealthCheckDTO getFullByRegistrationId(Long regId) {
+            HealthCheckForm form = formRepository.findByRegistration_RegistrationId(regId);
+            if (form == null) {
+                throw new MemberException("NOT_FOUND", "Chưa có phiếu khám.");
+            }
+            HealthCheckFormDTO healthDTO = healthCheckFormMapper.toDTO(form);
+            PreDonationTestDTO testDTO = null;
+
+            if (form.getPreDonationTest() != null) {
+                testDTO = preDonationTestMapper.toDTO(form.getPreDonationTest());
+            }
+
+            return new FullHealthCheckDTO(healthDTO, testDTO);
+        }
+
 
     }

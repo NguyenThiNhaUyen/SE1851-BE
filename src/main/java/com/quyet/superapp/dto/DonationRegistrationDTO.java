@@ -1,5 +1,6 @@
 package com.quyet.superapp.dto;
 
+import com.quyet.superapp.entity.BloodType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -21,7 +22,7 @@ public class DonationRegistrationDTO {
     private String location;
 
     @NotBlank(message = "Nhóm máu không được để trống")
-    private String bloodType;
+    private BloodType bloodType;
 
     private String status;
 
@@ -44,6 +45,8 @@ public class DonationRegistrationDTO {
     private LocalDateTime updatedAt;
     private Long userId;
     private String email;
+    private Long slotId;
+    private DonationSlotDTO slot;
 
 }
 

@@ -49,6 +49,7 @@ public class DonationRegistrationService {
 
         donationRegistrationValidator.validateRegistrationRequest(user, dto);
 
+        // Nếu chưa có hồ sơ → tạo mới
         UserProfile profile = user.getUserProfile();
         if (profile == null) {
             profile = new UserProfile();
@@ -57,6 +58,7 @@ public class DonationRegistrationService {
             profile.setDob(dto.getDob());
             profile.setGender(dto.getGender());
             profile.setBloodType(dto.getBloodType());
+
             if (dto.getAddressId() != null) {
                 Address address = addressRepository.findById(dto.getAddressId())
                         .orElseThrow(() -> new MemberException("ADDRESS_NOT_FOUND", MessageConstants.ADDRESS_NOT_FOUND));
@@ -66,17 +68,37 @@ public class DonationRegistrationService {
             userProfileRepository.save(profile);
         }
 
+        // Tạo đăng ký
         DonationRegistration registration = DonationRegistrationMapper.toEntity(dto, user);
         registration.setStatus(DonationStatus.PENDING);
+
+        // Gán slot
+        if (dto.getSlotId() != null) {
+            // Nếu slot đã đầy → tự động gán slot khác gần nhất
+            if (!donationSlotService.isSlotAvailable(dto.getSlotId())) {
+                log.warn("Slot {} đã đầy, hệ thống sẽ gợi ý slot khác", dto.getSlotId());
+                donationSlotService.autoAssignSlotToRegistration(registration);
+            } else {
+                donationSlotService.assignSlotToRegistration(registration, dto.getSlotId());
+            }
+        } else {
+            donationSlotService.autoAssignSlotToRegistration(registration);
+        }
+
         donationRegistrationRepository.save(registration);
 
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_REGISTERED, DonationRegistrationMapper.toDTO(registration)));
+        return ResponseEntity.ok(new ApiResponseDTO<>(
+                true,
+                MessageConstants.DONATION_REGISTERED,
+                DonationRegistrationMapper.toDTO(registration)
+        ));
     }
+
 
     public ResponseEntity<?> confirm(Long registrationId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
-        Long staffId = principal.getUserId(); // Lấy ID của staff hiện tại
+        Long staffId = principal.getUserId();
 
         User staff = userRepository.findById(staffId)
                 .orElseThrow(() -> new MemberException("USER_NOT_FOUND", MessageConstants.USER_NOT_FOUND));
@@ -124,7 +146,7 @@ public class DonationRegistrationService {
             throw new MemberException("DUPLICATE_DONATION", MessageConstants.DONATION_ALREADY_EXISTS);
         }
 
-        BloodType bloodType = bloodTypeRepository.findByDescription(reg.getBloodType())
+        BloodType bloodType = bloodTypeRepository.findByDescription(reg.getBloodType().getDescription())
                 .orElseThrow(() -> new MemberException("NOT_FOUND", MessageConstants.BLOOD_TYPE_NOT_FOUND));
 
         Donation donation = new Donation();

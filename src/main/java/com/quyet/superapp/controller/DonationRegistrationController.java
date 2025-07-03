@@ -55,7 +55,7 @@ public class DonationRegistrationController {
     /**
      * Xác nhận đơn đăng ký (chuyển trạng thái -> CONFIRMED)
      */
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('STAFF')")
     @PutMapping("/confirm")
     public ResponseEntity<?> confirmRegistration(@RequestParam("register_id") Long id) {
         return donationRegistrationService.confirm(id); // KHÔNG cần truyền username
@@ -105,16 +105,16 @@ public class DonationRegistrationController {
         return donationRegistrationService.createDonationIfEligible(regId);
     }
 
-    @PostMapping("/assign-slot")
-    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
-    public ResponseEntity<?> assignSlotToRegistration(
-            @RequestParam Long registrationId,
-            @RequestParam Long slotId
-    ) {
-        donationRegistrationService.assignSlotToRegistration(registrationId, slotId);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.SLOT_ASSIGNED_SUCCESS, null));
-
-    }
+//    @PostMapping("/assign-slot")
+//    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
+//    public ResponseEntity<?> assignSlotToRegistration(
+//            @RequestParam Long registrationId,
+//            @RequestParam Long slotId
+//    ) {
+//        donationRegistrationService.assignSlotToRegistration(registrationId, slotId);
+//        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.SLOT_ASSIGNED_SUCCESS, null));
+//
+//    }
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @PutMapping("/mark-donated")
     public ResponseEntity<?> markAsDonated(@RequestParam("register_id") Long regId) {

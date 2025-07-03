@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DonationSlotMapper {
 
-    public DonationSlotDTO toDTO(DonationSlot entity) {
+    public static DonationSlotDTO toDTO(DonationSlot entity) {
+        if (entity == null) return null;
         return DonationSlotDTO.builder()
                 .slotId(entity.getSlotId())
                 .slotDate(entity.getSlotDate())
@@ -21,7 +22,8 @@ public class DonationSlotMapper {
                 .build();
     }
 
-    public DonationSlot toEntity(DonationSlotDTO dto) {
+    public static DonationSlot toEntity(DonationSlotDTO dto) {
+        if (dto == null) return null;
         return DonationSlot.builder()
                 .slotId(dto.getSlotId())
                 .slotDate(dto.getSlotDate())
@@ -35,3 +37,4 @@ public class DonationSlotMapper {
                 .build();
     }
 }
+

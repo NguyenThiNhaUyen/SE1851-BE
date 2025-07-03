@@ -32,8 +32,9 @@ public class DonationRegistration {
     @Column(name = "location", columnDefinition = "NVARCHAR(100)")
     private String location;
 
-    @Column(name = "blood_type", columnDefinition = "NVARCHAR(20)")
-    private String bloodType;
+    @ManyToOne
+    @JoinColumn(name = "blood_type")
+    private BloodType bloodType;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -60,4 +61,6 @@ public class DonationRegistration {
     @ManyToOne
     @JoinColumn(name = "slot_id")
     private DonationSlot slot;
+
+
 }

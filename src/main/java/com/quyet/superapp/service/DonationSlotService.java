@@ -26,34 +26,43 @@ import java.util.stream.Collectors;
 public class DonationSlotService {
 
     private final DonationSlotRepository donationSlotRepository;
-    private final DonationSlotMapper donationSlotMapper;
     private final DonationRegistrationRepository donationRegistrationRepository;
 
+    // === CRUD ===
     public DonationSlotDTO create(DonationSlotDTO dto) {
-        DonationSlot entity = donationSlotMapper.toEntity(dto);
-        entity.setRegisteredCount(0); // default
+        DonationSlot entity = DonationSlotMapper.toEntity(dto);
+        entity.setRegisteredCount(0);
         entity.setStatus(SlotStatus.ACTIVE);
-        return donationSlotMapper.toDTO(donationSlotRepository.save(entity));
+        return DonationSlotMapper.toDTO(donationSlotRepository.save(entity));
     }
 
     public List<DonationSlotDTO> getAll() {
         return donationSlotRepository.findAll().stream()
-                .map(donationSlotMapper::toDTO)
+                .map(DonationSlotMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public DonationSlotDTO getById(Long id) {
         DonationSlot slot = donationSlotRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy slot"));
-        return donationSlotMapper.toDTO(slot);
+        return DonationSlotMapper.toDTO(slot);
     }
 
-    public List<DonationSlotDTO> getSuggestedSlots(int requiredCapacity) {
-        return donationSlotRepository
-                .findByStatusAndRegisteredCountLessThan(SlotStatus.ACTIVE, requiredCapacity)
-                .stream()
-                .map(donationSlotMapper::toDTO)
+    public List<DonationSlotDTO> getSlotsByDate(LocalDate date) {
+        return donationSlotRepository.findBySlotDate(date).stream()
+                .map(DonationSlotMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public List<DonationSlotDTO> getSlotsByStatus(SlotStatus status) {
+        return donationSlotRepository.findByStatus(status).stream()
+                .map(DonationSlotMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public boolean isSlotAvailable(Long slotId) {
+        DonationSlot slot = donationSlotRepository.findById(slotId).orElse(null);
+        return slot != null && slot.getRegisteredCount() < slot.getMaxCapacity();
     }
 
     public void incrementRegistrationCount(Long slotId) {
@@ -68,54 +77,72 @@ public class DonationSlotService {
         donationSlotRepository.save(slot);
     }
 
-    public boolean isSlotAvailable(Long slotId) {
-        DonationSlot slot = donationSlotRepository.findById(slotId)
-                .orElse(null);
-        return slot != null && slot.getRegisteredCount() < slot.getMaxCapacity();
-    }
-
-    public List<DonationSlotDTO> getSlotsByDate(LocalDate date) {
-        return donationSlotRepository.findBySlotDate(date).stream()
-                .map(donationSlotMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<DonationSlotDTO> getSlotsByStatus(SlotStatus status) {
-        return donationSlotRepository.findByStatus(status).stream()
-                .map(donationSlotMapper::toDTO)
+    // === Gợi ý slot ===
+    public List<DonationSlotDTO> getSuggestedSlots(int requiredCapacity) {
+        return donationSlotRepository
+                .findByStatusAndRegisteredCountLessThan(SlotStatus.ACTIVE, requiredCapacity)
+                .stream()
+                .map(DonationSlotMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public List<DonationSlotDTO> getTodayAvailableSlots() {
         LocalDate today = LocalDate.now();
-        // Giả định 1 slot tối đa bao nhiêu người, dùng Integer.MAX_VALUE để không giới hạn
-        List<DonationSlot> slots = donationSlotRepository
-                .findBySlotDateAndStatusAndRegisteredCountLessThan(today, SlotStatus.ACTIVE, Integer.MAX_VALUE);
-
-        return slots.stream()
-                .map(donationSlotMapper::toDTO)
+        return donationSlotRepository
+                .findBySlotDateAndStatusAndRegisteredCountLessThan(today, SlotStatus.ACTIVE, Integer.MAX_VALUE)
+                .stream()
+                .map(DonationSlotMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    public DonationSlotDTO getBestAvailableSlot() {
+        return donationSlotRepository.findByStatus(SlotStatus.ACTIVE).stream()
+                .filter(slot -> slot.getRegisteredCount() < slot.getMaxCapacity())
+                .sorted(Comparator.comparing(DonationSlot::getSlotDate)
+                        .thenComparing(DonationSlot::getRegisteredCount))
+                .findFirst()
+                .map(DonationSlotMapper::toDTO)
+                .orElse(null);
+    }
+
     @Transactional
-    public void assignSlotToRegistration(DonationRegistration registration, Long slotId) {
+    public DonationSlot assignSlotToRegistration(DonationRegistration registration, Long slotId) {
         DonationSlot slot = donationSlotRepository.findById(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.SLOT_NOT_FOUND));
 
+        // Nếu slot đầy → chọn slot khác tự động
         if (slot.getRegisteredCount() >= slot.getMaxCapacity()) {
-            log.warn("❌ Slot {} đã đầy. Không thể gán cho đăng ký {}", slotId, registration.getRegistrationId());
-            throw new IllegalStateException(MessageConstants.SLOT_FULL);
+            List<DonationSlot> available = donationSlotRepository.findByStatus(SlotStatus.ACTIVE).stream()
+                    .filter(s -> s.getRegisteredCount() < s.getMaxCapacity())
+                    .sorted(Comparator.comparing(DonationSlot::getSlotDate)
+                            .thenComparing(DonationSlot::getStartTime))
+                    .collect(Collectors.toList());
+
+            if (available.isEmpty()) {
+                throw new IllegalStateException("Tất cả các khung giờ đều đã đầy, vui lòng quay lại sau.");
+            }
+
+            slot = available.get(0); // Slot tốt nhất
+            log.info("Slot ban đầu đã đầy, chuyển sang slot mới: {}", slot.getSlotId());
         }
 
         registration.setSlot(slot);
         slot.setRegisteredCount(slot.getRegisteredCount() + 1);
-
         donationSlotRepository.save(slot);
-        donationRegistrationRepository.save(registration);
 
-        log.info("✅ Gán slot {} cho đơn đăng ký {} thành công.", slotId, registration.getRegistrationId());
+        return slot;
     }
 
+    @Transactional
+    public void autoAssignSlotToRegistration(DonationRegistration registration) {
+        DonationSlotDTO bestSlot = getBestAvailableSlot();
+        if (bestSlot == null) {
+            throw new IllegalStateException("Không tìm thấy slot phù hợp");
+        }
+        assignSlotToRegistration(registration, bestSlot.getSlotId());
+    }
+
+    // === Thống kê ===
     public List<SlotLoadDTO> getSlotLoadStats() {
         return donationSlotRepository.findAll().stream()
                 .map(slot -> SlotLoadDTO.builder()
@@ -127,20 +154,7 @@ public class DonationSlotService {
                         .registeredCount(slot.getRegisteredCount())
                         .loadPercent(slot.getMaxCapacity() == 0 ? 0 :
                                 (double) slot.getRegisteredCount() * 100 / slot.getMaxCapacity())
-                        .build()
-                ).collect(Collectors.toList());
+                        .build())
+                .collect(Collectors.toList());
     }
-
-    public DonationSlotDTO getBestAvailableSlot() {
-        List<DonationSlot> candidates = donationSlotRepository.findByStatus(SlotStatus.ACTIVE);
-
-        return candidates.stream()
-                .filter(slot -> slot.getRegisteredCount() < slot.getMaxCapacity()) // chỉ lấy slot còn trống
-                .sorted(Comparator.comparing(DonationSlot::getSlotDate)
-                        .thenComparing(DonationSlot::getRegisteredCount)) // Ưu tiên ngày gần và ít người
-                .findFirst()
-                .map(donationSlotMapper::toDTO)
-                .orElse(null);
-    }
-
 }

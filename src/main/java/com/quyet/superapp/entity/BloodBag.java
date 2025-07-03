@@ -1,6 +1,7 @@
 package com.quyet.superapp.entity;
 
 import com.quyet.superapp.enums.BloodBagStatus;
+import com.quyet.superapp.enums.RhType;
 import com.quyet.superapp.enums.TestStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,8 +29,9 @@ public class BloodBag {
     @JoinColumn(name = "blood_type_id")
     private BloodType bloodType;
 
-    @Column(name = "rh", nullable = false, length = 2)
-    private String rh;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rh", nullable = false, length = 10)
+    private RhType rh;
 
     @Column(name = "volume", nullable = false)
     private Integer volume;
@@ -53,4 +55,8 @@ public class BloodBag {
 
     @Column(name = "note")
     private String note;
+
+    @OneToOne
+    @JoinColumn(name = "donation_id")
+    private Donation donation;
 }

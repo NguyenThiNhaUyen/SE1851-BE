@@ -60,7 +60,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Đổi đúng port FE của bạn
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        //configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -146,7 +146,8 @@ public class SecurityConfig {
             "/api/blood/**",
             "/api/donation/**",
             "/api/transfusion/**",
-            "/api/urgent-requests/**"
+            "/api/urgent-requests/**",
+            "/api/donation/confirm"
 
     };
 }

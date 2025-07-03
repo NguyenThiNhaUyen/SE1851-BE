@@ -18,23 +18,16 @@ import java.time.LocalDateTime;
 public class DonationRegistrationValidator {
     private final DonationRegistrationRepository registrationRepository;
 
-    private static final int MIN_HOURS_BEFORE_SCHEDULE = 2;
+
     private static final int MIN_RECOVERY_DAYS = 90;
 
     public void validateRegistrationRequest(User user, DonationRegistrationDTO dto) {
-
-        // ❌ Kiểm tra thời gian hẹn tối thiểu trước X giờ
-        if (dto.getScheduledDate().isBefore(LocalDate.now().plusDays(MIN_HOURS_BEFORE_SCHEDULE))) {
-            throw new MemberException("SCHEDULE_TOO_SOON",
-                    "Vui lòng chọn thời gian hẹn cách hiện tại tối thiểu " + MIN_HOURS_BEFORE_SCHEDULE + " giờ.");
-        }
 
         // ❌ Đã có đơn đăng ký PENDING chưa xử lý
         if (registrationRepository.existsByUser_UserIdAndStatus(user.getUserId(), DonationStatus.PENDING)) {
             throw new MemberException("DUPLICATE_PENDING",
                     "Bạn đã có một đơn đăng ký đang chờ xác nhận.");
         }
-
         // ❌ Thời gian phục hồi chưa đủ (nếu có)
         UserProfile profile = user.getUserProfile();
         if (profile != null && profile.getLastDonationDate() != null) {

@@ -21,7 +21,7 @@ public class UserProfileMapper {
         dto.setFullName(profile.getFullName());
         dto.setDob(profile.getDob());
         dto.setGender(profile.getGender());
-        dto.setBloodType(profile.getBloodType());
+        dto.setBloodType(profile.getBloodType().getDescription());
         dto.setPhone(profile.getPhone());
         dto.setEmail(profile.getEmail());
         dto.setOccupation(profile.getOccupation());

@@ -2,6 +2,7 @@ package com.quyet.superapp.dto;
 
 import com.quyet.superapp.entity.BloodType;
 import com.quyet.superapp.enums.BloodBagStatus;
+import com.quyet.superapp.enums.RhType;
 import com.quyet.superapp.enums.TestStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -22,8 +23,8 @@ public class BloodBagDTO {
     private String bagCode;         // Mã túi máu (duy nhất)
     @NotBlank
     private String bloodType;  // ← "A+", "O−", v.v.      // Nhóm máu (A, B, AB, O)
-    @NotBlank
-    private String rh;              // Rh (+ hoặc -)
+    @NotNull
+    private RhType rh;              // Rh (+ hoặc -)
     @Min(0)
     private Integer volume;         // Tổng thể tích máu
     private Double hematocrit;      // Hct (nếu có)

@@ -50,7 +50,10 @@ public class UserProfile {
     private String citizenId;
 
     // ✅ Các trường y tế – tùy chọn
-    private String bloodType;
+    @ManyToOne
+    @JoinColumn(name = "blood_type")
+    private BloodType bloodType;
+
     private Double WeightKg;
     private Double HeightCm;
     private LocalDate lastDonationDate;

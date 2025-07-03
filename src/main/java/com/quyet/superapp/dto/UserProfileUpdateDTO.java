@@ -1,5 +1,6 @@
 package com.quyet.superapp.dto;
 
+import com.quyet.superapp.entity.BloodType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -27,7 +28,7 @@ public class UserProfileUpdateDTO {
     private String gender;
 
     @NotBlank(message = "Nhóm máu không thể trống")
-    private String bloodType;
+    private BloodType bloodType;
 
     @NotBlank(message = "Số điện thoại không thể trống")
     private String phone;
