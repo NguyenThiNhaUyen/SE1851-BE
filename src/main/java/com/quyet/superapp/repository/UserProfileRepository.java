@@ -16,6 +16,10 @@ import java.util.Optional;
 
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
+
+    boolean existsByInsuranceCardNumber(String insuranceCardNumber);
+
+
     Optional<UserProfile> findByUser_UserId(Long userId);
 
     // Tìm theo entity User

@@ -48,7 +48,6 @@ public class UserProfile {
     @Column(name = "email", columnDefinition = "VARCHAR(100)")
     private String email;
 
-    // ✅ Đã loại bỏ unique ở đây, thay bằng unique constraint ở @Table
     @Column(name = "citizen_id", columnDefinition = "VARCHAR(12)", nullable = false)
     private String citizenId;
 
@@ -90,8 +89,31 @@ public class UserProfile {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    // === Bảo hiểm y tế ===
+    @Column(name = "has_insurance")
+    private Boolean hasInsurance;  // TRUE / FALSE / NULL
+
+    @Column(name = "insurance_card_number", columnDefinition = "VARCHAR(20)")
+    private String insuranceCardNumber;
+
+    @Column(name = "insurance_valid_to")
+    private LocalDate insuranceValidTo;
+
+    // === Helpers ===
     public String getFullAddressString() {
         if (address == null) return "Chưa cập nhật";
-        return address.toString(); // hoặc format đẹp hơn
+        return address.toString();
     }
+
+    public boolean isInsuranceStillValid() {
+        return Boolean.TRUE.equals(hasInsurance)
+                && insuranceValidTo != null
+                && !insuranceValidTo.isBefore(LocalDate.now());
+    }
+
+    @Override
+    public String toString() {
+        return fullName + " - " + (phone != null ? phone : "No phone");
+    }
+
 }

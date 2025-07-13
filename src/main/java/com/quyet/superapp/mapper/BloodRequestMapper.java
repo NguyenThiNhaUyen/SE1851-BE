@@ -1,6 +1,7 @@
 package com.quyet.superapp.mapper;
 
 import com.quyet.superapp.dto.BloodRequestDTO;
+import com.quyet.superapp.dto.BloodRequestWithExistingPatientDTO;
 import com.quyet.superapp.dto.CreateBloodRequestDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.BloodRequestStatus;
@@ -68,52 +69,41 @@ public class BloodRequestMapper {
     }
 
     // ✅ DTO → Entity
+    // ✅ Overload cho CreateBloodRequestDTO
     public static BloodRequest toEntity(
             CreateBloodRequestDTO dto,
             User staff,
             User doctor,
             BloodType bloodType,
-            BloodType expectedBloodType, // ✅ thêm tham số này
+            BloodType expectedBloodType,
             BloodComponent component,
             String patientRecordCode,
             String requestCode,
             Patient patient
     ) {
-        UserProfile profile = staff.getUserProfile();
-
         return BloodRequest.builder()
                 .requester(staff)
                 .doctor(doctor)
-                .requesterName(profile != null ? profile.getFullName() : staff.getUsername())
-                .requesterPhone(profile != null ? profile.getPhone() : null)
-
                 .patient(patient)
-
-                // ✅ thông tin truyền máu
                 .bloodType(bloodType)
-                .expectedBloodType(expectedBloodType) // ✅ Gán trường này
+                .expectedBloodType(expectedBloodType)
                 .component(component)
                 .quantityBag(dto.getQuantityBag())
                 .quantityMl(dto.getQuantityMl())
-                .urgencyLevel(parseUrgencyLevel(dto.getUrgencyLevel()))
+                .urgencyLevel(UrgencyLevel.valueOf(dto.getUrgencyLevel()))
                 .triageLevel(dto.getTriageLevel())
                 .reason(dto.getReason())
                 .neededAt(dto.getNeededAt())
-
-                // ✅ Lịch sử y khoa
                 .crossmatchRequired(dto.getCrossmatchRequired())
                 .hasTransfusionHistory(dto.getHasTransfusionHistory())
                 .hasReactionHistory(dto.getHasReactionHistory())
                 .isPregnant(dto.getIsPregnant())
                 .hasAntibodyIssue(dto.getHasAntibodyIssue())
-
-                // ✅ Cảnh báo & metadata
                 .warningNote(dto.getWarningNote())
                 .specialNote(dto.getSpecialNote())
                 .isUnmatched(dto.getIsUnmatched())
                 .codeRedId(dto.getCodeRedId())
                 .emergencyNote(dto.getEmergencyNote())
-
                 .status(BloodRequestStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .patientRecordCode(patientRecordCode)
@@ -121,6 +111,8 @@ public class BloodRequestMapper {
                 .internalPriorityCode(dto.getInternalPriorityCode())
                 .build();
     }
+
+
 
 
     // ✅ Helper

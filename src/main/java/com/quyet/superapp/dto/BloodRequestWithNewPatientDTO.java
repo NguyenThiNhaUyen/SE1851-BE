@@ -1,66 +1,10 @@
 package com.quyet.superapp.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-//@Data
-//public class BloodRequestWithNewPatientDTO {
-//
-//    // ✅ Thêm CCCD để tra cứu
-//    private String citizenId;
-//
-//    // ✅ Thêm suspectedPatientId nếu đã tìm được
-//    private Long suspectedPatientId;
-//
-//    @NotBlank
-//    private String patientName;
-//    @NotBlank
-//    private String patientPhone;
-//    @NotNull
-//    private Integer patientAge;
-//    @NotBlank
-//    private String patientGender;
-//    @NotNull
-//    private Double patientWeight;
-//    @NotBlank
-//    private String patientBloodGroup;
-//
-//    @NotBlank
-//    private String requesterName;
-//    @NotBlank
-//    private String reason;
-//    @NotBlank
-//    private String urgencyLevel;
-//    @NotBlank
-//    private String triageLevel;
-//    @NotNull
-//    private Integer quantityBag;
-//    @NotNull
-//    private Integer quantityMl;
-//    @NotBlank
-//    private String componentName;
-//    @NotNull
-//    private LocalDateTime neededAt;
-//
-//    private Boolean crossmatchRequired;
-//    private Boolean hasTransfusionHistory;
-//    private Boolean hasReactionHistory;
-//    private Boolean isPregnant;
-//    private Boolean hasAntibodyIssue;
-//
-//    private String warningNote;
-//    private String specialNote;
-//
-//    private String patientRecordCode;
-//
-//    private Boolean deferredPayment;
-//    private String deferredPaymentReason;
-//
-//}
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 public class BloodRequestWithNewPatientDTO {
@@ -72,59 +16,82 @@ public class BloodRequestWithNewPatientDTO {
     // 👤 Thông tin bệnh nhân
     @NotBlank
     private String patientName;
+
     @NotBlank
     private String patientPhone;
+
     @NotNull
     private Integer patientAge;
+
     @NotBlank
     private String patientGender;
+
     @NotNull
     private Double patientWeight;
+
     @NotBlank
     private String patientBloodGroup;
 
-    // 🧑‍⚕️ Người gửi & bác sĩ (dùng ID thay vì name)
+    // 🧑‍⚕️ Thông tin người gửi yêu cầu và bác sĩ phụ trách
     @NotNull
     private Long requesterId;
+
     @NotNull
     private Long doctorId;
 
-    // 🩸 Yêu cầu máu
+    // 🩸 Yêu cầu truyền máu
     @NotBlank
     private String reason;
+
     @NotBlank
     private String urgencyLevel;
+
     @NotBlank
     private String triageLevel;
+
     @NotNull
     private Integer quantityBag;
+
     @NotNull
     private Integer quantityMl;
 
     @NotNull
     private Long bloodTypeId;
+
     @NotNull
     private Long componentId;
 
-    private Long expectedBloodTypeId;        // 🆕 nếu muốn truyền nhóm thay thế
-    private String priorityCode;             // 🆕 mã RED/VIP...
+    private Long expectedBloodTypeId;
+    private String priorityCode;
 
+    // ⏰ Thời gian cần truyền máu
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime neededAt;
 
-    // 🧪 Y tế nâng cao
+    // 🧪 Lịch sử y khoa
     private Boolean crossmatchRequired;
     private Boolean hasTransfusionHistory;
     private Boolean hasReactionHistory;
     private Boolean isPregnant;
     private Boolean hasAntibodyIssue;
 
+    // ⚠️ Ghi chú
     private String warningNote;
     private String specialNote;
 
-    private String patientRecordCode;        // nếu có thì dùng, không thì hệ thống sinh
+    // 🩺 Mã bệnh án
+    private String patientRecordCode;
 
     // 💰 Thanh toán
     private Boolean deferredPayment;
     private String deferredPaymentReason;
+
+    // 🩹 BHYT
+    private Boolean hasInsurance;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate insuranceValidTo;
+
+    private String insuranceCardNumber;
 }

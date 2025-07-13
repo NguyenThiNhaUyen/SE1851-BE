@@ -290,5 +290,7 @@ public class BloodRequest {
     private LocalDateTime updatedAt;
     private String cancelReason;             // ✅ lý do từ chối/hủy
     private LocalDateTime cancelledAt;       // ✅ thời gian hủy
+
+
 }
 

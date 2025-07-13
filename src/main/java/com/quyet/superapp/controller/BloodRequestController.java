@@ -3,11 +3,13 @@ package com.quyet.superapp.controller;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.BloodRequest;
 import com.quyet.superapp.entity.User;
-import com.quyet.superapp.entity.UserProfile;
+import com.quyet.superapp.exception.RegistrationException;
 import com.quyet.superapp.mapper.BloodRequestMapper;
 import com.quyet.superapp.repository.UserRepository;
 import com.quyet.superapp.service.BloodInventoryService;
 import com.quyet.superapp.service.BloodRequestService;
+import com.quyet.superapp.service.PatientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,9 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/blood-requests")
@@ -26,148 +26,166 @@ import java.util.Optional;
 public class BloodRequestController {
 
     private final BloodRequestService requestService;
-    private final BloodInventoryService bloodInventoryService;
+    private final BloodInventoryService inventoryService;
     private final UserRepository userRepository;
+    private final PatientService patientService;
 
+    // ================================
+    // [STAFF] Tạo yêu cầu máu với bệnh nhân mới
+    // ================================
+    @PostMapping("/new")
+    @PreAuthorize("hasRole('STAFF')")
+    public ResponseEntity<?> createRequestWithNewPatient(@Valid @RequestBody BloodRequestWithNewPatientDTO dto) {
+        patientService.validateInsurance(dto);  // chỉ gọi, không cần gán
+        BloodRequest created = requestService.createRequestWithNewPatient(dto);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(created));
+    }
+
+
+    // ================================
+    // [STAFF] Tạo yêu cầu máu với bệnh nhân đã có
+    // ================================
+    @PostMapping("/existing")
+    @PreAuthorize("hasRole('STAFF')")
+    public ResponseEntity<?> createRequestWithExistingPatient(@Valid @RequestBody BloodRequestWithExistingPatientDTO dto) {
+        BloodRequest created = requestService.createRequestWithExistingPatient(dto);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(created));
+    }
+
+    // ================================
+    // [STAFF + ADMIN] Kiểm tra số CMND/CCCD bệnh nhân
+    // ================================
+    @GetMapping("/check-citizen/{citizenId}")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    public ResponseEntity<?> checkCitizenInfo(@PathVariable String citizenId) {
+        Optional<User> userOpt = userRepository.findByCitizenId(citizenId);
+        if (userOpt.isPresent()) {
+            var u = userOpt.get();
+            var p = u.getUserProfile();
+            Map<String, Object> result = new HashMap<>();
+            result.put("userId", u.getUserId());
+            result.put("fullName", p.getFullName());
+            result.put("phone", p.getPhone());
+            result.put("age", (p.getDob() != null) ? Period.between(p.getDob(), LocalDate.now()).getYears() : null);
+            result.put("gender", p.getGender());
+            result.put("bloodGroup", (p.getBloodType() != null) ? p.getBloodType().getDescription() : null);
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.ok(Collections.emptyMap());
+    }
+
+    // ================================
+    // [STAFF] Xác nhận số lượng máu nhận được
+    // ================================
+    @PutMapping("/{id}/confirm")
+    @PreAuthorize("hasRole('STAFF')")
+    public ResponseEntity<BloodRequestDTO> confirmReceived(@PathVariable Long id, @RequestParam int confirmedVolumeMl) {
+        BloodRequest updated = requestService.confirmReceivedVolume(id, confirmedVolumeMl);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
+    }
+
+    // ================================
+    // [ADMIN] Duyệt hoặc từ chối yêu cầu máu
+    // ================================
+    @PutMapping("/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BloodRequestDTO> approveRequest(@RequestBody ApproveBloodRequestDTO dto) {
+        BloodRequest approved = requestService.approveRequest(dto);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(approved));
+    }
+
+    // ================================
+    // [ADMIN] Cập nhật trạng thái yêu cầu
+    // ================================
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BloodRequestDTO> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        BloodRequest updated = requestService.updateStatus(id, status);
+        return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
+    }
+
+    // ================================
+    // [ADMIN + STAFF] Xem chi tiết yêu cầu máu
+    // ================================
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<BloodRequestDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(requestService.getById(id));
+    }
+
+    // ================================
+    // [ADMIN + STAFF] Kiểm tra tồn kho phù hợp
+    // ================================
+    @GetMapping("/{id}/check-inventory")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<InventoryCheckResultDTO> checkInventory(@PathVariable Long id) {
+        BloodRequest request = requestService.findById(id);
+        InventoryCheckResultDTO result = inventoryService.checkInventoryForRequest(request);
+        return ResponseEntity.ok(result);
+    }
+
+    // ================================
+    // [ADMIN + STAFF] Lọc theo trạng thái và độ khẩn
+    // ================================
+    @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<List<BloodRequestDTO>> filterRequests(
+            @RequestParam(required = false) String urgency,
+            @RequestParam(required = false) String status) {
+        return ResponseEntity.ok(requestService.filterRequests(urgency, status));
+    }
+
+    // ================================
+    // [ADMIN] Danh sách yêu cầu hoàn tất
+    // ================================
     @GetMapping("/admin/requests/completed")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BloodRequestDTO>> getCompletedRequests() {
         return ResponseEntity.ok(requestService.getCompletedRequests());
     }
 
-
+    // ================================
+    // [ADMIN] Danh sách yêu cầu đang xử lý
+    // ================================
     @GetMapping("/admin/requests/processing")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BloodRequestDTO>> getProcessingRequests() {
         return ResponseEntity.ok(requestService.getProcessingRequests());
     }
 
-
-
-    @GetMapping("/pricing/{componentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<Integer> getComponentPrice(@PathVariable Long componentId) {
-        int unitPrice = requestService.getPriceForComponent(componentId);
-        return ResponseEntity.ok(unitPrice);
-    }
-
-
-    @GetMapping("/check-citizen/{citizenId}")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    public ResponseEntity<?> checkCitizenId(@PathVariable String citizenId) {
-        Optional<User> userOpt = userRepository.findByCitizenId(citizenId);
-        if (userOpt.isPresent()) {
-            var u = userOpt.get();
-            var p = u.getUserProfile();
-            return ResponseEntity.ok(Map.of(
-                    "userId", u.getUserId(),
-                    "fullName", p.getFullName(),
-                    "phone", p.getPhone(),
-                    "age", p.getDob() != null ? Period.between(p.getDob(), LocalDate.now()).getYears() : null,
-                    "gender", p.getGender(),
-                    "bloodGroup", p.getBloodType() != null ? p.getBloodType().getDescription() : null
-            ));
-        }
-        return ResponseEntity.ok(Map.of());
-    }
-
-
-    // ✅ [STAFF] Gửi yêu cầu máu mới
-    @PostMapping
-    @PreAuthorize("hasRole('STAFF')")
-    public ResponseEntity<BloodRequestDTO> createBloodRequest(@RequestBody CreateBloodRequestDTO dto) {
-        BloodRequest created = requestService.createRequest(dto);
-        return ResponseEntity.ok(BloodRequestMapper.toDTO(created));
-    }
-
-    // ✅ [ADMIN] Duyệt hoặc từ chối yêu cầu máu
-    @PutMapping("/approve")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BloodRequestDTO> approveBloodRequest(@RequestBody ApproveBloodRequestDTO dto) {
-        BloodRequest approved = requestService.approveRequest(dto);
-        return ResponseEntity.ok(BloodRequestMapper.toDTO(approved));
-    }
-
-    // ✅ [ADMIN or STAFF] Lấy chi tiết yêu cầu máu theo ID
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<BloodRequestDTO> getRequestById(@PathVariable("id") Long id) {
-        BloodRequestDTO dto = requestService.getById(id);
-        return ResponseEntity.ok(dto);
-    }
-
-    // ✅ [ADMIN] Lấy danh sách yêu cầu đã hoàn tất
-//    @GetMapping("/admin")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<List<BloodRequestDTO>> getCompletedRequests() {
-//        return ResponseEntity.ok(requestService.getCompletedRequests());
-//    }
-
-    // ✅ [ADMIN] Lấy danh sách yêu cầu đang xử lý
-//    @GetMapping("/admin/active")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<List<BloodRequestDTO>> getActiveRequests() {
-//        return ResponseEntity.ok(requestService.getActiveRequests());
-//    }
-
-    // ✅ [ADMIN] Cập nhật nhanh trạng thái
-    @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BloodRequestDTO> updateStatus(@PathVariable("id") Long id, @RequestParam String status) {
-        BloodRequest updated = requestService.updateStatus(id, status);
-        return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
-    }
-
-    // ✅ [ADMIN or STAFF] Lọc yêu cầu theo trạng thái & độ khẩn
-    @GetMapping("/filter")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<List<BloodRequestDTO>> getByFilter(
-            @RequestParam(required = false) String urgency,
-            @RequestParam(required = false) String status
-    ) {
-        return ResponseEntity.ok(requestService.filterRequests(urgency, status));
-    }
-
-    // ✅ [ADMIN] Lấy yêu cầu KHẨN CẤP đang chờ duyệt
+    // ================================
+    // [ADMIN] Yêu cầu KHẨN CẤP chờ duyệt
+    // ================================
     @GetMapping("/admin/urgent/pending")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BloodRequestDTO>> getUrgentPendingRequests() {
+    public ResponseEntity<List<BloodRequestDTO>> getUrgentPending() {
         return ResponseEntity.ok(requestService.getUrgentPendingRequests());
     }
 
-    // ✅ [ADMIN] Lịch sử yêu cầu KHẨN CẤP
-    @GetMapping("/admin/urgent/history")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BloodRequestDTO>> getUrgentRequestHistory() {
-        return ResponseEntity.ok(requestService.getUrgentRequestHistory());
-    }
-
-    // ✅ [ADMIN] Yêu cầu KHẨN CẤP đang hoạt động
+    // ================================
+    // [ADMIN] Yêu cầu KHẨN CẤP đang hoạt động
+    // ================================
     @GetMapping("/admin/urgent/active")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BloodRequestDTO>> getUrgentActiveRequests() {
+    public ResponseEntity<List<BloodRequestDTO>> getUrgentActive() {
         return ResponseEntity.ok(requestService.getUrgentActiveRequests());
     }
 
-
-
-    // ✅ [STAFF] Xác nhận số lượng máu đã nhận
-    @PutMapping("/{id}/confirm")
-    @PreAuthorize("hasRole('STAFF')")
-    public ResponseEntity<BloodRequestDTO> confirmReceivedBlood(
-            @PathVariable("id") Long id,
-            @RequestParam int confirmedVolumeMl
-    ) {
-        BloodRequest request = requestService.confirmReceivedVolume(id, confirmedVolumeMl);
-        return ResponseEntity.ok(BloodRequestMapper.toDTO(request));
+    // ================================
+    // [ADMIN] Lịch sử yêu cầu KHẨN CẤP
+    // ================================
+    @GetMapping("/admin/urgent/history")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<BloodRequestDTO>> getUrgentHistory() {
+        return ResponseEntity.ok(requestService.getUrgentRequestHistory());
     }
 
-    // ✅ [ADMIN or STAFF] Kiểm tra tồn kho máu theo yêu cầu
-    @GetMapping("/{id}/check-inventory")
+    // ================================
+    // [STAFF + ADMIN] Tra cứu đơn giá thành phần máu
+    // ================================
+    @GetMapping("/pricing/{componentId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<InventoryCheckResultDTO> checkInventory(@PathVariable("id") Long id) {
-        BloodRequest request = requestService.findById(id);
-        InventoryCheckResultDTO result = bloodInventoryService.checkInventoryForRequest(request);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Integer> getComponentPrice(@PathVariable Long componentId) {
+        return ResponseEntity.ok(requestService.getPriceForComponent(componentId));
     }
 }

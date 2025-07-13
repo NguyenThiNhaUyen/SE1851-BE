@@ -73,4 +73,14 @@ public class GlobalExceptionHandler {
                 "message", ex.getMessage()
         ));
     }
+
+    // ✅ 8. Lỗi đăng ký tài khoản (hoặc thêm mới có check nhiều điều kiện trùng)
+    @ExceptionHandler(RegistrationException.class)
+    public ResponseEntity<Map<String, Object>> handleRegistrationException(RegistrationException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("errorCode", ex.getMessage());
+        response.put("errors", ex.getErrors());
+        return ResponseEntity.badRequest().body(response);
+    }
+
 }

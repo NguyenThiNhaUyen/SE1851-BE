@@ -8,19 +8,16 @@ import com.quyet.superapp.entity.address.Ward;
 import com.quyet.superapp.entity.address.District;
 import com.quyet.superapp.entity.address.City;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class UserProfileMapper {
 
-
-    // Chuyển từ entity sang DTO
-
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    // ✅ Entity → DTO (chuyển đúng kiểu và có địa chỉ đầy đủ)
+    // ✅ Entity → DTO
     public static UserProfileDTO toDTO(UserProfile profile) {
         UserProfileDTO dto = new UserProfileDTO();
+
         dto.setUserId(profile.getUser() != null ? profile.getUser().getUserId() : null);
         dto.setFullName(profile.getFullName());
         dto.setDob(profile.getDob());
@@ -28,9 +25,7 @@ public class UserProfileMapper {
         dto.setBloodTypeId(profile.getBloodType() != null ? profile.getBloodType().getBloodTypeId() : null);
         dto.setPhone(profile.getPhone());
 
-        // ✅ Email lấy từ User
         dto.setEmail(profile.getUser() != null ? profile.getUser().getEmail() : null);
-
         dto.setOccupation(profile.getOccupation());
         dto.setLastDonationDate(profile.getLastDonationDate());
         dto.setRecoveryTime(profile.getRecoveryTime());
@@ -38,6 +33,11 @@ public class UserProfileMapper {
         dto.setCitizenId(profile.getCitizenId());
         dto.setHeight(profile.getHeight());
         dto.setWeight(profile.getWeight());
+
+        // ✅ Bảo hiểm y tế
+        dto.setHasInsurance(profile.getHasInsurance());
+        dto.setInsuranceCardNumber(profile.getInsuranceCardNumber());
+        dto.setInsuranceValidTo(profile.getInsuranceValidTo());
 
         // ✅ Địa chỉ đầy đủ
         if (profile.getAddress() != null && profile.getAddress().getWard() != null) {
@@ -59,10 +59,10 @@ public class UserProfileMapper {
         return dto;
     }
 
-
-    // ✅ DTO → Entity (không còn lỗi NullPointerException)
+    // ✅ DTO → Entity
     public static UserProfile toEntity(UserProfileDTO dto, User user, Address address) {
         UserProfile profile = new UserProfile();
+
         profile.setUser(user);
         profile.setDob(dto.getDob());
         profile.setFullName(dto.getFullName());
@@ -77,6 +77,12 @@ public class UserProfileMapper {
         profile.setAddress(address);
         profile.setHeight(dto.getHeight());
         profile.setWeight(dto.getWeight());
+
+        // ✅ Bảo hiểm y tế
+        profile.setHasInsurance(dto.getHasInsurance());
+        profile.setInsuranceCardNumber(dto.getInsuranceCardNumber());
+        profile.setInsuranceValidTo(dto.getInsuranceValidTo());
+
         return profile;
     }
 }

@@ -1,12 +1,12 @@
 package com.quyet.superapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL) // ⚠️ Bỏ qua các field null trong JSON
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfileDTO {
 
     // 🧍 Thông tin cơ bản
@@ -38,17 +38,32 @@ public class UserProfileDTO {
     private String email;
 
     // 📍 Địa chỉ
-    private Long addressId;              // Dùng để cập nhật
-    private String addressFull;          // VD: "123 ABC, P.5, Q.10, TP.HCM"
-    private AddressDTO address;          // Chi tiết nếu cần hiển thị
+    private Long addressId;
+    private String addressFull;
+    private AddressDTO address;
     private Double latitude;
     private Double longitude;
 
-    // 🩸 Thông tin hiến máu & sức khỏe
-    private Long bloodTypeId;            // ID nhóm máu
+    // 🩸 Thông tin nhóm máu & sức khỏe
+    private Long bloodTypeId;
     private Double weight;
     private Double height;
     private String location;
     private LocalDateTime lastDonationDate;
-    private Integer recoveryTime;        // Số ngày cần phục hồi
+    private Integer recoveryTime;
+
+    // 💳 Bảo hiểm y tế
+    private Boolean hasInsurance;
+    private String insuranceCardNumber;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate insuranceValidTo;
+
+    // 👔 Quản lý nhân sự
+    private String staffPosition;
+    private String note;
+
+    // 🕒 Hệ thống
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
 }

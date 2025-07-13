@@ -44,7 +44,7 @@ public class BloodRequestDTO {
     private String urgencyLevel;
     private String triageLevel;
     private String reason;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime neededAt;
 
     // === Lịch sử y khoa
@@ -64,9 +64,9 @@ public class BloodRequestDTO {
     private Boolean isUnmatched;
     private Long codeRedId;
     private String emergencyNote;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime approvedAt;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     private Integer totalAmount;

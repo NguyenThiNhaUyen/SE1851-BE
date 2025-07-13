@@ -1,7 +1,9 @@
 package com.quyet.superapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -33,7 +35,9 @@ public class CreateBloodRequestDTO {
     private String urgencyLevel;
     private String triageLevel;
     private String reason;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime neededAt;
+
 
     // ===== Lịch sử y khoa
     private Boolean crossmatchRequired;
@@ -59,4 +63,12 @@ public class CreateBloodRequestDTO {
 
     // ===== Ưu tiên nội bộ (mới thêm)
     private String internalPriorityCode; // ✅ BỔ SUNG
+
+    // ===== Thông tin BHYT
+    private Boolean hasInsurance;
+    private String insuranceCardNumber;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate insuranceValidTo;
+
 }

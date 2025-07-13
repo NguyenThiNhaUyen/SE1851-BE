@@ -82,6 +82,63 @@ public class BloodRequestService {
     private final BloodComponentRepository componentRepository;
     @Autowired
     private PatientRepository patientRepository;
+    private final BloodComponentRepository bloodComponentRepository;
+
+    @Transactional
+    public BloodRequest createRequestWithExistingPatient(BloodRequestWithExistingPatientDTO dto) {
+        // 1. Tìm bệnh nhân đã có trong hệ thống
+        Patient patient = patientRepository.findById(dto.getPatientId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bệnh nhân với ID: " + dto.getPatientId()));
+
+        // 2. Tìm nhân viên gửi yêu cầu
+        User staff = userRepository.findById(dto.getRequesterId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhân viên"));
+
+        // 3. Tìm bác sĩ phụ trách
+        User doctor = userRepository.findById(dto.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bác sĩ"));
+
+        // 4. Tìm nhóm máu & thành phần máu
+        BloodType bloodType = bloodTypeRepository.findById(dto.getBloodTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhóm máu"));
+
+        BloodComponent component = bloodComponentRepository.findById(dto.getComponentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thành phần máu"));
+
+        // 5. Tạo đơn yêu cầu truyền máu
+        BloodRequest request = new BloodRequest();
+        request.setPatient(patient);
+        request.setRequester(staff);
+        request.setDoctor(doctor);
+        request.setBloodType(bloodType);
+        request.setComponent(component);
+        request.setReason(dto.getReason());
+        request.setUrgencyLevel(UrgencyLevel.valueOf(dto.getUrgencyLevel()));
+        request.setTriageLevel(dto.getTriageLevel());
+        request.setQuantityBag(dto.getQuantityBag());
+        request.setQuantityMl(dto.getQuantityMl());
+        request.setNeededAt(dto.getNeededAt());
+        request.setCrossmatchRequired(dto.getCrossmatchRequired());
+        request.setHasTransfusionHistory(dto.getHasTransfusionHistory());
+        request.setHasReactionHistory(dto.getHasReactionHistory());
+        request.setIsPregnant(dto.getIsPregnant());
+        request.setHasAntibodyIssue(dto.getHasAntibodyIssue());
+        request.setWarningNote(dto.getWarningNote());
+        request.setSpecialNote(dto.getSpecialNote());
+        request.setCreatedAt(LocalDateTime.now());
+        request.setStatus(BloodRequestStatus.PENDING);
+
+        // 6. Gán mã bệnh án (nếu chưa có)
+        String code = dto.getPatientRecordCode();
+        if (code == null || code.isBlank()) {
+            code = generateUniqueMedicalRecordCode(); // đã có sẵn trong class
+        }
+        request.setPatientRecordCode(code);
+
+        // 7. Lưu và trả về
+        return bloodRequestRepository.save(request);
+    }
+
 
     public List<BloodRequestDTO> getCompletedRequests() {
         return requestRepo.findByStatus(BloodRequestStatus.COMPLETED)
@@ -553,28 +610,6 @@ public class BloodRequestService {
         return request;
     }
 
-
-//    public List<BloodRequestDTO> getActiveRequests() {
-//        List<String> statuses = List.of("APPROVED", "REJECTED", "CANCELLED", "WAITING_DONOR");
-//        return requestRepo.findByStatusIn(statuses)
-//                .stream()
-//                .map(BloodRequestMapper::toDTO)
-//                .collect(Collectors.toList());
-//    }
-
-//    public List<BloodRequestDTO> getCompletedRequests() {
-//        return requestRepo.findByStatusIn(List.of("COMPLETED"))
-//                .stream()
-//                .map(BloodRequestMapper::toDTO)
-//                .collect(Collectors.toList());
-//    }
-//    public List<BloodRequestDTO> getUrgentActiveRequests() {
-//        List<String> statuses = List.of("PENDING", "APPROVED", "REJECTED", "CANCELLED", "WAITING_DONOR");
-//        return requestRepo.findUrgentActiveRequests(statuses)
-//                .stream()
-//                .map(BloodRequestMapper::toDTO)
-//                .collect(Collectors.toList());
-//    }
 
     public List<BloodRequestDTO> getUrgentActiveRequests() {
         List<BloodRequestStatus> statuses = List.of(

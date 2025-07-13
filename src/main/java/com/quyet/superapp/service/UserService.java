@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,11 +78,36 @@ public class UserService {
         }
     }
 
+
+    private void applyInsuranceInfo(UserProfile profile, Boolean hasInsurance, String cardNumber, LocalDate validTo) {
+        profile.setHasInsurance(hasInsurance);
+        profile.setInsuranceCardNumber(cardNumber);
+        profile.setInsuranceValidTo(validTo);
+    }
+
+
     // ✅ Đăng ký thành viên (Member)
     @Transactional
     public ResponseEntity<?> register(RegisterRequestDTO request) {
         // 1. Kiểm tra thông tin trùng lặp
         validateRegisterFields(request);
+
+
+        // 🔍 Kiểm tra nếu có BHYT thì phải nhập đúng thông tin
+        if (Boolean.TRUE.equals(request.getHasInsurance())) {
+            if (request.getInsuranceCardNumber() == null || request.getInsuranceCardNumber().isBlank()) {
+                throw new MemberException("MISSING_BHYT_NUMBER", "Vui lòng nhập số thẻ BHYT");
+            }
+            if (request.getInsuranceValidTo() == null) {
+                throw new MemberException("MISSING_BHYT_DATE", "Vui lòng nhập ngày hết hạn BHYT");
+            }
+            if (request.getInsuranceValidTo() != null && request.getInsuranceValidTo().isBefore(LocalDate.now())) {
+                throw new MemberException("EXPIRED_BHYT", "Thẻ BHYT đã hết hạn");
+            }
+
+        }
+
+
 
         // 2. Tìm vai trò (mặc định là MEMBER)
         String roleName = Optional.ofNullable(request.getRole()).map(String::toUpperCase).orElse("MEMBER");
@@ -111,6 +137,10 @@ public class UserService {
 
         // 5. Tạo UserProfile
         UserProfile profile = new UserProfile();
+        applyInsuranceInfo(profile,
+                request.getHasInsurance(),
+                request.getInsuranceCardNumber(),
+                request.getInsuranceValidTo());
         profile.setUser(user);
         profile.setFullName(request.getFirstName() + " " + request.getLastName());
         profile.setDob(request.getDob());
@@ -165,6 +195,13 @@ public class UserService {
                 errors.put("citizenId", "CCCD đã tồn tại");
             }
         }
+        if (request.getInsuranceCardNumber() != null) {
+            String normalizedInsurance = request.getInsuranceCardNumber().trim();
+            if (userProfileRepository.existsByInsuranceCardNumber(normalizedInsurance)) {
+                errors.put("insuranceCardNumber", "Số thẻ BHYT đã tồn tại");
+            }
+        }
+
 
         if (!errors.isEmpty()) {
             log.warn("❌ Đăng ký thất bại do trùng lặp: {}", errors); // ✅ Logging rõ ràng
