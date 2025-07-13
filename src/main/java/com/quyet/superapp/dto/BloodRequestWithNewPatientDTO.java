@@ -1,5 +1,6 @@
 package com.quyet.superapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
@@ -11,7 +12,9 @@ public class BloodRequestWithNewPatientDTO {
 
     // 🔎 Tra cứu bệnh nhân
     private String citizenId;
-    private Long suspectedPatientId;
+    @JsonProperty("patientId")
+    private Long patientId;  // alias cho suspectedPatientId
+
 
     // 👤 Thông tin bệnh nhân
     @NotBlank

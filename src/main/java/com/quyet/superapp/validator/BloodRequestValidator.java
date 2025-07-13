@@ -15,9 +15,9 @@ public class BloodRequestValidator {
     private final PatientRepository patientRepository;
 
     public void validateAndSetSuspectedPatient(BloodRequestWithNewPatientDTO dto) {
-        if (dto.getSuspectedPatientId() == null && dto.getCitizenId() != null) {
+        if (dto.getPatientId() == null && dto.getCitizenId() != null) {
             Optional<Patient> patient = patientRepository.findByCitizenId(dto.getCitizenId());
-            patient.ifPresent(p -> dto.setSuspectedPatientId(p.getId()));
+            patient.ifPresent(p -> dto.setPatientId(p.getId()));
         }
     }
 }
