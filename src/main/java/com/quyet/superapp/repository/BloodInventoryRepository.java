@@ -1,5 +1,6 @@
 package com.quyet.superapp.repository;
 
+import com.quyet.superapp.dto.BloodGroupDistributionDTO;
 import com.quyet.superapp.entity.BloodComponent;
 import com.quyet.superapp.entity.BloodInventory;
 import com.quyet.superapp.entity.BloodType;
@@ -11,6 +12,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BloodInventoryRepository extends JpaRepository<BloodInventory, Long> {
+
+        long countByTotalQuantityMlGreaterThan(int value);
+
+        @Query("SELECT new com.quyet.superapp.dto.BloodGroupDistributionDTO(b.bloodType.description, SUM(b.totalQuantityMl)) " +
+                "FROM BloodInventory b WHERE b.totalQuantityMl > 0 GROUP BY b.bloodType.description")
+        List<BloodGroupDistributionDTO> calculateBloodGroupDistribution();
+
 
         /**
          * ✅ Tìm inventory usable theo nhóm máu + thành phần

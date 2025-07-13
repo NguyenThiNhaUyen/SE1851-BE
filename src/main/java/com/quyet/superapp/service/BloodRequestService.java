@@ -5,6 +5,7 @@ import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.EmailType;
 import com.quyet.superapp.enums.BloodRequestStatus;
 import com.quyet.superapp.enums.PaymentStatus;
+import com.quyet.superapp.enums.UrgencyLevel;
 import com.quyet.superapp.mapper.BloodRequestMapper;
 import com.quyet.superapp.repository.*;
 import com.quyet.superapp.util.AppEmailSender;
@@ -235,7 +236,7 @@ public class BloodRequestService {
         request.setBloodType(bloodType);
 
         request.setReason(dto.getReason());
-        request.setUrgencyLevel(dto.getUrgencyLevel());
+        request.setUrgencyLevel(UrgencyLevel.valueOf(dto.getUrgencyLevel()));
         request.setTriageLevel(dto.getTriageLevel());
         request.setQuantityBag(dto.getQuantityBag());
         request.setQuantityMl(dto.getQuantityMl());
@@ -479,7 +480,7 @@ public class BloodRequestService {
 
     public List<BloodRequestDTO> filterRequests(String urgency, String status) {
         return requestRepo.findAll().stream()
-                .filter(req -> urgency == null || urgency.equalsIgnoreCase(req.getUrgencyLevel()))
+                .filter(req -> urgency == null || urgency.equalsIgnoreCase(req.getUrgencyLevel().name()))
                 .filter(req -> {
                     if (status == null) return true;
                     try {
@@ -496,7 +497,7 @@ public class BloodRequestService {
     public List<BloodRequestDTO> getUrgentPendingRequests() {
         return requestRepo.findAll().stream()
                 .filter(req ->
-                        "KHẨN CẤP".equalsIgnoreCase(req.getUrgencyLevel()) &&
+                        "KHẨN CẤP".equalsIgnoreCase(req.getUrgencyLevel().name()) &&
                                 req.getStatus() == BloodRequestStatus.PENDING)
                 .map(BloodRequestMapper::toDTO)
                 .collect(Collectors.toList());
@@ -506,7 +507,7 @@ public class BloodRequestService {
     public List<BloodRequestDTO> getUrgentRequestHistory() {
         List<String> validStatuses = List.of("PENDING", "APPROVED", "REJECTED", "APPROVED_FULL", "COMPLETED");
         return requestRepo.findAll().stream()
-                .filter(req -> "KHẨN CẤP".equalsIgnoreCase(req.getUrgencyLevel()))
+                .filter(req -> "KHẨN CẤP".equalsIgnoreCase(req.getUrgencyLevel().name()))
                 .filter(req -> validStatuses.contains(req.getStatus()))
                 .map(BloodRequestMapper::toDTO)
                 .collect(Collectors.toList());

@@ -4,6 +4,7 @@ import com.quyet.superapp.dto.BloodRequestDTO;
 import com.quyet.superapp.dto.CreateBloodRequestDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.BloodRequestStatus;
+import com.quyet.superapp.enums.UrgencyLevel;
 
 import java.time.LocalDateTime;
 
@@ -38,7 +39,7 @@ public class BloodRequestMapper {
                 .componentName(req.getComponent() != null ? req.getComponent().getName() : null)
                 .quantityBag(req.getQuantityBag())
                 .quantityMl(req.getQuantityMl())
-                .urgencyLevel(req.getUrgencyLevel())
+                .urgencyLevel(req.getUrgencyLevel().name())
                 .triageLevel(req.getTriageLevel())
                 .reason(req.getReason())
                 .neededAt(req.getNeededAt())
@@ -93,7 +94,7 @@ public class BloodRequestMapper {
                 .component(component)
                 .quantityBag(dto.getQuantityBag())
                 .quantityMl(dto.getQuantityMl())
-                .urgencyLevel(dto.getUrgencyLevel())
+                .urgencyLevel(UrgencyLevel.valueOf(dto.getUrgencyLevel()))
                 .triageLevel(dto.getTriageLevel())
                 .reason(dto.getReason())
                 .neededAt(dto.getNeededAt())

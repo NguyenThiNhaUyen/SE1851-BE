@@ -1,17 +1,69 @@
     package com.quyet.superapp.repository;
 
+    import com.quyet.superapp.dto.DonorDetailDTO;
     import com.quyet.superapp.entity.BloodRequest;
     import com.quyet.superapp.entity.User;
     import com.quyet.superapp.enums.BloodRequestStatus;
+    import com.quyet.superapp.enums.UrgencyLevel;
     import org.springframework.data.jpa.repository.JpaRepository;
     import org.springframework.data.jpa.repository.Modifying;
     import org.springframework.data.jpa.repository.Query;
     import org.springframework.data.repository.query.Param;
 
+    import java.time.LocalDate;
     import java.time.LocalDateTime;
     import java.util.List;
 
     public interface BloodRequestRepository extends JpaRepository<BloodRequest, Long> {
+
+        @Query("""
+    SELECT new com.quyet.superapp.dto.DonorDetailDTO(
+        p.fullName,
+        CONCAT(bt.description, CASE WHEN bt.rh = '+' THEN '+' ELSE '-' END),
+        bc.name,
+        CAST(r.readinessLevel AS string),
+        COUNT(d),
+        MAX(d.donationDate)
+    )
+    FROM UrgentDonorRegistry r
+    JOIN r.donor u
+    JOIN u.userProfile p
+    JOIN r.bloodType bt
+    JOIN r.bloodComponent bc
+    LEFT JOIN Donation d ON d.registration.user.userId = u.userId AND d.status = 'DONATED'
+    WHERE r.isVerified = true
+      AND (:from IS NULL OR r.createdAt >= :from)
+      AND (:to IS NULL OR r.createdAt <= :to)
+      AND (:bloodTypeId IS NULL OR bt.bloodTypeId = :bloodTypeId)
+      AND (:componentId IS NULL OR bc.bloodComponentId = :componentId)
+      AND (:readinessLevel IS NULL OR r.readinessLevel = :readinessLevel)
+    GROUP BY p.fullName, bt.description, bt.rh, bc.name, r.readinessLevel
+""")
+        List<DonorDetailDTO> getFilteredDonorDetails(
+                @Param("from") LocalDateTime from,
+                @Param("to") LocalDateTime to,
+                @Param("bloodTypeId") Long bloodTypeId,
+                @Param("componentId") Long componentId,
+                @Param("readinessLevel") String readinessLevel
+        );
+
+
+        @Query("""
+    SELECT COUNT(r)
+    FROM BloodRequest r
+    WHERE r.status = 'COMPLETED'
+      AND r.createdAt BETWEEN :start AND :end
+""")
+        long countSuccessfulRequests(@Param("start") LocalDateTime start,
+                                     @Param("end") LocalDateTime end);
+
+
+        long countByUrgencyLevelAndStatusIn(UrgencyLevel urgencyLevel, List<BloodRequestStatus> statuses);
+
+        long countByStatusAndCreatedAtBetween(BloodRequestStatus status, LocalDateTime from, LocalDateTime to);
+
+
+
 
         @Query("""
         SELECT br FROM BloodRequest br

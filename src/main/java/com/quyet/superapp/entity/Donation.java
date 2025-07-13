@@ -76,4 +76,14 @@ public class Donation {
                 this.updatedAt = LocalDateTime.now();
         }
 
-        }
+        @Column(name = "recovered_at")
+        private LocalDate recoveryDate;
+
+        @Column(name = "is_emergency")
+        private Boolean isEmergency;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "separated_component_id")
+        private BloodComponent separatedComponent; // 🧪 Thành phần máu thực tế được tách ra
+
+}

@@ -26,7 +26,7 @@ public class TransfusionMapper {
 
         // Từ yêu cầu máu
         if (t.getRequest() != null) {
-            dto.setUrgencyLevel(t.getRequest().getUrgencyLevel());
+            dto.setUrgencyLevel(t.getRequest().getUrgencyLevel().name());
             dto.setTriageLevel(t.getRequest().getTriageLevel());
         }
 

@@ -64,4 +64,18 @@ public class UrgentDonorRegistry {
     public boolean isActiveAndVerified() {
         return Boolean.TRUE.equals(isAvailable) && Boolean.TRUE.equals(isVerified);
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "component_id")
+    private BloodComponent bloodComponent;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+
 }

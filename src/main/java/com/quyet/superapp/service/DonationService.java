@@ -39,17 +39,66 @@ public class DonationService {
         repository.deleteById(id);
     }
 
-    // ✅ Lấy tất cả đơn hiến máu theo userId
-    public List<Donation> getByUserId(Long userId) {
-        return repository.findAll().stream()
-                .filter(d -> d.getUser() != null && d.getUser().getUserId().equals(userId))
-                .collect(Collectors.toList());
+    /**
+     * Tính số ngày còn lại để phục hồi thành phần máu cụ thể
+     */
+    public int getDaysUntilRecover(Long userId, Long componentId) {
+        List<Donation> donations = getByUserId(userId);
+
+        // Tìm lần hiến cuối cùng cho thành phần máu cụ thể
+        Optional<LocalDateTime> lastDonation = donations.stream()
+                .filter(d -> d.getBloodComponent() != null
+                        && d.getBloodComponent().getBloodComponentId().equals(componentId))
+                .map(Donation::getDonationDate)
+                .filter(date -> date != null)
+                .max(LocalDateTime::compareTo);
+
+        if (lastDonation.isEmpty()) {
+            return 0; // Nếu chưa từng hiến, có thể hiến ngay
+        }
+
+        // Giả sử phục hồi là 30 ngày (sau này có thể cấu hình động)
+        LocalDateTime nextEligible = lastDonation.get().plusDays(30);
+        int daysLeft = (int) java.time.Duration.between(LocalDateTime.now(), nextEligible).toDays();
+
+        return Math.max(daysLeft, 0); // Không âm
     }
 
-    // ✅ Đếm số lượt hiến máu theo ngày
-    public long countByDate(LocalDateTime date) {
-        return repository.countByDonationDate(date);
+
+
+    // ✅ Kiểm tra người dùng đã đủ thời gian để hiến lại thành phần máu cụ thể hay chưa
+    public boolean canDonateNow(Long userId, Long componentId) {
+        List<Donation> donations = getByUserId(userId).stream()
+                .filter(d -> d.getBloodComponent() != null
+                        && d.getBloodComponent().getBloodComponentId().equals(componentId))
+                .filter(d -> d.getStatus() != null && d.getStatus().name().equals("DONATED"))
+                .toList();
+
+        return donations.stream()
+                .map(Donation::getDonationDate)
+                .filter(date -> date != null)
+                .max(LocalDateTime::compareTo)
+                .map(lastDonationDate -> lastDonationDate.plusDays(30).isBefore(LocalDateTime.now()))
+                .orElse(true);
     }
+
+
+
+    // ✅ Lấy tất cả đơn hiến máu theo userId
+    public List<Donation> getByUserId(Long userId) {
+        return repository.findByUser_UserId(userId); // Viết thêm trong DonationRepository
+    }
+
+
+
+    // ✅ Đếm số lượt hiến máu theo ngày
+    public long countByDate(LocalDate date) {
+        return repository.countByCreatedAtBetween(
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay()
+        );
+    }
+
 
     // ✅ Lấy các đơn hiến máu chưa được phân tách (chưa có log)
     public List<Donation> getUnseparatedDonations() {

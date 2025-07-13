@@ -51,4 +51,8 @@ public class DonationRegistration {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @Column(name = "is_emergency")
+    private Boolean isEmergency;
+
 }

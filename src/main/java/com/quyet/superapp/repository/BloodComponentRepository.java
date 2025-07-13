@@ -10,6 +10,15 @@ import java.util.Optional;
 @Repository
 public interface BloodComponentRepository extends JpaRepository<BloodComponent, Long> {
 
+    Optional<BloodComponent> findByBloodComponentIdAndIsActiveTrue(Long id);
+
+
+    List<BloodComponent> findAllByOrderByBloodComponentIdAsc();
+    List<BloodComponent> findByIsApheresisCompatibleTrueAndIsActiveTrueOrderByBloodComponentIdAsc();
+
+    List<BloodComponent> findByIsApheresisCompatibleTrue();
+
+
     // 🔍 Tìm theo tên thành phần máu (không phân biệt hoa thường)
     Optional<BloodComponent> findByNameIgnoreCase(String name);
 

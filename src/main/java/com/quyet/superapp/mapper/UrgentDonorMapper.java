@@ -1,13 +1,34 @@
 package com.quyet.superapp.mapper;
 
+import com.quyet.superapp.dto.DonorDetailDTO;
 import com.quyet.superapp.dto.EmergencyDonorDTO;
 import com.quyet.superapp.dto.UnverifiedDonorDTO;
 import com.quyet.superapp.dto.VerifiedUrgentDonorDTO;
 import com.quyet.superapp.entity.UrgentDonorRegistry;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @Component
 public class UrgentDonorMapper {
+
+    public DonorDetailDTO toDonorDetailDTO(UrgentDonorRegistry registry, int totalDonations,
+                                           LocalDate lastDonationDate, String status, double distanceKm) {
+        var profile = registry.getDonor().getUserProfile();
+        return DonorDetailDTO.builder()
+                .fullName(profile != null ? profile.getFullName() : "Chưa có hồ sơ")
+                .bloodGroup(registry.getBloodType().getDescription())
+                .component(registry.getBloodComponent().getName())
+                .readinessLevel(registry.getReadinessLevel().name())
+                .totalDonations((long) totalDonations)             // ✅ đóng ngoặc đúng chỗ
+                .lastDonationDate(lastDonationDate != null ? lastDonationDate.atStartOfDay() : null)
+                // ✅ LocalDate đúng kiểu
+                .status(status)
+                .distanceKm(distanceKm)
+                .build();
+    }
+
+
 
     public VerifiedUrgentDonorDTO toVerifiedDTO(UrgentDonorRegistry entity) {
         var dto = new VerifiedUrgentDonorDTO();

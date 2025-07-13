@@ -1,5 +1,6 @@
 package com.quyet.superapp.repository;
 
+import com.quyet.superapp.dto.StatisticFilterDTO;
 import com.quyet.superapp.entity.User;
 import com.quyet.superapp.enums.RoleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,11 +8,36 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+
+
+    @Query("""
+    SELECT COUNT(DISTINCT u.userId)
+    FROM User u
+    JOIN u.userProfile p
+    JOIN p.address a
+    WHERE (:from IS NULL OR p.createdAt >= :from)
+      AND (:to IS NULL OR p.createdAt <= :to)
+      AND (:bloodTypeId IS NULL OR p.bloodType.bloodTypeId = :bloodTypeId)
+""")
+    long countDistinctDonorsByFilter(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to,
+            @Param("bloodTypeId") Long bloodTypeId
+    );
+
+
+
+
+
+
 
     @Query("""
     SELECT u FROM User u

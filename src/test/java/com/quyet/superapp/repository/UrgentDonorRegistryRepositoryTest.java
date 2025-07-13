@@ -23,7 +23,7 @@ public class UrgentDonorRegistryRepositoryTest {
         double lng = 105.8542;
         double radius = 10.0;
 
-        List<UrgentDonorRegistry> results = donorRepo.findNearbyDonors(lat, lng, radius);
+        List<UrgentDonorRegistry> results = donorRepo.findNearbyVerifiedDonors(lat, lng, radius);
         assertThat(results).isNotNull();
         assertThat(results.size()).isGreaterThanOrEqualTo(0); // tuỳ dữ liệu test
     }

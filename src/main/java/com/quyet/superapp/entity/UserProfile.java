@@ -89,6 +89,11 @@ public class UserProfile {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    public String getFullAddressString() {
+        if (address == null) return "Chưa cập nhật";
+        return address.toString(); // Hoặc format lại đẹp hơn
+    }
+
 }
 
 

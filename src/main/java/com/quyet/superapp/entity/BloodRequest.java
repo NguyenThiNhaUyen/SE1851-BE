@@ -186,8 +186,11 @@ package com.quyet.superapp.entity;
 
 import com.quyet.superapp.enums.BloodRequestStatus;
 import com.quyet.superapp.enums.PaymentStatus;
+import com.quyet.superapp.enums.UrgencyLevel;
 import jakarta.persistence.*;
 import lombok.*;
+import com.quyet.superapp.enums.UrgencyLevel;
+import com.quyet.superapp.entity.BloodType;
 
 import java.time.LocalDateTime;
 
@@ -238,7 +241,10 @@ public class BloodRequest {
     private String requestCode;        // Mã đơn truyền máu
 
     private String reason;             // Lý do truyền máu
-    private String urgencyLevel;       // Mức độ khẩn cấp
+    @Enumerated(EnumType.STRING)
+    @Column(name = "urgency_level") // để rõ ràng, mapping tên cột
+    private UrgencyLevel urgencyLevel;
+
     private String triageLevel;        // Mức độ ưu tiên
 
     private Integer quantityBag;       // Số túi máu yêu cầu

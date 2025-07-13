@@ -75,7 +75,7 @@ public class DonationController {
     // ✅ Đếm số lượt hiến theo ngày (dùng cho thống kê)
     @GetMapping("/count")
     public ResponseEntity<Long> countByDate(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime date) {
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(donationService.countByDate(date));
     }
 

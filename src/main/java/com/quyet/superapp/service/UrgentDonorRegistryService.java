@@ -2,8 +2,10 @@ package com.quyet.superapp.service;
 
 import com.quyet.superapp.enums.BloodComponentType;
 import com.quyet.superapp.mapper.NearbyDonorMapper;
+import com.quyet.superapp.mapper.UrgentDonorSearchMapper;
 import com.quyet.superapp.util.HospitalLocation;
 import org.springframework.beans.factory.annotation.Value; // ✅ Đúng!
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.transaction.annotation.Transactional;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.dto.VerifiedUrgentDonorDTO;
@@ -26,10 +28,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.time.temporal.ChronoUnit;
 
@@ -46,6 +45,7 @@ public class UrgentDonorRegistryService {
     private final EmailService emailService;
     private final UrgentDonorRegistryRepository urgentDonorRegistryRepo;
     private final UrgentDonorListItemMapper urgentDonorListItemMapper;
+    private final UrgentDonorSearchMapper mapper;
     @Autowired
     private ReadinessChangeLogRepository readinessChangeLogRepository;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UrgentDonorRegistryService.class);
@@ -65,6 +65,118 @@ public class UrgentDonorRegistryService {
 
 
     private final UrgentDonorRegistryRepository urgentDonorRepository;
+
+    private final UrgentDonorSearchMapper urgentDonorSearchMapper;
+    private final BloodComponentRepository componentRepository;
+    private final UrgentDonorRegistryRepository donorRegistryRepository;
+    private final BloodTypeService bloodTypeService;
+    private final DonationService donationService;
+    private final BloodComponentRepository bloodComponentRepository;
+
+
+
+    public List<UrgentDonorMatchResultDTO> searchUrgentDonors(UrgentDonorSearchRequestDTO request) {
+        // Tìm nhóm máu người nhận
+        BloodType receiverType = bloodTypeRepository.findById(request.getReceiverBloodTypeId())
+                .orElseThrow(() -> new NoSuchElementException("Blood type not found"));
+
+        // Tìm thành phần máu cần
+        BloodComponent component = bloodComponentRepository
+                .findByBloodComponentIdAndIsActiveTrue(request.getComponentId())
+                .orElseThrow(() -> new RuntimeException("Component not found"));
+
+        // Lấy tất cả người hiến máu đã xác minh có sẵn thành phần máu này
+        List<UrgentDonorRegistry> allDonors =
+                donorRegistryRepository.findAllVerifiedWithComponent(component.getBloodComponentId());
+
+        List<UrgentDonorMatchResultDTO> result = new ArrayList<>();
+
+        for (UrgentDonorRegistry reg : allDonors) {
+            // Bỏ qua nếu thiếu user, profile hoặc bloodType
+            if (reg.getDonor() == null || reg.getDonor().getUserProfile() == null || reg.getDonor().getProfile() == null) {
+                continue;
+            }
+
+            UserProfile profile = reg.getDonor().getUserProfile();
+            Double donorLat = profile.getLatitude();
+            Double donorLng = profile.getLongitude();
+
+            // Bỏ qua nếu thiếu tọa độ
+            if (donorLat == null || donorLng == null) {
+                continue;
+            }
+
+            BloodType donorType = reg.getDonor().getProfile().getBloodType();
+            if (donorType == null) continue;
+
+            // Kiểm tra tương thích nhóm máu
+            boolean compatible = bloodTypeService.isCompatible(donorType, receiverType);
+
+            // Tính khoảng cách tới bệnh viện
+            double distance = GeoUtils.calculateDistanceKm(
+                    donorLat, donorLng,
+                    HospitalLocation.LATITUDE,
+                    HospitalLocation.LONGITUDE
+            );
+
+            // Ngoài bán kính tìm kiếm thì bỏ qua
+            if (distance > request.getRadiusKm()) continue;
+
+            // Kiểm tra khả năng hiến thành phần máu
+            boolean canDonateNow = donationService.canDonateNow(
+                    reg.getDonor().getUserId(), component.getBloodComponentId());
+
+            Integer daysLeft = donationService.getDaysUntilRecover(
+                    reg.getDonor().getUserId(), component.getBloodComponentId());
+
+            // Tạo DTO kết quả
+            result.add(UrgentDonorMatchResultDTO.builder()
+                    .id(reg.getId())
+                    .fullName(profile.getFullName())
+                    .phone(profile.getPhone())
+                    .address(profile.getFullAddressString())
+                    .bloodType(donorType.getDescription())
+                    .component(component.getName())
+                    .distance(Math.round(distance * 10.0) / 10.0)
+                    .readiness(reg.getReadinessLevel().name())
+                    .verified(true)
+                    .compatible(compatible)
+                    .canDonateNow(canDonateNow)
+                    .daysUntilRecover(canDonateNow ? null : daysLeft)
+                    .build());
+        }
+
+        // Sắp xếp theo khoảng cách gần nhất
+        result.sort(Comparator.comparing(UrgentDonorMatchResultDTO::getDistance));
+
+        return result;
+    }
+
+
+
+
+
+
+    public List<UrgentDonorSearchResultDTO> searchNearbyDonors(Long bloodTypeId, Long componentId, double maxDistanceKm) {
+        List<UrgentDonorRegistry> candidates = urgentDonorRegistryRepository
+                .findByBloodType_BloodTypeIdAndBloodComponent_BloodComponentIdAndIsVerifiedTrueAndIsAvailableTrue(bloodTypeId, componentId);
+
+        double hospitalLat = HospitalLocation.LATITUDE;
+        double hospitalLng = HospitalLocation.LONGITUDE;
+
+        return candidates.stream()
+                .map(donor -> {
+                    double distance = GeoUtils.calculateDistanceKm(hospitalLat, hospitalLng, donor.getLatitude(), donor.getLongitude());
+                    return new Object[]{donor, distance};
+                })
+                .filter(arr -> (double) arr[1] <= maxDistanceKm)
+                .sorted(Comparator.comparingDouble(arr -> (double) arr[1])) // ✅ sort theo khoảng cách
+                .map(arr -> urgentDonorSearchMapper.toDTO((UrgentDonorRegistry) arr[0], (double) arr[1]))
+                .collect(Collectors.toList());
+    }
+
+
+
 
     public List<NearbyDonorDTO> findNearbyVerifiedDonors(BloodRequest request, double radiusKm) {
         if (request == null || request.getBloodType() == null) {
@@ -382,11 +494,11 @@ public class UrgentDonorRegistryService {
     }
 
     public List<UrgentDonorRegistry> findNearbyDonors(double lat, double lng, double radiusKm) {
-        return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm);
+        return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm);
     }
 
     public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
-        return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm)
+        return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm)
                 .stream()
                 .filter(d -> d.getBloodType().getBloodTypeId().equals(bloodTypeId))
                 .map(d -> {

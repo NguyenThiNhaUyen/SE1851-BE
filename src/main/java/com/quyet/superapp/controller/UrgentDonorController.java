@@ -29,6 +29,38 @@ public class UrgentDonorController {
     private final DonorReadinessService donorReadinessService;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UrgentDonorRegistryService.class);
 
+//    @PostMapping("/search")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<List<UrgentDonorMatchResultDTO>> searchDonors(@RequestBody UrgentDonorSearchRequestDTO dto) {
+//        List<UrgentDonorMatchResultDTO> result = urgentDonorRegistryService.searchUrgentDonors(dto);
+//        return ResponseEntity.ok(result);
+//    }
+
+
+    @PostMapping("/search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UrgentDonorMatchResultDTO>> searchUrgentDonors(
+            @RequestBody UrgentDonorSearchRequestDTO request) {
+        List<UrgentDonorMatchResultDTO> results = urgentDonorRegistryService.searchUrgentDonors(request);
+        return ResponseEntity.ok(results);
+    }
+
+
+
+    // UrgentDonorController.java
+    @GetMapping("/search")
+    public ResponseEntity<List<UrgentDonorSearchResultDTO>> searchDonors(
+            @RequestParam Long bloodTypeId,
+            @RequestParam Long componentId,
+            @RequestParam(defaultValue = "20") double maxDistanceKm) {
+        List<UrgentDonorSearchResultDTO> result = urgentDonorRegistryService.searchNearbyDonors(bloodTypeId, componentId, maxDistanceKm);
+        return ResponseEntity.ok(result);
+    }
+
+
+
+
+
     @PostMapping("/process-readiness")
     @PreAuthorize("hasRole('MEMBER')")
     public ResponseEntity<ApiResponseDTO<String>> processReadiness(
