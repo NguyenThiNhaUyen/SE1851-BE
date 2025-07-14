@@ -84,6 +84,52 @@ public class BloodRequestService {
     private PatientRepository patientRepository;
     private final BloodComponentRepository bloodComponentRepository;
 
+    public BloodRequestDTO getDetailById(Long id) {
+        BloodRequest request = bloodRequestRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn với ID: " + id));
+
+        return BloodRequestMapper.toDTO(request);
+    }
+
+
+    public List<BloodRequestSummaryDTO> getSummaryList() {
+        return bloodRequestRepository.findAllSummaryRequests();
+    }
+
+    public PaymentInfoDTO getPaymentInfo(Long id) {
+        BloodRequest request = requestRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn truyền máu với ID: " + id));
+
+        // Lấy đơn giá từ bảng giá hoặc hardcode nếu chưa có
+        int unitPrice = bloodPricingService.getLatestPriceForComponent(request.getComponent().getBloodComponentId());
+
+        int quantity = request.getQuantityBag() != null ? request.getQuantityBag() : 0;
+        int total = unitPrice * quantity;
+
+        return PaymentInfoDTO.builder()
+                .bloodRequestId(request.getId())
+                .patientName(request.getPatient().getFullName())
+                .componentName(request.getComponent().getName())
+                .bloodTypeName(request.getBloodType().getDescription())
+                .quantityBag(quantity)
+                .unitPrice(unitPrice)
+                .totalAmount(total)
+                .paymentStatus(
+                        request.getPaymentStatus() != null ?
+                                request.getPaymentStatus().name() :
+                                PaymentStatus.PENDING.name()
+                )
+                .deferredPayment(request.getDeferredPayment())
+                .deferredPaymentReason(request.getDeferredPaymentReason())
+                .approvedAt(request.getApprovedAt())
+                .deadline(request.getApprovedAt() != null ? request.getApprovedAt().plusDays(3) : null)
+                .requesterName(request.getRequesterName())
+                .doctorName(request.getDoctor().getUserProfile().getFullName())
+                .build();
+    }
+
+
+
     @Transactional
     public BloodRequest createRequestWithExistingPatient(BloodRequestWithExistingPatientDTO dto) {
         // 1. Tìm bệnh nhân đã có trong hệ thống

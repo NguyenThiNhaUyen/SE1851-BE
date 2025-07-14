@@ -9,6 +9,7 @@ import com.quyet.superapp.repository.UserRepository;
 import com.quyet.superapp.service.BloodInventoryService;
 import com.quyet.superapp.service.BloodRequestService;
 import com.quyet.superapp.service.PatientService;
+import com.quyet.superapp.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,24 @@ public class BloodRequestController {
     private final BloodInventoryService inventoryService;
     private final UserRepository userRepository;
     private final PatientService patientService;
+    private final PaymentService paymentService;
+
+    @GetMapping("/{id}/payment-info")
+    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN', 'STAFF')")
+    public ResponseEntity<PaymentInfoDTO> getPaymentInfo(@PathVariable Long id) {
+        return ResponseEntity.ok(requestService.getPaymentInfo(id));
+    }
+
+
+    @PostMapping("/{id}/pay")
+    @PreAuthorize("hasRole('MEMBER')")
+    public ResponseEntity<?> payForRequest(@PathVariable Long id) {
+        paymentService.processPayment(id); // tính giá, giảm BHYT, lưu giao dịch
+        return ResponseEntity.ok(Map.of("message", "✅ Thanh toán thành công"));
+    }
+
+
+
 
     // ================================
     // [STAFF] Tạo yêu cầu máu với bệnh nhân mới

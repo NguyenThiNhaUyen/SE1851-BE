@@ -1,6 +1,7 @@
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.BloodRequestDTO;
+import com.quyet.superapp.dto.BloodRequestSummaryDTO;
 import com.quyet.superapp.dto.NearbyDonorDTO;
 import com.quyet.superapp.entity.BloodRequest;
 import com.quyet.superapp.mapper.BloodRequestMapper;
@@ -22,6 +23,18 @@ public class AdminBloodRequestController {
 
     private final BloodRequestService service;
     private final UrgentDonorRegistryService urgentDonorRegistryService;
+    private final BloodRequestService bloodRequestService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BloodRequestDTO> getRequestDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(bloodRequestService.getDetailById(id));
+    }
+
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<BloodRequestSummaryDTO>> getSummaryList() {
+        return ResponseEntity.ok(bloodRequestService.getSummaryList());
+    }
 
     // ✅ 1. Lấy danh sách người hiến gần bệnh viện
     @GetMapping("/nearby-hospital")

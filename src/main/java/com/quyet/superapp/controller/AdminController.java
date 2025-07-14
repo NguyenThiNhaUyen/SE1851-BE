@@ -75,12 +75,5 @@ public class AdminController {
         return ResponseEntity.ok(users);
     }
 
-
-//    @GetMapping("/doctors")
-//    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-//    public List<DoctorDTO> getDoctors() {
-//        return userService.getUsersByStaffPosition("Doctor");
-//    }
-
 }
 

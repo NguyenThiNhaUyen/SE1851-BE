@@ -1,5 +1,6 @@
     package com.quyet.superapp.repository;
 
+    import com.quyet.superapp.dto.BloodRequestSummaryDTO;
     import com.quyet.superapp.dto.DonorDetailDTO;
     import com.quyet.superapp.entity.BloodRequest;
     import com.quyet.superapp.entity.User;
@@ -15,6 +16,30 @@
     import java.util.List;
 
     public interface BloodRequestRepository extends JpaRepository<BloodRequest, Long> {
+
+        @Query("""
+    SELECT new com.quyet.superapp.dto.BloodRequestSummaryDTO(
+        br.id,
+        p.fullName,
+        p.bloodGroup,
+        bc.name,
+        p.age,
+        br.quantityMl,
+        br.triageLevel,
+        br.status,
+        br.createdAt
+    )
+    FROM BloodRequest br
+    JOIN br.patient p
+    JOIN br.component bc
+""")
+        List<BloodRequestSummaryDTO> findAllSummaryRequests();
+
+
+
+
+
+
 
         List<BloodRequest> findByStatus(BloodRequestStatus status);
 

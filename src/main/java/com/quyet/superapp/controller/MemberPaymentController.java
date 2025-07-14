@@ -29,6 +29,9 @@ public class MemberPaymentController {
     // Nếu bạn dùng @Component trong VnPaymentMapper thì inject vào đây
     private final VnPaymentMapper paymentMapper;
 
+
+
+
     /**
      * 🔍 Lấy thông tin tất cả giao dịch theo ID đơn yêu cầu máu
      */
@@ -65,7 +68,7 @@ public class MemberPaymentController {
         payment.setAmount(amount);
         payment.setPaymentTime(LocalDateTime.now());
         payment.setTransactionCode("TXN-" + System.currentTimeMillis());
-        payment.setUser(request.getRequester()); // ✅ Có thể thay bằng currentUser nếu tích hợp SecurityContext
+        payment.setUser(request.getRequester()); // hoặc lấy từ SecurityContext
 
         vnPaymentRepository.save(payment);
 
