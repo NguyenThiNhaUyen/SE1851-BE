@@ -3,6 +3,7 @@ package com.quyet.superapp.service;
 import com.quyet.superapp.dto.HealthCheckFailureLogDTO;
 import com.quyet.superapp.entity.DonationRegistration;
 import com.quyet.superapp.entity.HealthCheckFailureLog;
+import com.quyet.superapp.enums.HealthCheckFailureReason;
 import com.quyet.superapp.exception.MemberException;
 import com.quyet.superapp.mapper.HealthCheckFailureLogMapper;
 import com.quyet.superapp.repository.DonationRegistrationRepository;
@@ -19,7 +20,7 @@ public class HealthCheckFailureLogService {
     private final HealthCheckFailureLogRepository logRepository;
     private final DonationRegistrationRepository registrationRepository;
 
-    public HealthCheckFailureLogDTO saveLog(Long registrationId, String reason, String staffNote) {
+    public HealthCheckFailureLogDTO saveLog(Long registrationId, HealthCheckFailureReason reason, String staffNote) {
         DonationRegistration reg = registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký"));
 

@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HealthCheckFormMapper {
-    public  HealthCheckForm toEntity(HealthCheckFormDTO dto, DonationRegistration reg, boolean isEligible) {
+
+    public HealthCheckForm toEntity(HealthCheckFormDTO dto, DonationRegistration reg, boolean isEligible) {
         return HealthCheckForm.builder()
                 .registration(reg)
                 .bodyTemperature(dto.getBodyTemperature())
@@ -24,6 +25,13 @@ public class HealthCheckFormMapper {
                 .hasRiskySexualBehavior(dto.getHasRiskySexualBehavior())
                 .isEligible(isEligible)
                 .notesByStaff(dto.getNotesByStaff())
+
+                // ✅ Gộp thêm thông số xét nghiệm máu
+                .hemoglobin(dto.getHemoglobin())
+                .hbsAgPositive(dto.getHbsAgPositive())
+                .hcvPositive(dto.getHcvPositive())
+                .hivPositive(dto.getHivPositive())
+                .syphilisPositive(dto.getSyphilisPositive())
                 .build();
     }
 
@@ -45,7 +53,14 @@ public class HealthCheckFormMapper {
         dto.setHasRiskySexualBehavior(entity.getHasRiskySexualBehavior());
         dto.setIsEligible(entity.getIsEligible());
         dto.setNotesByStaff(entity.getNotesByStaff());
+
+        // ✅ Mapping thông số xét nghiệm máu
+        dto.setHemoglobin(entity.getHemoglobin());
+        dto.setHbsAgPositive(entity.getHbsAgPositive());
+        dto.setHcvPositive(entity.getHcvPositive());
+        dto.setHivPositive(entity.getHivPositive());
+        dto.setSyphilisPositive(entity.getSyphilisPositive());
+
         return dto;
     }
-
 }

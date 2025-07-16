@@ -23,7 +23,7 @@ public class DashboardService {
     private final UrgentRequestRepository urgentRequestRepository;
 
     public DashboardResponseDTO getDashboardStats() {
-        long donorsToday = donationRepository.countByDonationDate(LocalDateTime.now());
+        long donorsToday = donationRepository.countByCollectedAt(LocalDate.now());
         long totalUnits  = bloodInventoryRepository.sumAllUnits();
 
         long pendingReqs  = urgentRequestRepository.countByStatus(RequestStatus.PENDING);

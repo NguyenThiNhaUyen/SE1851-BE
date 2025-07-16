@@ -1,10 +1,7 @@
 package com.quyet.superapp.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,24 +17,27 @@ public class SeparationResult {
     @Column(name = "SeparationResultID")
     private Long separationResultId;
 
-    @OneToOne
-    @JoinColumn(name = "order_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false, unique = true)
     private SeparationOrder order;
 
-    @OneToMany(mappedBy = "result", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "result", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BloodSeparationDetail> details;
 
-    @Column(name = "completed_at")
+    @OneToMany(mappedBy = "result", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BloodUnit> createdUnits;
+
+    @Column(name = "completed_at", nullable = false)
     private LocalDateTime completedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processed_by_user_id")
     private User processedBy;
 
-    @Column(name = "note")
+    @Column(name = "note", columnDefinition = "NVARCHAR(1000)")
     private String note;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "suggestion_id")
     private BloodSeparationSuggestion suggestion;
 }

@@ -1,19 +1,15 @@
 package com.quyet.superapp.service;
 
-
-import com.quyet.superapp.entity.*;
-
 import com.quyet.superapp.dto.BloodInventoryDTO;
-import com.quyet.superapp.entity.BloodInventory;
+import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.BloodUnitStatus;
 import com.quyet.superapp.mapper.BloodInventoryMapper;
-
-import com.quyet.superapp.mapper.BloodUnitMapper;
 import com.quyet.superapp.repository.BloodInventoryRepository;
 import com.quyet.superapp.repository.BloodUnitRepository;
 import com.quyet.superapp.repository.LabTestResultRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,92 +19,107 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BloodService {
-    private final BloodInventoryRepository bloodRepo;
-    private final BloodUnitRepository bloodUnitRepo;
-    private final BloodInventoryRepository bloodInventoryRepo;
-    private final LabTestResultRepository labTestResultRepo;
 
+    private final BloodInventoryRepository inventoryRepo;
+    private final BloodUnitRepository unitRepo;
+    private final LabTestResultRepository labRepo;
+
+    // ✅ Lấy toàn bộ kho máu (Entity)
     public List<BloodInventory> getInventory() {
-        return bloodRepo.findAll();
+        return inventoryRepo.findAll();
     }
 
+    // ✅ Lấy kho máu theo ID
     public Optional<BloodInventory> getInventoryById(Long id) {
-        return bloodRepo.findById(id);
+        return inventoryRepo.findById(id);
     }
 
+    // ✅ Thêm mới 1 bản ghi kho máu (thủ công)
     public BloodInventory addBlood(BloodInventory inventory) {
         inventory.setLastUpdated(LocalDateTime.now());
-        return bloodRepo.save(inventory);
+        return inventoryRepo.save(inventory);
     }
 
+    // ✅ Cập nhật bản ghi kho máu (thủ công)
     public BloodInventory updateBlood(Long id, BloodInventory updated) {
-        return bloodRepo.findById(id)
-                .map(blood -> {
-                    blood.setBloodType(updated.getBloodType());
-                    blood.setComponent(updated.getComponent());
-                    blood.setTotalQuantityMl(updated.getTotalQuantityMl());
-                    blood.setLastUpdated(LocalDateTime.now());
-                    return bloodRepo.save(blood);
-                }).orElse(null);
+        return inventoryRepo.findById(id).map(inventory -> {
+            inventory.setBloodType(updated.getBloodType());
+            inventory.setComponent(updated.getComponent());
+            inventory.setTotalQuantityMl(updated.getTotalQuantityMl());
+            inventory.setLastUpdated(LocalDateTime.now());
+            return inventoryRepo.save(inventory);
+        }).orElse(null);
     }
 
+    // ✅ Xóa bản ghi kho máu
     public void deleteInventory(Long id) {
-        bloodRepo.deleteById(id);
+        inventoryRepo.deleteById(id);
     }
 
+    // ✅ Tìm kho máu theo nhóm máu và thành phần
     public Optional<BloodInventory> searchBloodByTypeAndComponent(BloodType bloodType, BloodComponent component) {
-        return bloodRepo.findByBloodTypeAndComponent(bloodType, component);
+        return inventoryRepo.findByBloodTypeAndComponent(bloodType, component);
     }
 
-
-    public List<BloodInventoryDTO> getAllDTOs() {
-        return bloodRepo.findAll().stream()
-                .map(BloodInventoryMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-
+    // ✅ Lấy danh sách DTO để hiển thị
     public List<BloodInventoryDTO> getAllInventoryDTO() {
-        return bloodRepo.findAll().stream()
+        return inventoryRepo.findAll()
+                .stream()
                 .map(BloodInventoryMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * ✅ Tự động lưu đơn vị máu vào kho sau khi xét nghiệm đạt
+     * 1. Kiểm tra đơn vị máu và kết quả xét nghiệm
+     * 2. Cập nhật trạng thái đơn vị máu
+     * 3. Cộng thể tích vào kho máu tương ứng
+     */
     @Transactional
     public void storeBloodUnit(Long bloodUnitId) {
-        BloodUnit unit = bloodUnitRepo.findById(bloodUnitId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn vị máu"));
+        // B1. Tìm đơn vị máu
+        BloodUnit unit = unitRepo.findById(bloodUnitId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Không tìm thấy đơn vị máu"));
 
-        // 1. Kiểm tra kết quả xét nghiệm
-        LabTestResult test = labTestResultRepo.findByBloodUnit_BloodUnitId(bloodUnitId)
-                .orElseThrow(() -> new IllegalStateException("Chưa có kết quả xét nghiệm"));
+        // B2. Kiểm tra kết quả xét nghiệm
+        LabTestResult test = labRepo.findByBloodUnit_BloodUnitId(bloodUnitId)
+                .orElseThrow(() -> new IllegalStateException("❌ Chưa có kết quả xét nghiệm"));
+
         if (!test.isPassed()) {
-            throw new IllegalStateException("Đơn vị máu không đạt yêu cầu xét nghiệm");
+            throw new IllegalStateException("⚠️ Đơn vị máu không đạt yêu cầu xét nghiệm");
         }
 
-        // 2. Cập nhật trạng thái và thời gian lưu
+        // B3. Cập nhật trạng thái đơn vị máu
         unit.setStatus(BloodUnitStatus.STORED);
         unit.setStoredAt(LocalDateTime.now());
-        bloodUnitRepo.save(unit);
+        unitRepo.save(unit);
 
-        // 3. Cập nhật kho máu
-        BloodType type = unit.getBloodType();
-        BloodComponent component = unit.getComponent();
-        BloodInventory inventory = bloodInventoryRepo.findByBloodTypeAndComponent(type, component)
-                .orElseGet(() -> {
-                    BloodInventory newInv = new BloodInventory();
-                    newInv.setBloodType(type);
-                    newInv.setComponent(component);
-                    newInv.setTotalQuantityMl(0);
-                    return newInv;
-                });
-
-        int newTotal = inventory.getTotalQuantityMl() + unit.getQuantityMl();
-        inventory.setTotalQuantityMl(newTotal);
-        inventory.setLastUpdated(LocalDateTime.now());
-
-        bloodInventoryRepo.save(inventory);
+        // B4. Cập nhật vào kho máu
+        updateInventory(unit);
     }
 
-}
+    // ✅ Hàm cập nhật kho máu từ đơn vị máu (reuse được nhiều nơi)
+    private void updateInventory(BloodUnit unit) {
+        BloodType type = unit.getBloodType();
+        BloodComponent component = unit.getComponent();
+        int volume = unit.getQuantityMl();
 
+        BloodInventory inventory = inventoryRepo.findByBloodTypeAndComponent(type, component)
+                .orElseGet(() -> {
+                    BloodInventory newEntry = new BloodInventory();
+                    newEntry.setBloodType(type);
+                    newEntry.setComponent(component);
+                    newEntry.setTotalQuantityMl(0);
+                    newEntry.setCreatedAt(LocalDateTime.now());
+                    return newEntry;
+                });
+
+        inventory.setTotalQuantityMl(inventory.getTotalQuantityMl() + volume);
+        inventory.setLastUpdated(LocalDateTime.now());
+        inventoryRepo.save(inventory);
+
+        log.info("✅ Cập nhật kho: {} - {} + {}ml", type.getDescription(), component.getName(), volume);
+    }
+}

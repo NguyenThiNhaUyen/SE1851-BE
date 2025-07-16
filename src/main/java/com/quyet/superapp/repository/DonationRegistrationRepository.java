@@ -5,6 +5,7 @@ import com.quyet.superapp.enums.DonationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -20,4 +21,7 @@ public interface DonationRegistrationRepository extends JpaRepository<DonationRe
 
     // Phương thức này cần tham chiếu đến thuộc tính đúng là `slot`
     List<DonationRegistration> findBySlot_SlotId(Long slotId);
+
+    // ✅ Lọc đăng ký hiến máu theo khoảng ngày sẵn sàng
+    List<DonationRegistration> findByReadyDateBetween(LocalDate start, LocalDate end);
 }

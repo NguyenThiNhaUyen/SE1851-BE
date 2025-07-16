@@ -38,4 +38,7 @@ public class RegisterRequestDTO {
     private Double height;
     @Valid
     private AddressDTO address;
+
+    @NotNull
+    private String confirmPassword;
 }

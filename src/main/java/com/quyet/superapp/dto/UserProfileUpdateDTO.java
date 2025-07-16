@@ -27,8 +27,8 @@ public class UserProfileUpdateDTO {
     @NotBlank(message = "Giới tính không thể trống")
     private String gender;
 
-    @NotBlank(message = "Nhóm máu không thể trống")
-    private BloodType bloodType;
+//    @NotBlank(message = "Nhóm máu không thể trống")
+//    private BloodType bloodType;
 
     @NotBlank(message = "Số điện thoại không thể trống")
     private String phone;
@@ -50,4 +50,8 @@ public class UserProfileUpdateDTO {
     private AddressDTO address;
     private Double latitude;
     private Double longitude;
+
+    private Boolean hasInsurance;
+    private String insuranceCardNumber;
+    private LocalDate insuranceValidTo;
 }

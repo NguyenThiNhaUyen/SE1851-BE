@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BloodComponentDTO {
-    @NotNull
     private Long bloodComponentId;
 
     @NotBlank

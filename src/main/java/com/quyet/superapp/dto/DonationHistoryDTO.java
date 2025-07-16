@@ -18,4 +18,8 @@ public class DonationHistoryDTO {
     private String bloodGroup;
     private String component;
     private String status;
+
+    // ✅ Thêm 2 trường mới để hiển thị thời gian phục hồi
+    private LocalDate recoveryDate;     // Ngày có thể hiến lại
+    private boolean isRecovered;        // Đã đủ điều kiện hiến lại?
 }

@@ -23,6 +23,7 @@ public class DonationRegistrationMapper {
         dto.setUserId(user.getUserId());
         dto.setEmail(user.getEmail());
 
+
         // Gán slotId và slotDTO nếu có
         if (entity.getSlot() != null) {
             dto.setSlotId(entity.getSlot().getSlotId());
@@ -66,6 +67,9 @@ public class DonationRegistrationMapper {
         entity.setReadyDate(dto.getScheduledDate());
         entity.setLocation(dto.getLocation());
         entity.setBloodType(dto.getBloodType());
+        entity.setEstimatedVolume(dto.getEstimatedVolume());
+        entity.setNote(dto.getNote());
+
         // Slot sẽ được gán sau ở service bằng slotId
         return entity;
     }

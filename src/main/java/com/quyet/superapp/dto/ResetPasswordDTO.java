@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AutoSeparationRequestDTO {
-    private Long donationId;
-    private String method;
-    private boolean leukoreduced;
-    private Long staffId;
+public class ResetPasswordDTO {
+    private String email;
+    private String otp;
+    private String newPassword;
 }

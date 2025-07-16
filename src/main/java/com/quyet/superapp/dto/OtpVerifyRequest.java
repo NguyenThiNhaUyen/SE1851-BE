@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FullHealthCheckDTO {
-
-    private HealthCheckFormDTO healthCheck;
-    private PreDonationTestDTO preDonationTest;
-
+public class OtpVerifyRequest {
+    private String email;
+    private String otp;
 }

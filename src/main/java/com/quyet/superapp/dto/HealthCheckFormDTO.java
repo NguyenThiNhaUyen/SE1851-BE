@@ -51,4 +51,11 @@ public class HealthCheckFormDTO {
     private Boolean isEligible;
     private String notesByStaff;
 
+    // 🔬 Xét nghiệm máu
+    private Double hemoglobin;
+    private Boolean hbsAgPositive;
+    private Boolean hcvPositive;
+    private Boolean hivPositive;
+    private Boolean syphilisPositive;
+
 }

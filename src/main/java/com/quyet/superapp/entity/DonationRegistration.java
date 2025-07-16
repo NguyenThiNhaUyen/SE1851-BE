@@ -1,6 +1,7 @@
 package com.quyet.superapp.entity;
 
 import com.quyet.superapp.enums.DonationStatus;
+import com.quyet.superapp.enums.DonorReadinessLevel;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -61,6 +62,17 @@ public class DonationRegistration {
     @ManyToOne
     @JoinColumn(name = "slot_id")
     private DonationSlot slot;
+
+    @Column(name = "estimated_volume")
+    private Integer estimatedVolume;
+
+    @Column(name = "note", columnDefinition = "NVARCHAR(255)")
+    private String note;
+
+    // ✅ MỚI: Mức độ sẵn sàng hiến máu
+    @Enumerated(EnumType.STRING)
+    @Column(name = "readiness_level", length = 30)
+    private DonorReadinessLevel readinessLevel;
 
 
 }

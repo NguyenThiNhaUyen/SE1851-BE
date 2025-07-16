@@ -18,7 +18,6 @@ public class VnPayment {
     @Column(name = "Payment_Id")
     private Long paymentId;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "User_Id")
     private User user;

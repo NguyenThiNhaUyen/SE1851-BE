@@ -1,18 +1,14 @@
 package com.quyet.superapp.dto;
 
-import com.quyet.superapp.entity.DonationRegistration;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.quyet.superapp.enums.HealthCheckFailureReason;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class HealthCheckFailureLogDTO {
 
@@ -22,12 +18,11 @@ public class HealthCheckFailureLogDTO {
     @NotNull(message = "Registration ID không thể null")
     private Long registrationId;
 
-    @NotBlank(message = "Lý do không thể trống")
-    private String reason;
+    @NotNull(message = "Lý do không thể null")
+    private HealthCheckFailureReason reason;
 
     private String staffNote;
 
     @NotNull(message = "Ngày tạo không thể null")
     private LocalDateTime createdAt;
-
 }

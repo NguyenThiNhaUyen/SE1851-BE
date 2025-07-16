@@ -24,5 +24,7 @@ public class BloodSeparationDetailDTO {
 
     private String qualityRating;
 
+    private String note;                  // ✅ Ghi chú thêm nếu có
 
+    private LocalDateTime createdAt;      // ✅ Thời gian tạo
 }

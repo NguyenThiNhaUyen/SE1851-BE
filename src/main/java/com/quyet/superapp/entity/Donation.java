@@ -3,6 +3,7 @@ package com.quyet.superapp.entity;
 import com.quyet.superapp.enums.DonationStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,14 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Donation {
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "Donation_Id")
         private Long donationId;
 
+        // ❗ Optional nếu luôn lấy từ registration
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "User_Id")
-        private User user; // ❓ Optional nếu đã có trong registration
+        private User user;
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "registration_id")
@@ -33,10 +36,10 @@ public class Donation {
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "component_id")
-        private BloodComponent component; // ❓ Optional nếu chưa phân tách
+        private BloodComponent component; // Có thể null nếu chưa phân tách
 
-        @Column(name = "donation_time")
-        private LocalDate donationDate; // ✅ Thay vì chỉ có ngày
+        @Column(name = "collected_at")
+        private LocalDate collectedAt;
 
         @Column(name = "volume_ml")
         private Integer volumeMl;
@@ -57,7 +60,17 @@ public class Donation {
         @Column(name = "status", columnDefinition = "NVARCHAR(20)")
         private DonationStatus status;
 
+        // ✅ Staff xử lý hiến máu (xác nhận, nhập kết quả...)
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "handled_by_staff_id")
+        private User handledBy;
 
+        // ✅ Túi máu được sinh ra từ lần hiến này
+        @OneToOne
+        @JoinColumn(name = "blood_bag_id")
+        private BloodBag bloodBag;
+
+        // ✅ Các đơn vị máu được tách ra từ túi máu của lần hiến này
         @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL)
         private List<BloodUnit> bloodUnits;
 
@@ -65,8 +78,8 @@ public class Donation {
         protected void onCreate() {
                 this.createdAt = LocalDateTime.now();
                 this.updatedAt = LocalDateTime.now();
-                if (this.donationDate == null) {
-                        this.donationDate = LocalDate.now();
+                if (this.collectedAt == null) {
+                        this.collectedAt = LocalDate.now();
                 }
         }
 
@@ -74,9 +87,4 @@ public class Donation {
         protected void onUpdate() {
                 this.updatedAt = LocalDateTime.now();
         }
-
-        @OneToOne
-        @JoinColumn(name = "blood_bag_id")
-        private BloodBag bloodBag;
-
-        }
+}

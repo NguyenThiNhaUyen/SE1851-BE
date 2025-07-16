@@ -40,4 +40,10 @@ public class UserProfileCreateDTO {
 
     @Positive(message = "Chiều cao phải là số dương")
     private Double height;
+
+    private String bloodGroup;
+
+    private boolean hasInsurance;
+    private String insuranceCardNumber;
+    private LocalDate insuranceValidTo;
 }

@@ -16,7 +16,7 @@ public class EmailLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // ✅ Dùng cột 'id' trong DB đã có (identity)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "User_Id")
@@ -39,5 +39,5 @@ public class EmailLog {
 
     @Column(name = "status", columnDefinition = "VARCHAR(20)")
     private String status; // SUCCESS, FAILED
-
 }
+

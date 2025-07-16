@@ -1,6 +1,6 @@
 package com.quyet.superapp.service;
 
-import com.quyet.superapp.constant.MessageConstants;
+
 import com.quyet.superapp.dto.DonationSlotDTO;
 import com.quyet.superapp.dto.SlotLoadDTO;
 import com.quyet.superapp.entity.DonationRegistration;
@@ -8,7 +8,6 @@ import com.quyet.superapp.entity.DonationSlot;
 import com.quyet.superapp.enums.SlotStatus;
 import com.quyet.superapp.exception.ResourceNotFoundException;
 import com.quyet.superapp.mapper.DonationSlotMapper;
-import com.quyet.superapp.repository.DonationRegistrationRepository;
 import com.quyet.superapp.repository.DonationSlotRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +25,9 @@ import java.util.stream.Collectors;
 public class DonationSlotService {
 
     private final DonationSlotRepository donationSlotRepository;
-    private final DonationRegistrationRepository donationRegistrationRepository;
 
-    // === CRUD ===
+
+    // === CRUD cơ bản ===
     public DonationSlotDTO create(DonationSlotDTO dto) {
         DonationSlot entity = DonationSlotMapper.toEntity(dto);
         entity.setRegisteredCount(0);
@@ -65,19 +64,41 @@ public class DonationSlotService {
         return slot != null && slot.getRegisteredCount() < slot.getMaxCapacity();
     }
 
-    public void incrementRegistrationCount(Long slotId) {
+    public void validateSlotAvailable(Long slotId) {
         DonationSlot slot = donationSlotRepository.findById(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy slot"));
 
         if (slot.getRegisteredCount() >= slot.getMaxCapacity()) {
-            throw new IllegalStateException("Slot này đã đầy");
+            throw new IllegalStateException("Slot đã đầy, vui lòng chọn slot khác.");
         }
-
-        slot.setRegisteredCount(slot.getRegisteredCount() + 1);
-        donationSlotRepository.save(slot);
     }
 
-    // === Gợi ý slot ===
+//    public void incrementRegistrationCount(Long slotId) {
+//        DonationSlot slot = donationSlotRepository.findById(slotId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy slot"));
+//
+//        if (slot.getRegisteredCount() >= slot.getMaxCapacity()) {
+//            throw new IllegalStateException("Slot này đã đầy");
+//        }
+//
+//        slot.setRegisteredCount(slot.getRegisteredCount() + 1);
+//        donationSlotRepository.save(slot);
+//    }
+
+    @Transactional
+    public DonationSlot assignSlotToRegistration(DonationRegistration registration, Long slotId) {
+        validateSlotAvailable(slotId);
+        DonationSlot slot = donationSlotRepository.findById(slotId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy slot"));
+
+        registration.setSlot(slot);
+        slot.setRegisteredCount(slot.getRegisteredCount() + 1);
+        donationSlotRepository.save(slot);
+
+        return slot;
+    }
+
+    // === Gợi ý slot nếu cần ===
     public List<DonationSlotDTO> getSuggestedSlots(int requiredCapacity) {
         return donationSlotRepository
                 .findByStatusAndRegisteredCountLessThan(SlotStatus.ACTIVE, requiredCapacity)
@@ -105,44 +126,7 @@ public class DonationSlotService {
                 .orElse(null);
     }
 
-    @Transactional
-    public DonationSlot assignSlotToRegistration(DonationRegistration registration, Long slotId) {
-        DonationSlot slot = donationSlotRepository.findById(slotId)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.SLOT_NOT_FOUND));
-
-        // Nếu slot đầy → chọn slot khác tự động
-        if (slot.getRegisteredCount() >= slot.getMaxCapacity()) {
-            List<DonationSlot> available = donationSlotRepository.findByStatus(SlotStatus.ACTIVE).stream()
-                    .filter(s -> s.getRegisteredCount() < s.getMaxCapacity())
-                    .sorted(Comparator.comparing(DonationSlot::getSlotDate)
-                            .thenComparing(DonationSlot::getStartTime))
-                    .collect(Collectors.toList());
-
-            if (available.isEmpty()) {
-                throw new IllegalStateException("Tất cả các khung giờ đều đã đầy, vui lòng quay lại sau.");
-            }
-
-            slot = available.get(0); // Slot tốt nhất
-            log.info("Slot ban đầu đã đầy, chuyển sang slot mới: {}", slot.getSlotId());
-        }
-
-        registration.setSlot(slot);
-        slot.setRegisteredCount(slot.getRegisteredCount() + 1);
-        donationSlotRepository.save(slot);
-
-        return slot;
-    }
-
-    @Transactional
-    public void autoAssignSlotToRegistration(DonationRegistration registration) {
-        DonationSlotDTO bestSlot = getBestAvailableSlot();
-        if (bestSlot == null) {
-            throw new IllegalStateException("Không tìm thấy slot phù hợp");
-        }
-        assignSlotToRegistration(registration, bestSlot.getSlotId());
-    }
-
-    // === Thống kê ===
+    // === Thống kê tải của các slot ===
     public List<SlotLoadDTO> getSlotLoadStats() {
         return donationSlotRepository.findAll().stream()
                 .map(slot -> SlotLoadDTO.builder()

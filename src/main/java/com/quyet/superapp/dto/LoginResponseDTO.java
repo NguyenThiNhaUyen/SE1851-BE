@@ -15,4 +15,12 @@ public class LoginResponseDTO {
     private String role;
     private boolean enable;
     private String accessToken;
+    private String refreshToken;
+
+    // 🩺 Profile Info (gửi kèm khi login)
+    private String fullName;
+    private String phone;
+    private String gender;
+    private String emergencyContact;
+
 }

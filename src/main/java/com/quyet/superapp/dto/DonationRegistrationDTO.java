@@ -1,9 +1,7 @@
 package com.quyet.superapp.dto;
 
 import com.quyet.superapp.entity.BloodType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,7 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DonationRegistrationDTO {
 
-    private Long registrationId;          // ✅ thêm để phục vụ confirm/get
+    private Long registrationId;
+
     @NotNull(message = "Thời gian hẹn không được để trống")
     private LocalDate scheduledDate;
 
@@ -26,7 +25,6 @@ public class DonationRegistrationDTO {
 
     private String status;
 
-    // Các thông tin nhập liệu nếu chưa có hồ sơ
     @NotBlank(message = "Họ tên không được để trống")
     private String fullName;
 
@@ -39,8 +37,10 @@ public class DonationRegistrationDTO {
     @NotBlank(message = "Số điện thoại không được để trống")
     @Pattern(regexp = "^\\d{9,12}$", message = "Số điện thoại không hợp lệ")
     private String phone;
+
     private Long addressId;
     private String addressFull;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long userId;
@@ -48,5 +48,10 @@ public class DonationRegistrationDTO {
     private Long slotId;
     private DonationSlotDTO slot;
 
-}
+    // ✅ Gợi ý bổ sung:
+    private String note;
 
+    @Min(200)
+    @Max(550)
+    private Integer estimatedVolume; // (ml)
+}

@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BloodTypeDTO {
-    @NotNull(message = "ID nhóm máu không được để trống")
+
     private Long bloodTypeId;
 
     @NotBlank(message = "Mô tả nhóm máu không được để trống")

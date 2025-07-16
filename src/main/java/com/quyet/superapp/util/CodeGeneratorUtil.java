@@ -29,4 +29,9 @@ public class CodeGeneratorUtil {
 
         return unitCode;
     }
+    public static String generateBloodBagCode() {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 20250709
+        int random = RANDOM.nextInt(900) + 100; // random 3 chữ số: 100–999
+        return String.format("BB-%s-%03d", date, random); // VD: BB-20250709-123
+    }
 }

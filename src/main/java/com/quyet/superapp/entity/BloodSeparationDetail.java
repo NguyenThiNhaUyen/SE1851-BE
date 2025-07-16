@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "blood_separation_details")
 @AllArgsConstructor
@@ -18,18 +20,28 @@ public class BloodSeparationDetail {
     @Column(name = "BloodSeparationDetailID")
     private Long bloodSeparationDetailId;
 
-    @ManyToOne
-    @JoinColumn(name = "result_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "result_id", nullable = false)
     private SeparationResult result;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "component_type", nullable = false)
     private BloodComponentType componentType;
 
-    @Column(name = "volume_ml")
+    @Column(name = "volume_ml", nullable = false)
     private Integer volumeMl;
 
-    @Column(name = "quality_rating")
+    @Column(name = "quality_rating", length = 50)
     private String qualityRating;
 
+    @Column(name = "note", columnDefinition = "TEXT")
+    private String note;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

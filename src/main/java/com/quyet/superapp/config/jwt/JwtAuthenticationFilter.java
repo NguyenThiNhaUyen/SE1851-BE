@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             if (tokenProvider.validateToken(token)) {
                 Long userId = tokenProvider.getUserId(token);
-                String username = tokenProvider.getUsername(token);
+                String username = tokenProvider.getUsernameFromToken(token);
 
                 // Lấy UserDetails từ DB qua username
                 var userDetails = userDetailsService.loadUserByUsername(username);

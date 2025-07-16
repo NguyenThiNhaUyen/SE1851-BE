@@ -61,6 +61,22 @@ public class UserProfile {
     private String location;
     private Double latitude;
     private Double longitude;
+    private String landline;
+    @Column(name = "emergency_contact")
+    private String emergencyContact;
+
+    @Column(name = "alt_phone")
+    private String altPhone;
+
+    // ✅ Thông tin BHYT
+    @Column(name = "has_insurance")
+    private boolean hasInsurance;
+
+    @Column(name = "insurance_card_number", columnDefinition = "VARCHAR(20)")
+    private String insuranceCardNumber;
+
+    @Column(name = "insurance_valid_to")
+    private LocalDate insuranceValidTo;
 }
 
 

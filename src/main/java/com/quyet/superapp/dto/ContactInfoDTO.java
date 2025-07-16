@@ -26,4 +26,7 @@ public class ContactInfoDTO {
 
     // Optional
     private String landline;
+
+    private String emergencyContact;
+    private String altPhone;
 }

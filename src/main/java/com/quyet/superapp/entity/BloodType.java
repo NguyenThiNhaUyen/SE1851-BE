@@ -2,9 +2,9 @@ package com.quyet.superapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-        import lombok.*;
+import lombok.*;
 
-        import java.util.List;
+import java.util.List;
 
 @Entity
 @Table(name = "BloodTypes")
@@ -18,8 +18,8 @@ public class BloodType {
     @Column(name = "BloodTypeID")
     private Long bloodTypeId;
 
-    @Column(name = "Description", columnDefinition = "NVARCHAR(20)")
-    private String description;
+    @Column(name = "Description", columnDefinition = "NVARCHAR(10)", nullable = false)
+    private String description; // VD: A+, B-, AB+
 
     @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -44,6 +44,4 @@ public class BloodType {
     @OneToMany(mappedBy = "recipientType", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CompatibilityRule> recipientRules;
-
-
 }

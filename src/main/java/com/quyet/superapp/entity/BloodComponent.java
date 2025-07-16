@@ -1,6 +1,7 @@
 package com.quyet.superapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.quyet.superapp.enums.BloodComponentType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -34,6 +35,10 @@ public class BloodComponent {
 
     @Column(name = "ApheresisCompatible")
     private Boolean isApheresisCompatible;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Type", columnDefinition = "VARCHAR(20)")
+    private BloodComponentType type;
 
     @OneToMany(mappedBy = "component")
     @JsonIgnore

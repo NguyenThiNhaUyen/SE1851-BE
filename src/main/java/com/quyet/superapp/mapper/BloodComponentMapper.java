@@ -3,8 +3,11 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.BloodComponentDTO;
 import com.quyet.superapp.entity.BloodComponent;
 
-public class BloodComponentMapper { //chưa sử dụng
+public class BloodComponentMapper {
+
     public static BloodComponentDTO toDTO(BloodComponent entity) {
+        if (entity == null) return null;
+
         return new BloodComponentDTO(
                 entity.getBloodComponentId(),
                 entity.getName(),
@@ -17,14 +20,16 @@ public class BloodComponentMapper { //chưa sử dụng
     }
 
     public static BloodComponent toEntity(BloodComponentDTO dto) {
-        BloodComponent component = new BloodComponent();
-        component.setBloodComponentId(dto.getBloodComponentId());
-        component.setName(dto.getName());
-        component.setCode(dto.getCode());
-        component.setStorageTemp(dto.getStorageTemp());
-        component.setStorageDays(dto.getStorageDays());
-        component.setUsage(dto.getUsage());
-        component.setIsApheresisCompatible(dto.getIsApheresisCompatible());
-        return component;
+        if (dto == null) return null;
+
+        BloodComponent entity = new BloodComponent();
+        entity.setBloodComponentId(dto.getBloodComponentId());
+        entity.setName(dto.getName());
+        entity.setCode(dto.getCode());
+        entity.setStorageTemp(dto.getStorageTemp());
+        entity.setStorageDays(dto.getStorageDays());
+        entity.setUsage(dto.getUsage());
+        entity.setIsApheresisCompatible(dto.getIsApheresisCompatible());
+        return entity;
     }
 }

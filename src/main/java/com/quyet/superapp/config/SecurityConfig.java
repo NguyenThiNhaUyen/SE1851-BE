@@ -118,7 +118,8 @@ public class SecurityConfig {
             "/api/request/**",
             "/api/transfusion/history",
             "/api/blood/**",
-            "/api/vnpay/**"
+            "/api/vnpay/**",
+            "/api/slots"
     };
     private static final String[] STAFF_ENDPOINTS = {
             "/api/staff/**",

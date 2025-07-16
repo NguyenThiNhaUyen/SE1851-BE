@@ -22,4 +22,11 @@ public class Address {
     @JoinColumn(name = "ward_id", nullable = false)
     @JsonIgnore
     private Ward ward;
+
+    // ✅ Thêm tọa độ
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 }

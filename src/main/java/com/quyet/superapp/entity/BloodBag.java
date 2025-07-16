@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,8 +51,9 @@ public class BloodBag {
     @Column(name = "status", nullable = false)
     private BloodBagStatus status;
 
-    @Column(name = "donor_id", nullable = false)
-    private String donorId;
+    @ManyToOne
+    @JoinColumn(name = "donor_id", referencedColumnName = "user_id")
+    private User donor;
 
     @Column(name = "note")
     private String note;

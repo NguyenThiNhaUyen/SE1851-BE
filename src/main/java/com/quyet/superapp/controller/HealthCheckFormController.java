@@ -1,6 +1,5 @@
 package com.quyet.superapp.controller;
 
-import com.quyet.superapp.dto.FullHealthCheckDTO;
 import com.quyet.superapp.dto.HealthCheckFormDTO;
 import com.quyet.superapp.service.HealthCheckFormService;
 import jakarta.validation.Valid;
@@ -40,11 +39,5 @@ public class HealthCheckFormController {
         return ResponseEntity.ok(healthCheckFormService.update(dto));
     }
 
-    // ✅ Trả cả phiếu khám + xét nghiệm máu (gộp)
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @GetMapping("/full")
-    public ResponseEntity<FullHealthCheckDTO> getFullByRegisterId(@RequestParam("register_id") Long regId) {
-        return ResponseEntity.ok(healthCheckFormService.getFullByRegistrationId(regId));
-    }
 
 }
