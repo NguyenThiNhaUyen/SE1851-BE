@@ -89,11 +89,6 @@ public class UserService {
             if (userRepository.existsByEmail(contact.getEmail()))
                 return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, MessageConstants.EMAIL_EXISTS));
 
-            // ✅ Kiểm tra OTP đã xác minh chưa
-            if (!redisOtpService.isRegisterOtpVerified(contact.getEmail())) {
-                return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, "Bạn chưa xác minh OTP. Vui lòng xác minh trước khi đăng ký."));
-            }
-
             if (userProfileRepository.existsByCitizenId(request.getCccd()))
                 return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, MessageConstants.CCCD_EXISTS));
             if (userProfileRepository.existsByEmail(contact.getEmail()))
@@ -300,46 +295,4 @@ public class UserService {
         );
     }
 
-    public String sendRegisterOtp(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email đã được đăng ký. Vui lòng sử dụng email khác.");
-        }
-
-        String otp = redisOtpService.generateOtp(email);
-
-        // ✅ Gửi bằng EmailService
-        User dummyUser = new User(); // không cần lưu vào DB
-        dummyUser.setEmail(email);
-        dummyUser.setUsername(email); // fallback nếu chưa có username
-        emailService.sendRegisterOtp(dummyUser, otp);
-
-        return otp;
-    }
-
-    /**
-     * ✅ Xác minh OTP đăng ký và lưu cờ đã xác minh vào Redis
-     */
-    public ResponseEntity<ApiResponseDTO<?>> verifyRegisterOtp(String email, String otp) {
-        log.info("🧪 Xác minh OTP đăng ký cho email: {}", email);
-
-        boolean isValid = redisOtpService.validateOtp(email, otp);
-        if (!isValid) {
-            log.warn("❌ OTP không hợp lệ hoặc hết hạn cho email: {}", email);
-            return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, "Mã OTP không hợp lệ hoặc đã hết hạn."));
-        }
-
-        redisOtpService.markRegisterOtpVerified(email);
-        log.info("✅ OTP hợp lệ – đánh dấu email {} đã xác minh OTP", email);
-
-        // Nếu đã có user tạo sẵn nhưng chưa kích hoạt (enable = false) → kích hoạt tại đây
-        userRepository.findByEmail(email).ifPresent(user -> {
-            if (!user.isEnable()) {
-                user.setEnable(true);
-                userRepository.save(user);
-                log.info("🔓 Đã kích hoạt tài khoản cho user {} sau khi xác minh OTP", email);
-            }
-        });
-
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Xác minh OTP thành công"));
-    }
 }

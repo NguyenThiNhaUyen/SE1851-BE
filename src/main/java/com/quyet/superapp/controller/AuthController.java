@@ -72,19 +72,5 @@ public class AuthController {
         return userService.refreshToken(refreshToken);
     }
 
-    @PostMapping("/send-register-otp")
-    public ResponseEntity<ApiResponseDTO<?>> sendRegisterOtp(@RequestParam String email) {
-        try {
-            String otp = userService.sendRegisterOtp(email);
-            return ResponseEntity.ok(new ApiResponseDTO<>(true, "Đã gửi OTP xác thực đến email: " + email, otp));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDTO<>(false, e.getMessage()));
-        }
-    }
-
-    @PostMapping("/auth/verify-otp")
-    public ResponseEntity<ApiResponseDTO<?>> verifyOtp(@RequestBody OtpVerifyRequest request) {
-        return userService.verifyRegisterOtp(request.getEmail(), request.getOtp());
-    }
 
 }

@@ -75,6 +75,8 @@
             profile.setCitizenId(dto.getCitizenId());
             profile.setEmergencyContact(dto.getContactInfo().getEmergencyContact());
             profile.setAltPhone(dto.getContactInfo().getAltPhone());
+            profile.setWeightKg(dto.getWeight());
+            profile.setHeightCm(dto.getHeight());
             profile.setAddress(address);
 
             // ✅ BHYT

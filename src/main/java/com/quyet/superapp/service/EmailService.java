@@ -4,6 +4,7 @@ import com.quyet.superapp.entity.EmailLog;
 import com.quyet.superapp.entity.User;
 
 import com.quyet.superapp.enums.BloodComponentType;
+import com.quyet.superapp.enums.EmailType;
 import com.quyet.superapp.repository.EmailLogRepository;
 
 import jakarta.mail.internet.MimeMessage;
@@ -77,15 +78,13 @@ public class EmailService {
     }
 
     /**
-     * ✅ Gửi email chứa OTP đăng ký
+     * ✅ Gửi email chứa liên kết xác thực tài khoản (dạng token)
      */
-    public void sendRegisterOtp(User user, String otp) {
+    public void sendEmailVerificationSuccess(User user) {
         String content = "<p>Xin chào <b>" + user.getUsername() + "</b>,</p>" +
-                "<p>Mã OTP xác thực tài khoản của bạn là: <b style='font-size: 18px;'>" + otp + "</b></p>" +
-                "<p>Vui lòng nhập mã này trong vòng <b>5 phút</b> để hoàn tất đăng ký.</p>" +
-                "<br><p>Trân trọng,</p><p>Hệ thống hỗ trợ hiến máu</p>";
-
-        sendEmail(user, "Mã xác thực OTP đăng ký tài khoản", content, "OTP_REGISTER");
+                "<p>Email của bạn đã được xác thực thành công.</p>" +
+                "<p>Chào mừng bạn đến với hệ thống hỗ trợ hiến máu!</p>";
+        sendEmail(user, "Xác thực thành công", content, EmailType.VERIFY_EMAIL.name());
     }
 
 

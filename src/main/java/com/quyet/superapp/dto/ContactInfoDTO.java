@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 /**
  * Thông tin liên hệ của người dùng.
  * Có thể tái sử dụng trong Create/Update/Response DTO.
@@ -29,4 +31,8 @@ public class ContactInfoDTO {
 
     private String emergencyContact;
     private String altPhone;
+
+    private boolean hasInsurance;
+    private String insuranceCardNumber;
+    private LocalDate insuranceValidTo;
 }
