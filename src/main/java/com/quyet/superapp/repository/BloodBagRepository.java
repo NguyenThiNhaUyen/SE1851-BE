@@ -1,7 +1,10 @@
 package com.quyet.superapp.repository;
 
 import com.quyet.superapp.entity.BloodBag;
+<<<<<<< HEAD
+=======
 import com.quyet.superapp.entity.Donation;
+>>>>>>> origin/main
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

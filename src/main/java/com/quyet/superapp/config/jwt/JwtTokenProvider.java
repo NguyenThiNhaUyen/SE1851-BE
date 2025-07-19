@@ -13,6 +13,14 @@ public class JwtTokenProvider {
 
     private final Key signingKey;
     private final long validityInMs;
+<<<<<<< HEAD
+
+    public JwtTokenProvider(
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.expiration-ms}") long validityInMs) {
+        this.signingKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.validityInMs = validityInMs;
+=======
     private final long refreshExpirationMs;
 
 
@@ -24,6 +32,7 @@ public class JwtTokenProvider {
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes());
         this.validityInMs = validityInMs;
         this.refreshExpirationMs = refreshExpirationMs;
+>>>>>>> origin/main
     }
 
     public String createToken(String username, Long userId) {
@@ -38,6 +47,8 @@ public class JwtTokenProvider {
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+<<<<<<< HEAD
+=======
     // Tạo Refresh Token
     public String createRefreshToken(String username, Long userId) {
         Date now = new Date();
@@ -51,6 +62,7 @@ public class JwtTokenProvider {
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+>>>>>>> origin/main
 
     public boolean validateToken(String token) {
         try {
@@ -74,7 +86,11 @@ public class JwtTokenProvider {
         return getClaims(token).get("userId", Long.class);
     }
 
+<<<<<<< HEAD
+    public String getUsername(String token) {
+=======
     public String getUsernameFromToken(String token) {
+>>>>>>> origin/main
         return getClaims(token).getSubject();
     }
 }

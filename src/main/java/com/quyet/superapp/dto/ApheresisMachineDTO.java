@@ -1,8 +1,11 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+=======
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +18,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class ApheresisMachineDTO {
+<<<<<<< HEAD
+    private Long id;
+    private String serialNumber;
+    private String manufacturer;
+    private String model;
+    private boolean isActive;
+    private LocalDate lastMaintenance;
+=======
     @NotNull
     private Long id;
 
@@ -33,5 +44,6 @@ public class ApheresisMachineDTO {
     private LocalDate lastMaintenance;
 
     @NotBlank
+>>>>>>> origin/main
     private String note;
 }

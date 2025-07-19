@@ -4,6 +4,15 @@ import com.quyet.superapp.dto.BloodBagDTO;
 import com.quyet.superapp.dto.UpdateBloodBagRequest;
 import com.quyet.superapp.entity.BloodBag;
 import com.quyet.superapp.entity.BloodType;
+<<<<<<< HEAD
+import com.quyet.superapp.mapper.BloodBagMapper;
+import com.quyet.superapp.repository.BloodBagRepository;
+import com.quyet.superapp.repository.BloodTypeRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+=======
 import com.quyet.superapp.entity.Donation;
 import com.quyet.superapp.entity.User;
 import com.quyet.superapp.enums.BloodBagStatus;
@@ -17,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.quyet.superapp.util.CodeGeneratorUtil;
 
 import java.time.LocalDateTime;
+>>>>>>> origin/main
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,9 +34,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BloodBagService {
+<<<<<<< HEAD
+    private final BloodBagRepository bloodBagRepository;
+    private final BloodTypeRepository bloodTypeRepository;
+=======
 
     private final BloodBagRepository bloodBagRepository;
     private final DonationRepository donationRepository;
+>>>>>>> origin/main
 
     public List<BloodBagDTO> getAll() {
         return bloodBagRepository.findAll()
@@ -41,6 +56,13 @@ public class BloodBagService {
         return BloodBagMapper.toDTO(bag);
     }
 
+<<<<<<< HEAD
+    public BloodBagDTO create(BloodBagDTO dto) {
+        BloodType bloodType = bloodTypeRepository.findById(Long.parseLong(dto.getBloodType()))
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhóm máu ID " + dto.getBloodType()));
+        BloodBag bag = BloodBagMapper.fromDTO(dto, bloodType);
+        return BloodBagMapper.toDTO(bloodBagRepository.save(bag));
+=======
     /**
      * ✅ Tạo túi máu từ DTO + donationId
      * - Nếu không có bloodTypeId → tự lấy từ donation hoặc registration
@@ -67,6 +89,7 @@ public class BloodBagService {
 
         BloodBag saved = bloodBagRepository.save(bag);
         return BloodBagMapper.toDTO(saved);
+>>>>>>> origin/main
     }
 
     @Transactional
@@ -95,6 +118,8 @@ public class BloodBagService {
                 .map(BloodBagMapper::toDTO);
     }
 
+<<<<<<< HEAD
+=======
     public BloodBag createFromDonation(Donation donation) {
         BloodBag bag = new BloodBag();
         bag.setBagCode(CodeGeneratorUtil.generateBloodBagCode()); // ✅ sinh mã tự động
@@ -108,4 +133,5 @@ public class BloodBagService {
 
         return bloodBagRepository.save(bag);
     }
+>>>>>>> origin/main
 }

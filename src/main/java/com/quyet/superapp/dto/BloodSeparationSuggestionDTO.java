@@ -1,7 +1,10 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+=======
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BloodSeparationSuggestionDTO {
+<<<<<<< HEAD
+    private int redCellsMl;
+    private int plasmaMl;
+    private int plateletsMl;
+    private String redCellLabel;
+    private String plasmaLabel;
+    private String plateletsLabel;
+    private String note;
+=======
     @Min(value = 0, message = "Thể tích hồng cầu phải >= 0")
     private int redCellsMl;
 
@@ -31,4 +43,5 @@ public class BloodSeparationSuggestionDTO {
     private String note;
 
 
+>>>>>>> origin/main
 }

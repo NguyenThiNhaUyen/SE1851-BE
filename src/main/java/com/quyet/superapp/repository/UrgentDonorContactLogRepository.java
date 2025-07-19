@@ -10,6 +10,16 @@ import java.util.List;
 
 @Repository
 public interface UrgentDonorContactLogRepository extends JpaRepository<UrgentDonorContactLog, Long> {
+<<<<<<< HEAD
+    @Query("SELECT COUNT(l) > 0 FROM UrgentDonorContactLog l " +
+            "WHERE l.donor.userId = :donorId AND l.bloodRequest.id = :requestId")
+    boolean existsByDonorAndRequest(@Param("donorId") Long donorId,
+                                    @Param("requestId") Long requestId);
+
+
+    @Query("SELECT l FROM UrgentDonorContactLog l WHERE l.bloodRequest.id = :requestId")
+=======
 
     @Query("SELECT l FROM UrgentDonorContactLog l WHERE l.bloodRequest.bloodRequestId = :requestId")
+>>>>>>> origin/main
     List<UrgentDonorContactLog> findByRequestId(@Param("requestId") Long requestId);}

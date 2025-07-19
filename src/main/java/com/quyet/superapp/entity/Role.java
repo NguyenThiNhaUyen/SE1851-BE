@@ -1,5 +1,17 @@
 package com.quyet.superapp.entity;
 
+<<<<<<< HEAD
+import com.quyet.superapp.enums.RoleEnum;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "Roles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+=======
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -15,6 +27,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+>>>>>>> origin/main
 public class Role {
 
     @Id
@@ -22,6 +35,15 @@ public class Role {
     @Column(name = "Role_Id")
     private Long roleId;
 
+<<<<<<< HEAD
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Name", nullable = false, unique = true, length = 50)
+    private RoleEnum name;
+
+    // nếu bạn có mappedBy User thì thêm sau
+    // @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    // private List<User> users;
+=======
     @Column(name = "Name", nullable = false, unique = true, length = 50)
     private String name;
 
@@ -29,4 +51,5 @@ public class Role {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     private List<User> users;
 
+>>>>>>> origin/main
 }

@@ -1,13 +1,22 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+=======
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+>>>>>>> origin/main
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
 public class ReportDTO {
+<<<<<<< HEAD
+    private Long id;
+    private String reportType;
+    private Long generatedById;
+    private LocalDateTime createdAt;
+=======
     @NotNull(message = "ID báo cáo không thể null")
     private Long id;
 
@@ -21,5 +30,6 @@ public class ReportDTO {
     private LocalDateTime createdAt;
 
     @NotBlank(message = "Nội dung báo cáo không thể trống")
+>>>>>>> origin/main
     private String content;
 }

@@ -15,6 +15,15 @@ public class UserMapper {
         dto.setEmail(user.getEmail());
         dto.setEnable(user.isEnable());
         dto.setRoleId(user.getRole().getRoleId());
+<<<<<<< HEAD
+
+        if (user.getUserProfile() != null) {
+            dto.setFullName(user.getUserProfile().getFullName());
+            dto.setStaffPosition(user.getUserProfile().getStaffPosition());
+        }
+
+=======
+>>>>>>> origin/main
         return dto;
     }
 

@@ -1,6 +1,10 @@
 package com.quyet.superapp.enums;
 
+<<<<<<< HEAD
+public enum BloodBagSize {
+=======
 public enum BloodBagSize { //chưa sử dụng
+>>>>>>> origin/main
     SIZE_50(50),
     SIZE_100(100),
     SIZE_150(150),
@@ -17,5 +21,8 @@ public enum BloodBagSize { //chưa sử dụng
     public int getVolumeMl() {
         return volumeMl;
     }
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/main
 }

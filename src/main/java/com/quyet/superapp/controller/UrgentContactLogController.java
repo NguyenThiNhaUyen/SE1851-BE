@@ -14,6 +14,15 @@ public class UrgentContactLogController {
 
     private final UrgentDonorContactLogRepository contactLogRepo;
 
+<<<<<<< HEAD
+    @GetMapping("/by-request/{requestId}")
+    public ResponseEntity<List<UrgentDonorContactLog>> getLogsByRequest(@PathVariable Long requestId) {
+        return ResponseEntity.ok(contactLogRepo.findByRequestId(requestId));
+    }
+
+    @PutMapping("/confirm/{logId}")
+    public ResponseEntity<?> confirmDonorResponse(@PathVariable Long logId) {
+=======
     @GetMapping("/by-request")
     public ResponseEntity<List<UrgentDonorContactLog>> getLogsByRequest(@RequestParam Long requestId) {
         return ResponseEntity.ok(contactLogRepo.findByRequestId(requestId));
@@ -21,6 +30,7 @@ public class UrgentContactLogController {
 
     @PutMapping("/confirm")
     public ResponseEntity<?> confirmDonorResponse(@RequestParam Long logId) {
+>>>>>>> origin/main
         return contactLogRepo.findById(logId).map(log -> {
             log.setStatus("CONFIRMED");
             contactLogRepo.save(log);

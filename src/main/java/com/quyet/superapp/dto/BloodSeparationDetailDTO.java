@@ -1,8 +1,11 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+=======
 import com.quyet.superapp.enums.BloodComponentType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +16,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BloodSeparationDetailDTO {
+<<<<<<< HEAD
+    private Long id;
+    private Long separationLogId;
+    private Long bloodTypeId;
+    private Long componentId;
+    private Integer volumeMl;
+    private String unitCode;
+    private LocalDateTime createdAt;
+
+=======
     private Long bloodSeparationDetailId;
 
     @NotNull(message = "Loại thành phần không được để trống")
@@ -27,4 +40,5 @@ public class BloodSeparationDetailDTO {
     private String note;                  // ✅ Ghi chú thêm nếu có
 
     private LocalDateTime createdAt;      // ✅ Thời gian tạo
+>>>>>>> origin/main
 }

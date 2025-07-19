@@ -1,5 +1,16 @@
 package com.quyet.superapp.controller;
 
+<<<<<<< HEAD
+import com.quyet.superapp.dto.LoginRequestDTO;
+import com.quyet.superapp.dto.RegisterRequestDTO;
+import com.quyet.superapp.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+=======
 import com.quyet.superapp.config.jwt.UserPrincipal;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.service.UserService;
@@ -12,17 +23,31 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+>>>>>>> origin/main
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+<<<<<<< HEAD
+=======
 @Validated
+>>>>>>> origin/main
 public class AuthController {
 
     private final UserService userService;
 
 
      @PostMapping("/login")
+<<<<<<< HEAD
+     public ResponseEntity<?> Login(@RequestBody LoginRequestDTO loginRequest){
+         return userService.login(loginRequest);
+     }
+
+     @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequestDTO registerRequest){
+         return userService.register(registerRequest);
+     }
+=======
      public ResponseEntity<ApiResponseDTO<?>> Login(@RequestBody LoginRequestDTO loginRequest){
          return userService.login(loginRequest);
      }
@@ -73,4 +98,5 @@ public class AuthController {
     }
 
 
+>>>>>>> origin/main
 }
