@@ -54,4 +54,15 @@ public class DonationSlot {
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
     private List<DonationRegistration> registrations;
 
+    @Transient
+    public int getAvailableCapacity() {
+        return this.maxCapacity - (this.registeredCount != null ? this.registeredCount : 0);
+    }
+
+    public void decreaseAvailableCapacity() {
+        if (this.registeredCount == null) this.registeredCount = 0;
+        if (this.registeredCount < this.maxCapacity) {
+            this.registeredCount++;
+        }
+    }
 }

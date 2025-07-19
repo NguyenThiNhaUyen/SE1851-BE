@@ -32,7 +32,7 @@ public class UserProfileResponseDTO {
     private String altPhone;
     private String location;
     private LocalDate lastDonationDate;
-    private Integer recoveryTime;
+    private LocalDate recoveryTime;
 
     private String addressFull;
     private Long addressId;

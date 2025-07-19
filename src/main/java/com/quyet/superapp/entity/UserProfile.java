@@ -57,7 +57,8 @@ public class UserProfile {
     private Double WeightKg;
     private Double HeightCm;
     private LocalDate lastDonationDate;
-    private Integer recoveryTime;
+    @Column(name = "recovery_time")
+    private LocalDate recoveryTime;
     private String location;
     private Double latitude;
     private Double longitude;

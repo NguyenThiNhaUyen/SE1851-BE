@@ -1,9 +1,6 @@
 package com.quyet.superapp.service;
 
-import com.quyet.superapp.dto.AddressDTO;
-import com.quyet.superapp.dto.UrgentDonorRegistrationDTO;
-import com.quyet.superapp.dto.UserProfileCreateDTO;
-import com.quyet.superapp.dto.UserProfileUpdateDTO;
+import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.User;
 import com.quyet.superapp.entity.UserProfile;
 import com.quyet.superapp.entity.address.Address;
@@ -126,6 +123,28 @@ public class UserProfileService {
                 userProfileRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email đã tồn tại trong hệ thống");
         }
+    }
+
+    public void updateOrCreateFromRegistration(User user, DonationRegistrationDTO dto) {
+        UserProfile profile = user.getUserProfile();
+        if (profile == null) {
+            profile = new UserProfile();
+            profile.setUser(user);
+        }
+
+        profile.setFullName(dto.getFullName());
+        profile.setDob(dto.getDob());
+        profile.setGender(dto.getGender());
+        profile.setPhone(dto.getPhone());
+        profile.setBloodType(dto.getBloodType());
+
+        if (dto.getAddressId() != null) {
+            Address address = addressRepository.findById(dto.getAddressId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ"));
+            profile.setAddress(address);
+        }
+
+        userProfileRepository.save(profile);
     }
 }
 

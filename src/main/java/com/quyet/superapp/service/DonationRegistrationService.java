@@ -5,20 +5,13 @@ import com.quyet.superapp.constant.MessageConstants;
 import com.quyet.superapp.dto.ApiResponseDTO;
 import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.entity.*;
-import com.quyet.superapp.entity.address.Address;
-
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.enums.HealthCheckFailureReason;
-
 import com.quyet.superapp.event.EmailNotificationEvent;
 import com.quyet.superapp.exception.MemberException;
-
 import com.quyet.superapp.mapper.DonationRegistrationMapper;
 import com.quyet.superapp.repository.*;
-import com.quyet.superapp.repository.address.AddressRepository;
-
 import com.quyet.superapp.validator.DonationRegistrationValidator;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,128 +28,129 @@ public class DonationRegistrationService {
 
     private final DonationRegistrationRepository registrationRepo;
     private final UserRepository userRepo;
-    private final UserProfileRepository profileRepo;
-    private final AddressRepository addressRepo;
     private final DonationRepository donationRepo;
     private final HealthCheckFailureLogService failureLogService;
     private final ApplicationEventPublisher eventPublisher;
     private final DonationRegistrationValidator validator;
     private final DonationSlotService slotService;
     private final BloodBagService bloodBagService;
+    private final RecoveryReminderService recoveryReminderService;
+    private final EmailService emailService;
+    private final UserProfileService userProfileService;
 
-    // ✅ Đăng ký hiến máu
+    // ✅ Xử lý đăng ký hiến máu từ phía người dùng
     public ResponseEntity<?> register(Long userId, DonationRegistrationDTO dto) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new MemberException("USER_NOT_FOUND", MessageConstants.USER_NOT_FOUND));
-
+        User user = findUser(userId);
         validator.validateRegistrationRequest(user, dto);
-        updateOrCreateUserProfile(user, dto);
 
-        if (dto.getSlotId() == null) {
-            throw new MemberException("SLOT_REQUIRED", "Bạn cần chọn khung giờ hiến máu.");
-        }
+        userProfileService.updateOrCreateFromRegistration(user, dto);
 
-        slotService.validateSlotAvailable(dto.getSlotId());
+        validateSlotAndAssign(dto, user);
 
         DonationRegistration reg = DonationRegistrationMapper.toEntity(dto, user);
         reg.setStatus(DonationStatus.PENDING);
         slotService.assignSlotToRegistration(reg, dto.getSlotId());
 
         registrationRepo.save(reg);
+        emailService.sendPreDonationInstructionEmail(user, dto.getScheduledDate());
 
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_REGISTERED, DonationRegistrationMapper.toDTO(reg)));
+        return buildSuccess(DonationRegistrationMapper.toDTO(reg), MessageConstants.DONATION_REGISTERED);
     }
 
-    // ✅ Xác nhận đơn đăng ký
+    // ✅ Xác nhận đơn hiến máu (STAFF/ADMIN)
     public ResponseEntity<?> confirm(Long regId, UserPrincipal principal) {
-        User staff = getUserById(principal.getUserId());
-        validateStaffOrAdmin(staff);
+        User staff = findUser(principal.getUserId());
+        ensureStaffPrivileges(staff);
 
-        DonationRegistration reg = getRegistrationOrThrow(regId);
-        validateStatus(reg, DonationStatus.PENDING);
-
+        DonationRegistration reg = getValidRegistration(regId, DonationStatus.PENDING);
         reg.setStatus(DonationStatus.CONFIRMED);
         reg.setConfirmedBy(staff);
-        registrationRepo.save(reg);
+        reg.getSlot().decreaseAvailableCapacity();
 
+        registrationRepo.save(reg);
         sendConfirmationEmail(reg);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_CONFIRMED, DonationRegistrationMapper.toDTO(reg)));
+
+        return buildSuccess(DonationRegistrationMapper.toDTO(reg), MessageConstants.DONATION_CONFIRMED);
     }
 
-    // ✅ Hủy đơn
+    // ✅ Đánh dấu đã hủy (có thể do người dùng hoặc hệ thống)
     public ResponseEntity<?> markAsCancelled(Long regId) {
-        DonationRegistration reg = getRegistrationOrThrow(regId);
-        validateStatus(reg, DonationStatus.CONFIRMED);
-
+        DonationRegistration reg = getValidRegistration(regId, DonationStatus.CONFIRMED);
         reg.setStatus(DonationStatus.CANCELLED);
         registrationRepo.save(reg);
 
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_CANCELLED, DonationRegistrationMapper.toDTO(reg)));
+        return buildSuccess(DonationRegistrationMapper.toDTO(reg), MessageConstants.DONATION_CANCELLED);
     }
 
-    // ✅ Đánh dấu không đủ sức khỏe
-    public ResponseEntity<?> markAsFailedHealth(Long regId, HealthCheckFailureReason reason, String staffNote) {
-        DonationRegistration reg = getRegistrationOrThrow(regId);
-        validateStatus(reg, DonationStatus.CONFIRMED);
-
+    // ✅ Đánh dấu thất bại do sức khỏe
+    public ResponseEntity<?> markAsFailedHealth(Long regId, HealthCheckFailureReason reason, String note) {
+        DonationRegistration reg = getValidRegistration(regId, DonationStatus.CONFIRMED);
         reg.setStatus(DonationStatus.FAILED_HEALTH);
         registrationRepo.save(reg);
-        failureLogService.saveLog(regId, reason, staffNote);
 
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_FAILED_HEALTH, DonationRegistrationMapper.toDTO(reg)));
+        failureLogService.saveLog(regId, reason, note);
+
+        return buildSuccess(DonationRegistrationMapper.toDTO(reg), MessageConstants.DONATION_FAILED_HEALTH);
     }
 
-    // ✅ Đánh dấu đã hiến máu và tạo túi máu nếu chưa có
+    // ✅ Đánh dấu đã hiến máu và tạo túi máu nếu cần
     public ResponseEntity<?> markAsDonated(Long regId) {
-        DonationRegistration reg = getRegistrationOrThrow(regId);
+        DonationRegistration reg = getValidRegistration(regId, DonationStatus.CONFIRMED);
         Donation donation = donationRepo.findByRegistration_RegistrationId(regId)
-                .orElseThrow(() -> new MemberException("NOT_YET_DONATED", "Chưa có bản ghi hiến máu tương ứng"));
+                .orElseThrow(() -> new MemberException("DONATION_NOT_FOUND", "Không tìm thấy thông tin hiến máu."));
 
-        // Nếu chưa có túi máu → tạo mới
+        // Tạo túi máu nếu chưa có
         if (donation.getBloodBag() == null) {
-            BloodBag bag = bloodBagService.createFromDonation(donation);
-            donation.setBloodBag(bag);
+            donation.setBloodBag(bloodBagService.createFromDonation(donation));
             donationRepo.save(donation);
         }
 
-        // Cập nhật trạng thái đơn đăng ký
         reg.setStatus(DonationStatus.DONATED);
         registrationRepo.save(reg);
+        recoveryReminderService.scheduleRecoveryReminder(donation);
 
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, "✅ Cập nhật trạng thái DONATED & tạo túi máu thành công", DonationRegistrationMapper.toDTO(reg)));
+        log.info("✅ Đã đánh dấu hiến máu thành công, regId={}", regId);
+        return buildSuccess(DonationRegistrationMapper.toDTO(reg), "✅ DONATED thành công");
     }
 
-    // ✅ Lấy danh sách theo trạng thái
+    // ✅ Truy vấn danh sách đơn theo trạng thái
     public List<DonationRegistrationDTO> getByStatus(DonationStatus status) {
         return registrationRepo.findByStatus(status)
-                .stream().map(DonationRegistrationMapper::toDTO)
-                .collect(Collectors.toList());
+                .stream().map(DonationRegistrationMapper::toDTO).collect(Collectors.toList());
     }
-    // ✅ Lấy toàn bộ
+
+    // ✅ Truy vấn tất cả đơn đăng ký
     public ResponseEntity<?> getAllDTO() {
         List<DonationRegistrationDTO> list = registrationRepo.findAll()
-                .stream().map(DonationRegistrationMapper::toDTO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.GET_REGISTRATION_SUCCESS, list));
+                .stream().map(DonationRegistrationMapper::toDTO).collect(Collectors.toList());
+        return buildSuccess(list, MessageConstants.GET_REGISTRATION_SUCCESS);
     }
 
+    // ✅ Lấy chi tiết theo ID
     public ResponseEntity<?> getDTOById(Long id) {
         DonationRegistration reg = getRegistrationOrThrow(id);
-        return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.GET_REGISTRATION_SUCCESS, DonationRegistrationMapper.toDTO(reg)));
+        return buildSuccess(DonationRegistrationMapper.toDTO(reg), MessageConstants.GET_REGISTRATION_SUCCESS);
     }
 
+    // ✅ Truy vấn đơn theo slot
     public List<DonationRegistrationDTO> getBySlotId(Long slotId) {
         return registrationRepo.findBySlot_SlotId(slotId)
-                .stream().map(DonationRegistrationMapper::toDTO)
-                .collect(Collectors.toList());
+                .stream().map(DonationRegistrationMapper::toDTO).collect(Collectors.toList());
     }
 
-    // ===================== Helper Methods =====================
+    // ========== PRIVATE SUPPORT METHODS ==========
 
-    private User getUserById(Long id) {
-        return userRepo.findById(id)
+    private User findUser(Long userId) {
+        return userRepo.findById(userId)
                 .orElseThrow(() -> new MemberException("USER_NOT_FOUND", MessageConstants.USER_NOT_FOUND));
+    }
+
+    private DonationRegistration getValidRegistration(Long regId, DonationStatus requiredStatus) {
+        DonationRegistration reg = getRegistrationOrThrow(regId);
+        if (reg.getStatus() != requiredStatus) {
+            throw new MemberException("INVALID_STATUS", MessageConstants.INVALID_REGISTRATION_STATUS);
+        }
+        return reg;
     }
 
     private DonationRegistration getRegistrationOrThrow(Long id) {
@@ -164,46 +158,37 @@ public class DonationRegistrationService {
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND", MessageConstants.DONATION_REGISTRATION_NOT_FOUND));
     }
 
-    private void validateStatus(DonationRegistration reg, DonationStatus expected) {
-        if (reg.getStatus() != expected) {
-            throw new MemberException("INVALID_STATUS", MessageConstants.INVALID_REGISTRATION_STATUS);
+    private void ensureStaffPrivileges(User user) {
+        String role = user.getRole().getName();
+        if (!role.equals("STAFF") && !role.equals("ADMIN")) {
+            throw new MemberException("FORBIDDEN", "Bạn không có quyền thực hiện thao tác này.");
         }
     }
 
-    private void validateStaffOrAdmin(User user) {
-        String role = user.getRole().getName();
-        if (!"STAFF".equals(role) && !"ADMIN".equals(role)) {
-            throw new MemberException("FORBIDDEN", "Bạn không có quyền xác nhận đơn đăng ký");
+    private void validateSlotAndAssign(DonationRegistrationDTO dto, User user) {
+        if (dto.getSlotId() == null) {
+            throw new MemberException("SLOT_REQUIRED", "Bạn cần chọn khung giờ hiến máu.");
         }
+        slotService.validateSlotAvailable(dto.getSlotId());
     }
 
     private void sendConfirmationEmail(DonationRegistration reg) {
-        String content = String.format(
-                "<h3>Xin chào %s</h3><p>Đơn đăng ký hiến máu của bạn vào ngày <b>%s</b> đã được xác nhận.</p><p>Trân trọng cảm ơn!</p>",
-                reg.getUser().getUsername(), reg.getReadyDate());
+        String content = String.format("""
+                <h3>Xin chào %s</h3>
+                <p>Đơn đăng ký hiến máu của bạn vào ngày <b>%s</b> đã được xác nhận.</p>
+                <p>Trân trọng cảm ơn!</p>
+                """, reg.getUser().getUsername(), reg.getReadyDate());
 
-        eventPublisher.publishEvent(new EmailNotificationEvent(this, reg.getUser(), MessageConstants.DONATION_CONFIRMED, content, "XÁC NHẬN HIẾN MÁU"));
+        eventPublisher.publishEvent(new EmailNotificationEvent(
+                this,
+                reg.getUser(),
+                MessageConstants.DONATION_CONFIRMED,
+                content,
+                "XÁC NHẬN HIẾN MÁU"
+        ));
     }
 
-    private void updateOrCreateUserProfile(User user, DonationRegistrationDTO dto) {
-        UserProfile profile = user.getUserProfile();
-        if (profile == null) {
-            profile = new UserProfile();
-            profile.setUser(user);
-        }
-
-        profile.setFullName(dto.getFullName());
-        profile.setDob(dto.getDob());
-        profile.setGender(dto.getGender());
-        profile.setPhone(dto.getPhone());
-        profile.setBloodType(dto.getBloodType());
-
-        if (dto.getAddressId() != null) {
-            Address address = addressRepo.findById(dto.getAddressId())
-                    .orElseThrow(() -> new MemberException("ADDRESS_NOT_FOUND", MessageConstants.ADDRESS_NOT_FOUND));
-            profile.setAddress(address);
-        }
-
-        profileRepo.save(profile);
+    private ResponseEntity<?> buildSuccess(Object data, String message) {
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, message, data));
     }
 }

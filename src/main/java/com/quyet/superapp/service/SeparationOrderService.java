@@ -204,7 +204,7 @@ public class SeparationOrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhân viên thao tác"));
     }
 
-    // ✅ Truy vấn máy tách từ ID
+    // ✅ Truy vấn máy tách từ IDx`
     private ApheresisMachine getMachine(Long id) {
         return apheresisMachineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy máy tách máu"));

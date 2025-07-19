@@ -41,7 +41,7 @@ public class UserProfileUpdateDTO {
     private String email;
     private String occupation;
     private LocalDate lastDonationDate;
-    private Integer recoveryTime;
+    private LocalDate recoveryTime;
     private String location;
     private Double weight;
     private Double height;

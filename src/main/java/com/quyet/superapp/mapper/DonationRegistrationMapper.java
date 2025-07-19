@@ -1,7 +1,6 @@
 package com.quyet.superapp.mapper;
 
 import com.quyet.superapp.dto.DonationRegistrationDTO;
-import com.quyet.superapp.dto.DonationSlotDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.entity.address.*;
 
