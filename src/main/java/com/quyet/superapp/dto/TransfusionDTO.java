@@ -1,12 +1,17 @@
 package com.quyet.superapp.dto;
 
 import lombok.Data;
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 import java.time.LocalDateTime;
 
 @Data
 public class TransfusionDTO {
     private Long id;
 
+<<<<<<< HEAD
     private Long recipientId;       // Người nhận
     private Long requestId;         // Mã yêu cầu
     private Long bloodUnitId;       // Liên kết túi máu
@@ -29,4 +34,13 @@ public class TransfusionDTO {
     private String approvedBy;      // Người phê duyệt (admin)
 
 
+=======
+    private Long recipientId;
+    private Long requestId;
+    private Long bloodUnitId;
+
+    private LocalDateTime transfusionDate;
+    private String status;
+    private String notes;
+>>>>>>> origin/main
 }

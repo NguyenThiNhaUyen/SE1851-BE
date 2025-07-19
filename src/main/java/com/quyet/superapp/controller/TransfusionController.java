@@ -1,6 +1,7 @@
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.TransfusionDTO;
+<<<<<<< HEAD
 import com.quyet.superapp.entity.Transfusion;
 import com.quyet.superapp.mapper.TransfusionMapper;
 import com.quyet.superapp.service.TransfusionService;
@@ -10,6 +11,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+=======
+import com.quyet.superapp.mapper.TransfusionMapper;
+import com.quyet.superapp.service.TransfusionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+>>>>>>> origin/main
 import java.util.List;
 
 @RestController
@@ -17,7 +28,10 @@ import java.util.List;
 @CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 public class TransfusionController {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
     private final TransfusionService svc;
     private final TransfusionMapper map;
 
@@ -27,6 +41,7 @@ public class TransfusionController {
                 .map(map::toDTO)
                 .toList();
     }
+<<<<<<< HEAD
 
     @GetMapping("/{id}")
     public ResponseEntity<TransfusionDTO> getById(@PathVariable Long id) {
@@ -47,3 +62,7 @@ public class TransfusionController {
 
 
 }
+=======
+}
+
+>>>>>>> origin/main

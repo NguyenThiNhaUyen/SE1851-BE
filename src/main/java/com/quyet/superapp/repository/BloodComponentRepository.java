@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.quyet.superapp.repository;
 
 import com.quyet.superapp.entity.BloodComponent;
@@ -34,3 +35,25 @@ public interface BloodComponentRepository extends JpaRepository<BloodComponent, 
     // 🔍 Tìm tất cả theo nhóm loại: Ví dụ: ["Huyết tương", "Tiểu cầu"]
     List<BloodComponent> findByCodeIn(List<String> codes);
 }
+=======
+
+    package com.quyet.superapp.repository;
+
+    import com.quyet.superapp.entity.BloodComponent;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
+
+    import java.util.Optional;
+
+    @Repository
+    public interface BloodComponentRepository extends JpaRepository<BloodComponent,Long> {
+        // Tìm theo tên thành phần máu: "Hồng cầu", "Huyết tương", "Tiểu cầu"
+        Optional<BloodComponent> findByName(String name);
+
+        // (tuỳ chọn) Tìm theo code y tế: PRC, FFP, PLT
+        Optional<BloodComponent> findByCode(String code);
+
+
+    }
+
+>>>>>>> origin/main

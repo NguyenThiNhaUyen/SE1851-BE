@@ -1,15 +1,27 @@
 package com.quyet.superapp.service;
 
+<<<<<<< HEAD
 import com.quyet.superapp.entity.Donation;
 import com.quyet.superapp.entity.DonationHistory;
 import com.quyet.superapp.mapper.DonationHistoryMapper;
 import com.quyet.superapp.repository.DonationHistoryRepository;
 import com.quyet.superapp.repository.DonationRepository;
+=======
+import com.quyet.superapp.dto.DonationHistoryDTO;
+import com.quyet.superapp.entity.Donation;
+import com.quyet.superapp.entity.RecoveryRule;
+import com.quyet.superapp.enums.BloodComponentType;
+import com.quyet.superapp.repository.DonationRepository;
+import com.quyet.superapp.repository.RecoveryRuleRepository;
+>>>>>>> origin/main
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+<<<<<<< HEAD
 import java.time.LocalDateTime;
+=======
+>>>>>>> origin/main
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,8 +31,12 @@ import java.util.stream.Collectors;
 public class DonationService {
 
     private final DonationRepository repository;
+<<<<<<< HEAD
     private final DonationHistoryRepository donationHistoryRepository;
     private final DonationHistoryMapper donationHistoryMapper;
+=======
+    private final RecoveryRuleRepository recoveryRuleRepository;
+>>>>>>> origin/main
 
 
     public List<Donation> getAll() {
@@ -39,6 +55,7 @@ public class DonationService {
         repository.deleteById(id);
     }
 
+<<<<<<< HEAD
     /**
      * Tính số ngày còn lại để phục hồi thành phần máu cụ thể
      */
@@ -140,3 +157,57 @@ public class DonationService {
 
 
 }
+=======
+    // ✅ Lấy tất cả đơn hiến máu theo userId
+    public List<Donation> getByUserId(Long userId) {
+        return repository.findByUser_UserId(userId);
+    }
+
+    // ✅ Đếm số lượt hiến máu theo ngày (LocalDate chuẩn hóa)
+    public long countByDate(LocalDate date) {
+        return repository.countByCollectedAt(date);
+    }
+
+    // ✅ Lấy các đơn hiến máu chưa được phân tách (chưa có BloodUnit)
+    public List<Donation> getUnseparatedDonations() {
+        return repository.findByBloodUnitsIsEmpty();
+    }
+
+    public List<DonationHistoryDTO> getHistoryByUserId(Long userId) {
+        LocalDate today = LocalDate.now();
+
+        return repository.findByUser_UserId(userId).stream()
+                .map(d -> {
+                    // Lấy loại thành phần máu
+                    BloodComponentType componentType = d.getComponent() != null && d.getComponent().getType() != null
+                            ? d.getComponent().getType()
+                            : BloodComponentType.RBC; // fallback nếu chưa rõ → toàn phần
+
+                    // Lấy số ngày phục hồi
+                    int recoveryDays = recoveryRuleRepository.findByComponentType(componentType)
+                            .map(RecoveryRule::getRecoveryDays)
+                            .orElse(60); // fallback mặc định
+
+                    LocalDate recoveryDate = d.getCollectedAt().plusDays(recoveryDays);
+                    boolean isRecovered = recoveryDate.isBefore(today);
+
+                    return DonationHistoryDTO.builder()
+                            .donationDate(d.getCollectedAt())
+                            .location(d.getLocation())
+                            .volumeMl(d.getVolumeMl())
+                            .bloodGroup(d.getBloodType() != null ? d.getBloodType().getDescription() : "Chưa rõ")
+                            .component(d.getComponent() != null ? d.getComponent().getName() : "Chưa tách")
+                            .status(d.getStatus() != null ? d.getStatus().name() : "Không rõ")
+                            .recoveryDate(recoveryDate)
+                            .isRecovered(isRecovered)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    // ✅ Lấy các lượt hiến máu theo khoảng ngày
+    public List<Donation> getDonationsBetween(LocalDate start, LocalDate end) {
+        return repository.findByCollectedAtBetween(start, end);
+    }
+}
+>>>>>>> origin/main

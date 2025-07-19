@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 //package com.quyet.superapp.service;
 //
 //import com.quyet.superapp.dto.BloodComponentDTO;
@@ -65,6 +66,13 @@ import com.quyet.superapp.dto.BloodComponentDTO;
 import com.quyet.superapp.dto.BloodComponentFullDTO;
 import com.quyet.superapp.dto.BloodComponentUpdateDTO;
 import com.quyet.superapp.entity.BloodComponent;
+=======
+package com.quyet.superapp.service;
+
+import com.quyet.superapp.dto.BloodComponentDTO;
+import com.quyet.superapp.entity.BloodComponent;
+import com.quyet.superapp.exception.ResourceNotFoundException;
+>>>>>>> origin/main
 import com.quyet.superapp.mapper.BloodComponentMapper;
 import com.quyet.superapp.repository.BloodComponentRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +85,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BloodComponentService {
 
+<<<<<<< HEAD
     private final BloodComponentRepository bloodComponentRepository;
     private final BloodComponentMapper mapper;
 
@@ -145,6 +154,35 @@ public class BloodComponentService {
     public BloodComponentDTO update(Long id, BloodComponentDTO dto) {
         BloodComponent existing = bloodComponentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thành phần máu"));
+=======
+    private final BloodComponentRepository componentRepo;
+
+    // 🔍 Lấy toàn bộ
+    public List<BloodComponentDTO> getAll() {
+        return componentRepo.findAll().stream()
+                .map(BloodComponentMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 🔍 Lấy theo ID
+    public BloodComponentDTO getById(Long id) {
+        BloodComponent component = componentRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thành phần máu với ID: " + id));
+        return BloodComponentMapper.toDTO(component);
+    }
+
+    // ✅ Tạo mới
+    public BloodComponentDTO create(BloodComponentDTO dto) {
+        BloodComponent entity = BloodComponentMapper.toEntity(dto);
+        BloodComponent saved = componentRepo.save(entity);
+        return BloodComponentMapper.toDTO(saved);
+    }
+
+    // ✅ Cập nhật
+    public BloodComponentDTO update(Long id, BloodComponentDTO dto) {
+        BloodComponent existing = componentRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thành phần máu"));
+>>>>>>> origin/main
 
         existing.setName(dto.getName());
         existing.setCode(dto.getCode());
@@ -152,6 +190,7 @@ public class BloodComponentService {
         existing.setStorageDays(dto.getStorageDays());
         existing.setUsage(dto.getUsage());
         existing.setIsApheresisCompatible(dto.getIsApheresisCompatible());
+<<<<<<< HEAD
         existing.setType(dto.getType());
         existing.setIsActive(dto.getIsActive());
 
@@ -180,3 +219,25 @@ public class BloodComponentService {
     }
 }
 
+=======
+
+        BloodComponent updated = componentRepo.save(existing);
+        return BloodComponentMapper.toDTO(updated);
+    }
+
+    // ❌ Xoá
+    public void delete(Long id) {
+        if (!componentRepo.existsById(id)) {
+            throw new ResourceNotFoundException("Không tồn tại thành phần máu");
+        }
+        componentRepo.deleteById(id);
+    }
+
+    // 🔍 Tìm theo mã code (ví dụ: PRC)
+    public BloodComponentDTO getByCode(String code) {
+        BloodComponent found = componentRepo.findByCode(code)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy mã thành phần máu: " + code));
+        return BloodComponentMapper.toDTO(found);
+    }
+}
+>>>>>>> origin/main

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 //package com.quyet.superapp.service;
 //
 //import com.quyet.superapp.dto.DashboardResponseDTO;
@@ -61,6 +62,14 @@ import com.quyet.superapp.enums.BloodRequestStatus;
 import com.quyet.superapp.enums.UrgencyLevel;
 import com.quyet.superapp.repository.BloodInventoryRepository;
 import com.quyet.superapp.repository.BloodRequestRepository;
+=======
+package com.quyet.superapp.service;
+
+import com.quyet.superapp.dto.DashboardResponseDTO;
+import com.quyet.superapp.dto.GroupStat;
+import com.quyet.superapp.enums.RequestStatus;
+import com.quyet.superapp.repository.BloodInventoryRepository;
+>>>>>>> origin/main
 import com.quyet.superapp.repository.DonationRepository;
 import com.quyet.superapp.repository.UrgentRequestRepository;
 import lombok.RequiredArgsConstructor;
@@ -70,12 +79,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
 
     private final DonationRepository donationRepository;
     private final BloodInventoryRepository bloodInventoryRepository;
+<<<<<<< HEAD
     private final BloodRequestRepository bloodRequestRepository;
 
     public DashboardOverviewDTO getDashboardOverview() {
@@ -103,5 +117,34 @@ public class DashboardService {
                 .urgentRequestsCount(urgentRequests)
                 .bloodDistribution(distribution)
                 .build();
+=======
+    private final UrgentRequestRepository urgentRequestRepository;
+
+    public DashboardResponseDTO getDashboardStats() {
+        long donorsToday = donationRepository.countByCollectedAt(LocalDate.now());
+        long totalUnits  = bloodInventoryRepository.sumAllUnits();
+
+        long pendingReqs  = urgentRequestRepository.countByStatus(RequestStatus.PENDING);
+        long approvedReqs = urgentRequestRepository.countByStatus(RequestStatus.APPROVED);
+        long rejectedReqs = urgentRequestRepository.countByStatus(RequestStatus.REJECTED);
+
+        List<GroupStat> groupStats =
+                bloodInventoryRepository.findGroupCounts()
+                        .stream()
+                        .map(arr -> new GroupStat(
+                                (String) arr[0],
+                                ((Number) arr[1]).longValue()
+                        ))
+                        .collect(Collectors.toList());
+
+        return new DashboardResponseDTO(
+                donorsToday,
+                totalUnits,
+                pendingReqs,
+                approvedReqs,
+                rejectedReqs,
+                groupStats
+        );
+>>>>>>> origin/main
     }
 }

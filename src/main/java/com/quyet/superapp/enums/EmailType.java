@@ -1,6 +1,7 @@
 package com.quyet.superapp.enums;
 
 public enum EmailType {
+<<<<<<< HEAD
     BLOOD_REQUEST_CREATED,
     BLOOD_REQUEST_WAITING_DONOR,
     BLOOD_REQUEST_APPROVED,
@@ -24,3 +25,10 @@ public enum EmailType {
     DONATION_REMINDER
     }
 
+=======
+    REGISTER,
+    RESET_PASSWORD,
+    SYSTEM,
+    VERIFY_EMAIL
+}
+>>>>>>> origin/main

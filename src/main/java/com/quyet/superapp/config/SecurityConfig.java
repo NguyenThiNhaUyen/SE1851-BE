@@ -36,10 +36,22 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+<<<<<<< HEAD
+=======
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService); // đã load user từ DB
+        provider.setPasswordEncoder(passwordEncoder()); // dùng BCrypt để so sánh
+        return provider;
+    }
+>>>>>>> origin/main
 
     // Nếu cần dùng AuthenticationManager ở chỗ khác (ví dụ login), bạn có thể expose nó
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+<<<<<<< HEAD
         AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
         builder
                 .userDetailsService(userDetailsService)
@@ -48,6 +60,13 @@ public class SecurityConfig {
     }
 
 
+=======
+        var builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.authenticationProvider(authenticationProvider());
+        return builder.build();
+    }
+
+>>>>>>> origin/main
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
@@ -55,6 +74,11 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Đổi đúng port FE của bạn
 
+<<<<<<< HEAD
+=======
+        //configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+
+>>>>>>> origin/main
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         var source = new UrlBasedCorsConfigurationSource();
@@ -68,6 +92,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+<<<<<<< HEAD
+=======
+                // ✅ Gắn Provider để xử lý xác thực username/password
+                .authenticationProvider(authenticationProvider())
+
+>>>>>>> origin/main
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(MEMBER_ENDPOINTS).hasAnyRole("MEMBER", "ADMIN", "STAFF")
@@ -89,13 +119,22 @@ public class SecurityConfig {
         return http.build();
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/**",
             "/api/verify-otp",
             "/api/forgot",
             "/api/change-password",
             "/api/blog/**",
+<<<<<<< HEAD
             "/api/public/**"
+=======
+            "/api/public/**",
+            
+>>>>>>> origin/main
     };
     private static final String[] MEMBER_ENDPOINTS = {
             "/api/user/**",
@@ -106,18 +145,34 @@ public class SecurityConfig {
             "/api/request/**",
             "/api/transfusion/history",
             "/api/blood/**",
+<<<<<<< HEAD
             "/api/vnpay/**"
+=======
+            "/api/vnpay/**",
+            "/api/slots"
+>>>>>>> origin/main
     };
     private static final String[] STAFF_ENDPOINTS = {
             "/api/staff/**",
             "/api/staff/requests/**",
             "/api/blood-requests/**",
             "/api/donation/confirm",
+<<<<<<< HEAD
             "/api/separation/**",// ✅ Thêm dòng này
             "/api/urgent-requests/**",
             "/api/blood-inventory/**",
             "/api/blood/**",
             "/api/separation/logs/**"
+=======
+            //"/api/separation/**",// ✅ Thêm dòng này
+            "/api/urgent-requests/**",
+            "/api/blood-inventory/**",
+            "/api/blood/**",
+            "/api/separation/logs/**",
+            "/api/separation-orders/**",
+            "/api/separation-details/**",
+            "/api/separation-statistics/**"
+>>>>>>> origin/main
     };
     private static final String[] ADMIN_ENDPOINTS = {
             "/api/admin",
@@ -132,7 +187,11 @@ public class SecurityConfig {
             "/api/donation/**",
             "/api/transfusion/**",
             "/api/urgent-requests/**",
+<<<<<<< HEAD
             "/api/test-email/**"
+=======
+            "/api/donation/confirm"
+>>>>>>> origin/main
 
     };
 }

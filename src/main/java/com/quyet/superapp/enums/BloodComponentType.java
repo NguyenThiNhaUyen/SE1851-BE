@@ -1,5 +1,6 @@
 package com.quyet.superapp.enums;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -47,4 +48,11 @@ public enum BloodComponentType {
     public String toValue() {
         return name();
     }
+=======
+public enum BloodComponentType {
+    PLASMA,
+    RBC,
+    PLATELET,
+    WBC
+>>>>>>> origin/main
 }

@@ -23,6 +23,7 @@ public class Address {
     @JsonIgnore
     private Ward ward;
 
+<<<<<<< HEAD
     public String getFullAddress() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.addressStreet);
@@ -40,11 +41,17 @@ public class Address {
         return sb.toString();
     }
 
+=======
+    // ✅ Thêm tọa độ
+>>>>>>> origin/main
     @Column(name = "latitude")
     private Double latitude;
 
     @Column(name = "longitude")
     private Double longitude;
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/main
 }

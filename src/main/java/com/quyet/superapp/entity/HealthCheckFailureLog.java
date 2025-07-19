@@ -1,5 +1,9 @@
 package com.quyet.superapp.entity;
 
+<<<<<<< HEAD
+=======
+import com.quyet.superapp.enums.HealthCheckFailureReason;
+>>>>>>> origin/main
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +27,11 @@ public class HealthCheckFailureLog {
     @JoinColumn(name = "registration_id", nullable = false)
     private DonationRegistration registration;
 
+<<<<<<< HEAD
     private String reason;        // Ví dụ: Huyết áp cao, Cân nặng thấp
+=======
+    private HealthCheckFailureReason reason;        // Ví dụ: Huyết áp cao, Cân nặng thấp
+>>>>>>> origin/main
     private String staffNote;     // Ghi chú thêm từ nhân viên y tế
 
     private LocalDateTime createdAt;

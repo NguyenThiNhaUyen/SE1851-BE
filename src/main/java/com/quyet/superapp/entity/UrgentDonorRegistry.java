@@ -1,7 +1,10 @@
 package com.quyet.superapp.entity;
 
+<<<<<<< HEAD
 import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.enums.DonorReadinessLevel;
+=======
+>>>>>>> origin/main
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +23,7 @@ public class UrgentDonorRegistry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+<<<<<<< HEAD
     // Người dùng đăng ký hiến máu khẩn cấp
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -78,4 +82,22 @@ public class UrgentDonorRegistry {
     }
 
 
+=======
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User donor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blood_type_id")
+    private BloodType bloodType;
+
+    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
+    private String location;
+
+    @Column(name = "is_available")
+    private Boolean isAvailable;  // ✅ Sửa từ primitive boolean sang Boolean
+
+    @Column(name = "last_contacted")
+    private LocalDateTime lastContacted;
+>>>>>>> origin/main
 }

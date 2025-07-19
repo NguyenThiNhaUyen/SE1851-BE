@@ -1,13 +1,18 @@
 package com.quyet.superapp.repository;
 
+<<<<<<< HEAD
 import com.quyet.superapp.dto.StatisticFilterDTO;
 import com.quyet.superapp.entity.User;
 import com.quyet.superapp.enums.RoleEnum;
+=======
+import com.quyet.superapp.entity.User;
+>>>>>>> origin/main
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -99,3 +104,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // ✅ Thêm: tìm theo email
     Optional<User> findByEmail(String email);
 }
+=======
+import java.util.Optional;
+
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    long countByIsEnableTrue();
+
+    Optional<User> findByUsername(String username);
+
+    @Query("SELECT u FROM User u JOIN FETCH u.role WHERE u.username = :username")
+    Optional<User> findByUsernameWithRole(@Param("username") String username);
+
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+
+    // ✅ BỔ SUNG THIẾU
+    Optional<User> findByEmail(String email);
+}
+
+
+>>>>>>> origin/main

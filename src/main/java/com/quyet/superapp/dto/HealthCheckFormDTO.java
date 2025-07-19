@@ -1,5 +1,9 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+=======
+import jakarta.validation.constraints.*;
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class HealthCheckFormDTO {
+<<<<<<< HEAD
     private Long id;
     private Long registrationId;
 
@@ -18,6 +23,38 @@ public class HealthCheckFormDTO {
     private Integer bloodPressureDia;
     private Double weightKg;
 
+=======
+    @NotNull(message = "ID không thể null")
+    private Long id;
+
+    @NotNull(message = "Registration ID không thể null")
+    private Long registrationId;
+
+    @DecimalMin(value = "30.0", message = "Nhiệt độ cơ thể phải ít nhất 30°C")
+    @DecimalMax(value = "42.0", message = "Nhiệt độ cơ thể phải dưới 42°C")
+    private Double bodyTemperature;
+
+    @Min(value = 30, message = "Nhịp tim phải tối thiểu 30 lần/phút")
+    @Max(value = 200, message = "Nhịp tim phải dưới 200 lần/phút")
+    private Integer heartRate;
+
+    @Min(value = 80, message = "Huyết áp tâm thu phải ít nhất 80")
+    @Max(value = 180, message = "Huyết áp tâm thu phải dưới 180")
+    private Integer bloodPressureSys;
+
+    @Min(value = 50, message = "Huyết áp tâm trương phải ít nhất 50")
+    @Max(value = 120, message = "Huyết áp tâm trương phải dưới 120")
+    private Integer bloodPressureDia;
+
+    @Min(value = 30, message = "Cân nặng phải ít nhất 30 kg")
+    @Max(value = 200, message = "Cân nặng phải dưới 200 kg")
+    private Double weightKg;
+
+    @DecimalMin(value = "130.0", message = "Chiều cao tối thiểu là 130cm")
+    private Double HeightCm;
+
+
+>>>>>>> origin/main
     private Boolean hasFever;
     private Boolean tookAntibioticsRecently;
     private Boolean hasChronicIllness;
@@ -25,7 +62,21 @@ public class HealthCheckFormDTO {
     private Boolean hadRecentTattooOrSurgery;
     private Boolean hasRiskySexualBehavior;
 
+<<<<<<< HEAD
     private Boolean isEligible;
     private String notesByStaff;
 
+=======
+    @NotNull(message = "Trạng thái đủ điều kiện không thể null")
+    private Boolean isEligible;
+    private String notesByStaff;
+
+    // 🔬 Xét nghiệm máu
+    private Double hemoglobin;
+    private Boolean hbsAgPositive;
+    private Boolean hcvPositive;
+    private Boolean hivPositive;
+    private Boolean syphilisPositive;
+
+>>>>>>> origin/main
 }

@@ -28,6 +28,7 @@ public class Ward {
     @JoinColumn(name = "district_id", nullable = false)
     @JsonBackReference // ✅ Tránh vòng lặp ngược
     private District district;
+<<<<<<< HEAD
 
     @Column(name = "latitude")
     private Double latitude;
@@ -35,4 +36,6 @@ public class Ward {
     @Column(name = "longitude")
     private Double longitude;
 
+=======
+>>>>>>> origin/main
 }

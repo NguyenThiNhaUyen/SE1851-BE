@@ -1,15 +1,22 @@
 package com.quyet.superapp.entity;
 
+<<<<<<< HEAD
 import com.quyet.superapp.enums.BloodInventoryStatus;
 import com.quyet.superapp.enums.BloodUnitStatus;
+=======
+>>>>>>> origin/main
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+=======
+import java.time.LocalDateTime;
+>>>>>>> origin/main
 
 
 @Entity
@@ -54,6 +61,7 @@ public class BloodInventory {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+<<<<<<< HEAD
 
     @Column(name = "MinThresholdML")
     private Integer minThresholdMl;
@@ -82,4 +90,6 @@ public class BloodInventory {
 
 
 
+=======
+>>>>>>> origin/main
 }

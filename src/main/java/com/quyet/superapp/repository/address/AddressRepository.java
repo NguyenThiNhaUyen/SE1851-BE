@@ -1,6 +1,7 @@
 package com.quyet.superapp.repository.address;
 
 import com.quyet.superapp.entity.address.Address;
+<<<<<<< HEAD
 import com.quyet.superapp.entity.address.Ward;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,5 +23,10 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
 
     @Query("SELECT a FROM Address a WHERE LOWER(a.addressStreet) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Address> searchSimilarAddresses(@Param("keyword") String keyword);
+=======
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AddressRepository extends JpaRepository<Address, Long> {
+>>>>>>> origin/main
 
 }

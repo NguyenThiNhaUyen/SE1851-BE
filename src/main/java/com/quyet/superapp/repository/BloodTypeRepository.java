@@ -1,6 +1,7 @@
 package com.quyet.superapp.repository;
 
 import com.quyet.superapp.entity.BloodType;
+<<<<<<< HEAD
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,4 +29,16 @@ public interface BloodTypeRepository extends JpaRepository<BloodType, Long> {
     List<BloodType> findByDescriptionContaining(String keyword); // chứa chuỗi, ví dụ "O"
 
 
+=======
+import com.quyet.superapp.enums.RhType;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface BloodTypeRepository extends JpaRepository<BloodType, Long> {
+    // Có thể thêm custom query nếu cần, ví dụ:
+
+    // ✅ Repository
+    Optional<BloodType> findByDescription(String description);
+>>>>>>> origin/main
 }

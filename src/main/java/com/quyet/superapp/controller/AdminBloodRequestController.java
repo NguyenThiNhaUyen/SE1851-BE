@@ -1,19 +1,28 @@
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.BloodRequestDTO;
+<<<<<<< HEAD
 import com.quyet.superapp.dto.BloodRequestSummaryDTO;
 import com.quyet.superapp.dto.NearbyDonorDTO;
 import com.quyet.superapp.entity.BloodRequest;
 import com.quyet.superapp.mapper.BloodRequestMapper;
 import com.quyet.superapp.service.BloodRequestService;
 import com.quyet.superapp.service.UrgentDonorRegistryService;
+=======
+import com.quyet.superapp.entity.BloodRequest;
+import com.quyet.superapp.mapper.BloodRequestMapper;
+import com.quyet.superapp.service.BloodRequestService;
+>>>>>>> origin/main
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Map;
+=======
+>>>>>>> origin/main
 
 @RestController
 @RequestMapping("/api/admin/blood-requests")
@@ -22,6 +31,7 @@ import java.util.Map;
 public class AdminBloodRequestController {
 
     private final BloodRequestService service;
+<<<<<<< HEAD
     private final UrgentDonorRegistryService urgentDonorRegistryService;
     private final BloodRequestService bloodRequestService;
 
@@ -46,13 +56,21 @@ public class AdminBloodRequestController {
     }
 
     // ✅ 2. Lấy danh sách tất cả yêu cầu máu
+=======
+
+    // ✅ Lấy danh sách tất cả yêu cầu máu
+>>>>>>> origin/main
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BloodRequestDTO>> getAllRequests() {
         return ResponseEntity.ok(service.getAllRequests());
     }
 
+<<<<<<< HEAD
     // ✅ 3. Duyệt đơn truyền máu
+=======
+    // ✅ Duyệt yêu cầu
+>>>>>>> origin/main
     @PutMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BloodRequestDTO> approveRequest(@PathVariable("id") Long id) {
@@ -60,13 +78,18 @@ public class AdminBloodRequestController {
         return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
     }
 
+<<<<<<< HEAD
     // ✅ 4. Từ chối đơn truyền máu
+=======
+    // ✅ Từ chối yêu cầu
+>>>>>>> origin/main
     @PutMapping("/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BloodRequestDTO> rejectRequest(@PathVariable("id") Long id) {
         BloodRequest updated = service.updateStatus(id, "REJECTED");
         return ResponseEntity.ok(BloodRequestMapper.toDTO(updated));
     }
+<<<<<<< HEAD
 
     // ✅ 5. Đánh dấu WAITING_DONOR (tìm người hiến khẩn cấp)
     @PutMapping("/{id}/mark-waiting-donor")
@@ -91,4 +114,6 @@ public class AdminBloodRequestController {
         service.cancelByAdmin(id, reason);
         return ResponseEntity.ok("Đơn #" + id + " đã bị huỷ");
     }
+=======
+>>>>>>> origin/main
 }

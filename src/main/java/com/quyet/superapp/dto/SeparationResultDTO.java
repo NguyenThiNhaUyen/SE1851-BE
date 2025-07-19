@@ -4,13 +4,40 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
 import java.util.List;
 
+=======
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * DTO tổng hợp kết quả tách máu, gộp từ BloodSeparationResultDTO và SeparationResultDTO
+ */
+>>>>>>> origin/main
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeparationResultDTO {
+<<<<<<< HEAD
     private Long separationOrderId;
     private BloodSeparationSuggestionDTO suggestion;
     private List<BloodUnitDTO> createdUnits;
+=======
+
+    private Long separationOrderId;                                // ID lệnh tách máu
+
+    private BloodSeparationSuggestionDTO suggestion;          // Gợi ý preset nếu có
+
+    private List<BloodSeparationDetailDTO> components;        // Thành phần chi tiết sau tách (volume, component type)
+
+    private List<BloodUnitDTO> createdUnits;                  // Đơn vị máu đã sinh ra và lưu kho
+
+    private String note;                                      // Ghi chú thêm nếu có
+
+    private Long processedById;                               // ID người thực hiện
+    private String processedByName;                           // Tên người thực hiện
+
+    private LocalDateTime completedAt;                        // Thời gian hoàn tất
+>>>>>>> origin/main
 }

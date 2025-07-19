@@ -2,6 +2,7 @@ package com.quyet.superapp.mapper;
 
 import com.quyet.superapp.dto.VnPaymentDTO;
 import com.quyet.superapp.entity.VnPayment;
+<<<<<<< HEAD
 import com.quyet.superapp.enums.PaymentStatus;
 import org.springframework.stereotype.Component;
 
@@ -35,4 +36,18 @@ public class VnPaymentMapper {
         payment.setStatus(PaymentStatus.valueOf(dto.getStatus()));
         return payment;
     }
+=======
+
+public class VnPaymentMapper {
+    public static VnPaymentDTO toDTO(VnPayment payment) {
+        return new VnPaymentDTO(
+                payment.getPaymentId(),              // sửa lại đúng field
+                payment.getUser().getUserId(),       // đảm bảo User có getUserId()
+                payment.getAmount(),
+                payment.getPaymentTime(),
+                payment.getTransactionCode(),
+                payment.getStatus()
+        );
+    }
+>>>>>>> origin/main
 }

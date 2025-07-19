@@ -1,11 +1,15 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonFormat;
+=======
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
 import java.time.LocalDateTime;
 
 @Data
@@ -36,4 +40,23 @@ public class DonationHistoryDTO {
 
     private String paymentMethod;
     private String transactionCode;
+=======
+import java.time.LocalDate;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class DonationHistoryDTO {
+    private LocalDate donationDate;
+    private String location;
+    private Integer volumeMl;
+    private String bloodGroup;
+    private String component;
+    private String status;
+
+    // ✅ Thêm 2 trường mới để hiển thị thời gian phục hồi
+    private LocalDate recoveryDate;     // Ngày có thể hiến lại
+    private boolean isRecovered;        // Đã đủ điều kiện hiến lại?
+>>>>>>> origin/main
 }

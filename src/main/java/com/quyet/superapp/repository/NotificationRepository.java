@@ -12,6 +12,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByUser_UserId(Long userId); // ✅ Tìm theo người nhận
 
     List<Notification> findByUser_UserIdAndIsReadFalse(Long userId); // 🔔 Thông báo chưa đọc
+<<<<<<< HEAD
 
     List<Notification> findByUserUserIdOrderBySentAtDesc(Long userId);
+=======
+>>>>>>> origin/main
 }

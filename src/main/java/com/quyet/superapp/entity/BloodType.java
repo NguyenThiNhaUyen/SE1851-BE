@@ -5,12 +5,19 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 @Entity
 @Table(name = "BloodTypes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+<<<<<<< HEAD
 @Builder
+=======
+>>>>>>> origin/main
 public class BloodType {
 
     @Id
@@ -18,6 +25,7 @@ public class BloodType {
     @Column(name = "BloodTypeID")
     private Long bloodTypeId;
 
+<<<<<<< HEAD
     @Column(name = "Description", columnDefinition = "NVARCHAR(20)", nullable = false)
     private String description; // A, B, AB, O
 
@@ -32,6 +40,10 @@ public class BloodType {
 
     @Column(name = "Code", columnDefinition = "VARCHAR(10)", nullable = false, unique = true)
     private String code; // A+, B-, AB+, O- ...
+=======
+    @Column(name = "Description", columnDefinition = "NVARCHAR(10)", nullable = false)
+    private String description; // VD: A+, B-, AB+
+>>>>>>> origin/main
 
     @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -56,6 +68,7 @@ public class BloodType {
     @OneToMany(mappedBy = "recipientType", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CompatibilityRule> recipientRules;
+<<<<<<< HEAD
 
     @PrePersist
     @PreUpdate
@@ -69,4 +82,6 @@ public class BloodType {
         return code;
     }
 
+=======
+>>>>>>> origin/main
 }

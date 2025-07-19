@@ -8,6 +8,10 @@ public enum BloodUnitStatus {
     USED,           // ✅ Đã được truyền cho bệnh nhân
     DISCARDED,      // ❌ Bị loại bỏ (hết hạn, nhiễm khuẩn, lỗi tách...)
     EXPIRED,      // ⏰ Hết hạn sử dụng theo ngày
+<<<<<<< HEAD
     FAILED_TEST,// Xét nghiệm không đạt
+=======
+    FAILED_TEST,  // Xét nghiệm không đạt
+>>>>>>> origin/main
     STORED
 }

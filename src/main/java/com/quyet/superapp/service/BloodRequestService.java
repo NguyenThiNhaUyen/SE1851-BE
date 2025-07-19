@@ -1,5 +1,6 @@
 package com.quyet.superapp.service;
 
+<<<<<<< HEAD
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.EmailType;
@@ -12,10 +13,19 @@ import com.quyet.superapp.repository.*;
 import com.quyet.superapp.util.AppEmailSender;
 import com.quyet.superapp.validator.BloodRequestValidator;
 import jakarta.transaction.Transactional;
+=======
+import com.quyet.superapp.dto.ApproveBloodRequestDTO;
+import com.quyet.superapp.dto.BloodRequestDTO;
+import com.quyet.superapp.dto.CreateBloodRequestDTO;
+import com.quyet.superapp.entity.*;
+import com.quyet.superapp.mapper.BloodRequestMapper;
+import com.quyet.superapp.repository.*;
+>>>>>>> origin/main
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,10 +39,20 @@ import static com.quyet.superapp.enums.PaymentStatus.PENDING;
 @RequiredArgsConstructor
 public class BloodRequestService {
 
+=======
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class    BloodRequestService {
+>>>>>>> origin/main
     private final BloodRequestRepository requestRepo;
     private final UserRepository userRepo;
     private final BloodTypeRepository bloodTypeRepo;
     private final BloodComponentRepository componentRepo;
+<<<<<<< HEAD
     private final BloodComponentPricingRepository pricingRepo;
     private final UserRepository userRepository;
     private final AppEmailSender appEmailSender;
@@ -41,6 +61,8 @@ public class BloodRequestService {
 
     @Autowired
     private BloodPricingService bloodPricingService;
+=======
+>>>>>>> origin/main
 
     @Autowired
     private TransfusionRepository transfusionRepo;
@@ -60,6 +82,7 @@ public class BloodRequestService {
     @Autowired
     private InventoryService inventoryService;
 
+<<<<<<< HEAD
     @Autowired
     private PatientUserService patientUserService;
 
@@ -480,6 +503,38 @@ public class BloodRequestService {
 // Tạm comment để test commit GitHub
 
 
+=======
+
+    public BloodRequest createRequest(CreateBloodRequestDTO dto) {
+        User staff = userRepo.findById(dto.getRequesterId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người gửi"));
+
+        BloodType bloodType = bloodTypeRepo.findById(dto.getBloodTypeId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm máu"));
+
+        BloodComponent component = componentRepo.findById(dto.getComponentId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thành phần máu"));
+
+        BloodRequest entity = BloodRequestMapper.toEntity(dto, staff, bloodType, component);
+        entity.setCreatedAt(LocalDateTime.now());
+
+        String urgency = dto.getUrgencyLevel();
+        if ("BÌNH THƯỜNG".equalsIgnoreCase(urgency)) {
+            if (inventoryService.hasEnough(dto.getBloodTypeId(), dto.getComponentId(), dto.getQuantityMl())) {
+                entity.setStatus("APPROVED");
+                entity.setConfirmedVolumeMl(dto.getQuantityMl());
+            } else {
+                entity.setStatus("REJECTED");
+            }
+        } else {
+            entity.setStatus("PENDING"); // khẩn cấp hoặc cấp cứu → admin xử lý
+        }
+
+        return requestRepo.save(entity);
+    }
+
+
+>>>>>>> origin/main
     public List<BloodRequestDTO> getAllRequests() {
         return requestRepo.findAll().stream()
                 .map(BloodRequestMapper::toDTO)
@@ -489,7 +544,12 @@ public class BloodRequestService {
     public BloodRequest updateStatus(Long id, String status) {
         BloodRequest req = requestRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu máu với ID: " + id));
+<<<<<<< HEAD
         req.setStatus(BloodRequestStatus.valueOf(status));
+=======
+
+        req.setStatus(status);
+>>>>>>> origin/main
         return requestRepo.save(req);
     }
 
@@ -497,6 +557,7 @@ public class BloodRequestService {
         BloodRequest request = requestRepo.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
 
+<<<<<<< HEAD
         if (!BloodRequestStatus.APPROVED.equals(request.getStatus())) {
             throw new RuntimeException("Chỉ xác nhận được yêu cầu đã được duyệt");
         }
@@ -512,6 +573,23 @@ public class BloodRequestService {
             List<UrgentDonorRegistry> urgentDonors = urgentDonorRepo.findAvailableDonors(
                     request.getBloodType().getBloodTypeId()
             );
+=======
+        if (!"APPROVED".equalsIgnoreCase(request.getStatus())) {
+            throw new RuntimeException("Chỉ xác nhận được yêu cầu đã được duyệt");
+        }
+
+        BloodInventory inventory = inventoryRepo.findByTypeAndComponent(
+                request.getBloodType().getBloodTypeId(),
+                request.getComponent().getBloodComponentId()
+        ).orElse(null);
+
+        if (inventory == null || inventory.getTotalQuantityMl() < confirmedVolumeMl) {
+            List<UrgentDonorRegistry> urgentDonors = urgentDonorRepo.findAvailableDonors(request.getBloodType().getBloodTypeId());
+
+            if (urgentDonors.isEmpty()) {
+                throw new RuntimeException("Kho máu không đủ và không có người hiến khẩn cấp sẵn sàng");
+            }
+>>>>>>> origin/main
 
             for (UrgentDonorRegistry donor : urgentDonors) {
                 UrgentDonorContactLog log = new UrgentDonorContactLog();
@@ -522,6 +600,7 @@ public class BloodRequestService {
                 contactLogRepo.save(log);
             }
 
+<<<<<<< HEAD
             request.setStatus(WAITING_DONOR);
             request.setUpdatedAt(LocalDateTime.now());
             requestRepo.save(request);
@@ -535,12 +614,18 @@ public class BloodRequestService {
         }
 
 
+=======
+            throw new RuntimeException("Kho máu không đủ. Đã liên hệ người hiến máu khẩn cấp.");
+        }
+
+>>>>>>> origin/main
         inventory.setTotalQuantityMl(inventory.getTotalQuantityMl() - confirmedVolumeMl);
         inventory.setLastUpdated(LocalDateTime.now());
         inventoryRepo.save(inventory);
 
         Transfusion transfusion = new Transfusion();
         transfusion.setRequest(request);
+<<<<<<< HEAD
         transfusion.setTransfusionDate(LocalDateTime.now());
         transfusion.setStatus("COMPLETED");
         transfusion.setVolumeTakenMl(confirmedVolumeMl);
@@ -555,6 +640,17 @@ public class BloodRequestService {
 
         request.setConfirmedVolumeMl(confirmedVolumeMl);
         request.setStatus(BloodRequestStatus.COMPLETED);
+=======
+        transfusion.setRecipient(request.getRequester());
+        transfusion.setTransfusionDate(LocalDateTime.now());
+        transfusion.setStatus("COMPLETED");
+        transfusion.setNotes("Lấy " + confirmedVolumeMl + "ml từ kho");
+
+        transfusionRepo.save(transfusion);
+
+        request.setConfirmedVolumeMl(confirmedVolumeMl);
+        request.setStatus("COMPLETED");
+>>>>>>> origin/main
 
         return requestRepo.save(request);
     }
@@ -563,6 +659,7 @@ public class BloodRequestService {
         BloodRequest request = requestRepo.findById(dto.getBloodRequestId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
 
+<<<<<<< HEAD
         if (request.getPatientRecordCode() == null || request.getPatientRecordCode().isEmpty()) {
             request.setPatientRecordCode(generatePatientRecordCode());
         }
@@ -572,6 +669,28 @@ public class BloodRequestService {
         request.setApprovedAt(LocalDateTime.now());
         request.setIsUnmatched(dto.getIsUnmatched());
 
+=======
+        request.setStatus(dto.getStatus());
+        request.setConfirmedVolumeMl(dto.getConfirmedVolumeMl());
+        request.setEmergencyNote(dto.getEmergencyNote());
+        request.setApprovedBy(dto.getApprovedBy());
+        request.setApprovedAt(LocalDateTime.now());
+        request.setIsUnmatched(dto.getIsUnmatched());
+
+        // Trừ máu trong kho nếu đủ
+        BloodInventory inventory = inventoryRepo.findByTypeAndComponent(
+                request.getBloodType().getBloodTypeId(),
+                request.getComponent().getBloodComponentId()
+        ).orElse(null);
+
+        if (inventory != null && dto.getStatus().startsWith("APPROVED")) {
+            int remain = inventory.getTotalQuantityMl() - dto.getConfirmedVolumeMl();
+            inventory.setTotalQuantityMl(Math.max(0, remain));
+            inventory.setLastUpdated(LocalDateTime.now());
+            inventoryRepo.save(inventory);
+        }
+
+>>>>>>> origin/main
         return requestRepo.save(request);
     }
 
@@ -581,6 +700,7 @@ public class BloodRequestService {
         return BloodRequestMapper.toDTO(entity);
     }
 
+<<<<<<< HEAD
     public List<BloodRequestDTO> filterRequests(String urgency, String status) {
         return requestRepo.findAll().stream()
                 .filter(req -> urgency == null || urgency.equalsIgnoreCase(req.getUrgencyLevel().name()))
@@ -675,4 +795,6 @@ public class BloodRequestService {
                 .collect(Collectors.toList());
     }
 
+=======
+>>>>>>> origin/main
 }

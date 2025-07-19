@@ -1,5 +1,6 @@
 package com.quyet.superapp.service;
 
+<<<<<<< HEAD
 import com.quyet.superapp.enums.BloodComponentType;
 import com.quyet.superapp.mapper.NearbyDonorMapper;
 import com.quyet.superapp.mapper.UrgentDonorSearchMapper;
@@ -31,6 +32,18 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.time.temporal.ChronoUnit;
+=======
+import com.quyet.superapp.dto.UrgentDonorRegistrationDTO;
+import com.quyet.superapp.dto.UrgentDonorResponseDTO;
+import com.quyet.superapp.entity.*;
+import com.quyet.superapp.entity.address.Address;
+import com.quyet.superapp.repository.*;
+import com.quyet.superapp.service.AddressService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+>>>>>>> origin/main
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +54,7 @@ public class UrgentDonorRegistryService {
     private final UrgentDonorRegistryRepository urgentDonorRegistryRepository;
     private final UserProfileRepository userProfileRepository;
     private final AddressService addressService;
+<<<<<<< HEAD
     private final UrgentDonorMapper urgentDonorMapper;
     private final EmailService emailService;
     private final UrgentDonorRegistryRepository urgentDonorRegistryRepo;
@@ -489,16 +503,58 @@ public class UrgentDonorRegistryService {
 
 
 
+=======
+
+    /**
+     * Đăng ký người hiến máu khẩn cấp.
+     */
+    public void registerUrgentDonor(UrgentDonorRegistrationDTO dto) {
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        BloodType bloodType = bloodTypeRepository.findById(dto.getBloodTypeId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm máu"));
+
+        Address address = addressService.createAddressFromDTO(dto.getAddressRequest());
+
+        // Tạo bản ghi khẩn cấp
+        UrgentDonorRegistry donor = new UrgentDonorRegistry();
+        donor.setDonor(user);
+        donor.setBloodType(bloodType);
+        donor.setLocation(dto.getLocation());
+        donor.setIsAvailable(true);
+        donor.setLastContacted(null);
+        urgentDonorRegistryRepository.save(donor);
+
+        // Cập nhật hồ sơ
+        UserProfile profile = user.getUserProfile();
+        if (profile != null) {
+            profile.setAddress(address);
+            profile.setLatitude(dto.getLatitude());
+            profile.setLongitude(dto.getLongitude());
+            userProfileRepository.save(profile);
+        }
+    }
+
+>>>>>>> origin/main
     public List<UrgentDonorRegistry> getAllAvailableDonors() {
         return urgentDonorRegistryRepository.findAvailableDonorsAll();
     }
 
     public List<UrgentDonorRegistry> findNearbyDonors(double lat, double lng, double radiusKm) {
+<<<<<<< HEAD
         return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm);
     }
 
     public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
         return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm)
+=======
+        return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm);
+    }
+
+    public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
+        return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm)
+>>>>>>> origin/main
                 .stream()
                 .filter(d -> d.getBloodType().getBloodTypeId().equals(bloodTypeId))
                 .map(d -> {
@@ -507,13 +563,21 @@ public class UrgentDonorRegistryService {
                             d.getDonor().getUserId(),
                             profile.getFullName(),
                             d.getBloodType().getDescription(),
+<<<<<<< HEAD
                             profile.getLocation(),
                             profile.getPhone(),
                             profile.getAddress()
+=======
+                            d.getLocation(),
+                            profile.getPhone(),
+                            profile.getAddress()
+
+>>>>>>> origin/main
                     );
                 })
                 .toList();
     }
+<<<<<<< HEAD
 
     public List<UnverifiedDonorDTO> getUnverifiedDonors() {
         return urgentDonorRegistryRepository.findUnverifiedDonors()
@@ -683,4 +747,6 @@ public class UrgentDonorRegistryService {
         );
     }
 
+=======
+>>>>>>> origin/main
 }

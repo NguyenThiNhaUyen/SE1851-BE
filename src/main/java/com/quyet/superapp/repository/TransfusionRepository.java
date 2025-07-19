@@ -2,6 +2,7 @@ package com.quyet.superapp.repository;
 
 import com.quyet.superapp.entity.Transfusion;
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,11 @@ public interface TransfusionRepository extends JpaRepository<Transfusion, Long> 
             @Param("recipientId") Long recipientId,
             @Param("fromDate") LocalDateTime fromDate,
             @Param("toDate") LocalDateTime toDate);
+=======
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TransfusionRepository extends JpaRepository<Transfusion, Long> {
+    
+>>>>>>> origin/main
 }
