@@ -101,7 +101,7 @@ public class BloodUnitController {
     @GetMapping("/filter/by-code")
     public ResponseEntity<BloodUnitDTO> findByUnitCode(@RequestParam String code) {
         BloodUnit unit = service.getByUnitCode(code);
->>>>>>> origin/main
+
         return ResponseEntity.ok(BloodUnitMapper.toDTO(unit));
     }
 }
