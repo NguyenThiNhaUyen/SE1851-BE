@@ -21,32 +21,26 @@ public class BloodUnitController {
 
     private final BloodUnitService service;
 
-<<<<<<< HEAD
-    @GetMapping
-    public ResponseEntity<List<BloodUnitDTO>> getAll() {
-        List<BloodUnitDTO> result = service.getAll().stream()
-=======
+
     // ✅ Lấy tất cả đơn vị máu
     @GetMapping
     public ResponseEntity<List<BloodUnitDTO>> getAll() {
         List<BloodUnitDTO> result = service.getAllUnits().stream()
->>>>>>> origin/main
+
                 .map(BloodUnitMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
 
-<<<<<<< HEAD
-=======
     // ✅ Lấy đơn vị máu theo ID (PathVariable)
->>>>>>> origin/main
+
     @GetMapping("/{id}")
     public ResponseEntity<BloodUnitDTO> getById(@PathVariable Long id) {
         BloodUnit unit = service.getById(id);
         return ResponseEntity.ok(BloodUnitMapper.toDTO(unit));
     }
 
-<<<<<<< HEAD
+
     @PostMapping
     public ResponseEntity<BloodUnitDTO> create(@RequestBody BloodUnitDTO dto) {
         BloodUnit entity = BloodUnitMapper.fromDTO(dto);
@@ -63,7 +57,7 @@ public class BloodUnitController {
         return ResponseEntity.ok(BloodUnitMapper.toDTO(saved));
     }
 
-=======
+
     // ✅ Tạo mới đơn vị máu
     @PostMapping
     public ResponseEntity<BloodUnitDTO> create(@RequestBody BloodUnitDTO dto) {
@@ -83,33 +77,17 @@ public class BloodUnitController {
     }
 
     // ✅ Xóa đơn vị máu
->>>>>>> origin/main
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-<<<<<<< HEAD
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<BloodUnitDTO>> findByStatus(@PathVariable BloodUnitStatus status) {
-=======
-    // ✅ Lọc theo trạng thái máu
-    @GetMapping("/filter/status")
-    public ResponseEntity<List<BloodUnitDTO>> findByStatus(@RequestParam BloodUnitStatus status) {
->>>>>>> origin/main
-        List<BloodUnitDTO> result = service.findByStatus(status).stream()
-                .map(BloodUnitMapper::toDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(result);
-    }
 
-<<<<<<< HEAD
+
     @GetMapping("/expiring")
-=======
-    // ✅ Tìm máu sắp hết hạn
-    @GetMapping("/filter/expiring")
->>>>>>> origin/main
+
     public ResponseEntity<List<BloodUnitDTO>> findExpiringBefore(
             @RequestParam("before") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<BloodUnitDTO> result = service.findExpiringBefore(date).stream()
@@ -118,11 +96,7 @@ public class BloodUnitController {
         return ResponseEntity.ok(result);
     }
 
-<<<<<<< HEAD
-    @GetMapping("/code/{code}")
-    public ResponseEntity<BloodUnitDTO> findByUnitCode(@PathVariable String code) {
-        BloodUnit unit = service.findByUnitCode(code);
-=======
+
     // ✅ Tìm theo mã đơn vị
     @GetMapping("/filter/by-code")
     public ResponseEntity<BloodUnitDTO> findByUnitCode(@RequestParam String code) {

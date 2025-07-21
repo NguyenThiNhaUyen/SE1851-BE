@@ -1,67 +1,3 @@
-<<<<<<< HEAD
-//package com.quyet.superapp.controller;
-//
-//import com.quyet.superapp.dto.BloodComponentDTO;
-//import com.quyet.superapp.dto.BloodTypeDTO;
-//import com.quyet.superapp.entity.BloodType;
-//import com.quyet.superapp.mapper.BloodTypeMapper;
-//import com.quyet.superapp.service.BloodComponentService;
-//import com.quyet.superapp.service.BloodTypeService;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
-//import org.springframework.validation.annotation.Validated;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("/api/blood-components")
-//@RequiredArgsConstructor
-//@CrossOrigin(origins = "http://localhost:5173")
-//@Validated
-//public class BloodComponentController {
-//
-//    private final BloodComponentService bloodComponentService;
-//
-//    @GetMapping("/full")
-//    public ResponseEntity<List<BloodComponentDTO>> getFullComponents() {
-//        return ResponseEntity.ok(bloodComponentService.getAll());
-//    }
-//
-//
-//
-//
-//    @PostMapping
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<BloodComponentDTO> create(@Validated @RequestBody BloodComponentDTO dto) {
-//        return ResponseEntity.ok(bloodComponentService.create(dto));
-//    }
-//
-//    @GetMapping("/available")
-//    public ResponseEntity<List<BloodComponentDTO>> getAvailableComponents() {
-//        return ResponseEntity.ok(bloodComponentService.getAvailableComponents());
-//    }
-//
-//    @GetMapping
-//    public ResponseEntity<List<BloodComponentDTO>> getAllComponents() {
-//        return ResponseEntity.ok(bloodComponentService.getAll());
-//    }
-//
-//    @PutMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<BloodComponentDTO> update(@PathVariable Long id, @RequestBody BloodComponentDTO dto) {
-//        return ResponseEntity.ok(bloodComponentService.update(id, dto));
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<Void> delete(@PathVariable Long id) {
-//        bloodComponentService.delete(id);
-//        return ResponseEntity.ok().build();
-//    }
-//}
-
 
 package com.quyet.superapp.controller;
 
@@ -73,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-=======
+
 package com.quyet.superapp.controller;
 
 import com.quyet.superapp.dto.BloodComponentDTO;
@@ -81,7 +17,7 @@ import com.quyet.superapp.service.BloodComponentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
->>>>>>> origin/main
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -90,7 +26,7 @@ import java.util.List;
 @RequestMapping("/api/blood-components")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
-<<<<<<< HEAD
+
 @Validated
 public class BloodComponentController {
 
@@ -155,7 +91,7 @@ public class BloodComponentController {
         return ResponseEntity.ok("Đã khôi phục thành phần máu");
     }
 
-=======
+
 public class BloodComponentController {
 
     private final BloodComponentService service;
@@ -193,5 +129,5 @@ public class BloodComponentController {
     public ResponseEntity<BloodComponentDTO> getByCode(@RequestParam String code) {
         return ResponseEntity.ok(service.getByCode(code));
     }
->>>>>>> origin/main
+
 }

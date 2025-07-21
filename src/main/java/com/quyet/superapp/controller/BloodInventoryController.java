@@ -1,25 +1,12 @@
 package com.quyet.superapp.controller;
 
-<<<<<<< HEAD
-import com.quyet.superapp.dto.BloodInventoryAlertDTO;
-import com.quyet.superapp.dto.BloodInventoryDTO;
-import com.quyet.superapp.entity.BloodComponent;
-=======
 import com.quyet.superapp.dto.ApiResponseDTO;
 import com.quyet.superapp.entity.BloodComponent;
 import com.quyet.superapp.dto.BloodInventoryDTO;
->>>>>>> origin/main
-import com.quyet.superapp.entity.BloodInventory;
-import com.quyet.superapp.entity.BloodType;
-import com.quyet.superapp.service.BloodService;
-import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-=======
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
->>>>>>> origin/main
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +19,7 @@ public class BloodInventoryController {
     private final BloodService bloodService;
 
     @GetMapping
-<<<<<<< HEAD
+
     public List<BloodInventoryDTO> getAll() {
         return bloodService.getAllInventoryDTO();
     }
@@ -77,7 +64,7 @@ public class BloodInventoryController {
     ) {
         BloodType type = new BloodType();
         type.setBloodTypeId(bloodTypeId);
-=======
+
     public ResponseEntity<ApiResponseDTO<List<BloodInventoryDTO>>> getAll() {
         List<BloodInventoryDTO> list = bloodService.getAllInventoryDTO();
         return ResponseEntity.ok(ApiResponseDTO.success("Lấy danh sách kho máu thành công", list));
@@ -123,12 +110,7 @@ public class BloodInventoryController {
         BloodType type = new BloodType();
         type.setBloodTypeId(bloodTypeId);
 
->>>>>>> origin/main
-        BloodComponent component = new BloodComponent();
-        component.setBloodComponentId(componentId);
 
-        return bloodService.searchBloodByTypeAndComponent(type, component)
-<<<<<<< HEAD
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -138,7 +120,6 @@ public class BloodInventoryController {
     public ResponseEntity<Void> storeBlood(@PathVariable Long bloodUnitId) {
         bloodService.storeBloodUnit(bloodUnitId);
         return ResponseEntity.ok().build();
-=======
                 .map(inv -> ResponseEntity.ok(ApiResponseDTO.success("Tìm thấy kho máu theo nhóm máu và thành phần", inv)))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(ApiResponseDTO.fail("Không tìm thấy kho máu theo yêu cầu")));
@@ -148,6 +129,6 @@ public class BloodInventoryController {
     public ResponseEntity<ApiResponseDTO<Void>> storeBlood(@RequestParam Long bloodUnitId) {
         bloodService.storeBloodUnit(bloodUnitId);
         return ResponseEntity.ok(ApiResponseDTO.success("Lưu đơn vị máu vào kho thành công", null));
->>>>>>> origin/main
+
     }
 }
