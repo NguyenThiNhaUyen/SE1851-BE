@@ -2,10 +2,7 @@ package com.quyet.superapp.controller;
 
 
 import com.quyet.superapp.dto.BloodTypeDTO;
-<<<<<<< HEAD
-import com.quyet.superapp.dto.BloodTypeFullDTO;
-=======
->>>>>>> origin/main
+
 import com.quyet.superapp.service.BloodTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +19,14 @@ public class BloodTypeController {
 
     private final BloodTypeService bloodTypeService;
 
-<<<<<<< HEAD
-    /* ===== CRUD cơ bản ===== */
-=======
->>>>>>> origin/main
+
     @GetMapping
     public List<BloodTypeDTO> getAllBloodTypes() {
         return bloodTypeService.getAll();
     }
 
     @PostMapping
-<<<<<<< HEAD
+
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BloodTypeDTO> create(@RequestBody BloodTypeDTO dto) {
         return ResponseEntity.ok(bloodTypeService.create(dto));
@@ -74,7 +68,7 @@ public class BloodTypeController {
 }
 
 
-=======
+
     @PreAuthorize("hasRole('ADMIN')") // chỉ admin được thêm
     public ResponseEntity<BloodTypeDTO> createBloodType(@RequestBody BloodTypeDTO dto) {
         BloodTypeDTO created = bloodTypeService.create(dto);
@@ -82,4 +76,4 @@ public class BloodTypeController {
     }
 
 }
->>>>>>> origin/main
+

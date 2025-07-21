@@ -13,27 +13,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
-=======
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.quyet.superapp.service.AddressService;
 
-@RestController
-@RequestMapping("/api/addresses")
-@RequiredArgsConstructor
 
->>>>>>> origin/main
 public class AddressController {
 
     private final AddressService addressService;
 
-<<<<<<< HEAD
+
     @GetMapping("/nearby-streets")
     public List<String> getNearbyStreetNames(@RequestParam Double lat, @RequestParam Double lng) {
         return addressService.suggestAddressStreets(lat, lng);
@@ -49,11 +35,7 @@ public class AddressController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody AddressRequestDTO dto) {
         Address saved = addressService.createOrUpdateAddress(dto);
-=======
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody AddressRequestDTO dto) {
-        Address saved = addressService.createAddressFromDTO(dto);
->>>>>>> origin/main
+
         return ResponseEntity.ok(saved);
     }
 }
