@@ -44,6 +44,7 @@ public class AuthController {
     public ResponseEntity<ApiResponseDTO<?>> getCurrentUser() {
         return userService.getCurrentUserProfile();
     }
+
     // ✅ Gửi mã OTP qua email
     @PostMapping("/send-otp")
     public ResponseEntity<ApiResponseDTO<?>> sendOtp(@RequestParam String email) {
