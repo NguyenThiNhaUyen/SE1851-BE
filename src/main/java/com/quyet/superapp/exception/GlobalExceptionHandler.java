@@ -2,36 +2,22 @@ package com.quyet.superapp.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-<<<<<<< HEAD
-import org.springframework.web.bind.*;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.*;
-=======
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
->>>>>>> origin/main
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-<<<<<<< HEAD
-    // ✅ 1. Lỗi validate @Valid (form nhập không đúng)
-=======
-    // ✅ 1. Xử lý lỗi validation khi dùng @Valid
->>>>>>> origin/main
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-<<<<<<< HEAD
         return ResponseEntity.badRequest().body(errors);
     }
 
@@ -97,7 +83,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-=======
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
@@ -125,5 +110,4 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
->>>>>>> origin/main
 }
