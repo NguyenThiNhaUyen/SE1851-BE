@@ -28,7 +28,7 @@ public class DonationRegistrationController {
     private final HealthCheckFailureLogService healthCheckFailureLogService;
 
     /**
-     * ✅ Thành viên gửi đơn đăng ký hiến máu
+     * ✅ Member gửi đơn đăng ký hiến máu
      */
     @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("/register")

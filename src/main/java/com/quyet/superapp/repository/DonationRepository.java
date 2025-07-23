@@ -1,15 +1,11 @@
 package com.quyet.superapp.repository;
 
 import com.quyet.superapp.entity.Donation;
-import com.quyet.superapp.entity.DonationRegistration;
 import com.quyet.superapp.enums.DonationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +24,6 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
     List<Donation> findByCollectedAtBetween(LocalDate start, LocalDate end);
 
     List<Donation> findByCollectedAtBetweenAndStatus(LocalDate from, LocalDate to, DonationStatus status);
-
-
 
 
 }

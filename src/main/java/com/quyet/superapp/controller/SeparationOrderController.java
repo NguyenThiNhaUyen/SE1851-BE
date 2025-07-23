@@ -92,7 +92,6 @@ public class SeparationOrderController {
         var result = separationOrderService.getAll().stream().map(SeparationOrderMapper::toDTO).toList();
         return ResponseEntity.ok(ApiResponseDTO.success("Lấy danh sách lệnh tách máu", result));
     }
-
     /**
      * 🔍 Lọc lệnh theo loại tách máu (plasma, tiểu cầu, RBC,...)
      */
