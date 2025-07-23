@@ -36,13 +36,16 @@ public class CreateSeparationWithSuggestionRequest {
     private Long bloodBagId;
     @NotNull
     private Long operatorId;
+
     private Long machineId;
     @NotNull
     private SeparationMethod type;
     @NotNull
     private String gender;
     @Min(30)
+
     private Double weight;
+
     private boolean leukoreduced;
     @Size(max = 200)
     private String note;
