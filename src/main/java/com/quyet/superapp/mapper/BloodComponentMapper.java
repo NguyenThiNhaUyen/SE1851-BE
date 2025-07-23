@@ -1,7 +1,7 @@
 package com.quyet.superapp.mapper;
 
 import com.quyet.superapp.dto.BloodComponentDTO;
-<<<<<<< HEAD
+
 import com.quyet.superapp.dto.BloodComponentFullDTO;
 import com.quyet.superapp.entity.BloodComponent;
 import org.springframework.stereotype.Component;

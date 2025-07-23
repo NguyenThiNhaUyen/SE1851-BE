@@ -7,9 +7,5 @@ public enum DonationStatus {
     CANCELLED,      // Đã huỷ
     NO_SHOW,
     FAILED_HEALTH,
-<<<<<<< HEAD
-=======
-    PASSED_HEALTH,
->>>>>>> origin/main
     FAILED_TEST
 }

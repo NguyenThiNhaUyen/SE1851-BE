@@ -2,16 +2,11 @@ package com.quyet.superapp.controller;
 
 import com.quyet.superapp.entity.Notification;
 import com.quyet.superapp.service.NotificationService;
-<<<<<<< HEAD
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-=======
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
->>>>>>> origin/main
-import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 

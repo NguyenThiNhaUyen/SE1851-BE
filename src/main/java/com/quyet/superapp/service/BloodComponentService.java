@@ -1,64 +1,4 @@
-<<<<<<< HEAD
-//package com.quyet.superapp.service;
-//
-//import com.quyet.superapp.dto.BloodComponentDTO;
-//import com.quyet.superapp.entity.BloodComponent;
-//import com.quyet.superapp.mapper.BloodComponentMapper;
-//import com.quyet.superapp.repository.BloodComponentRepository;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class BloodComponentService {
-//
-//    private final BloodComponentRepository bloodComponentRepository;
-//    private final BloodComponentMapper mapper;
-//
-//    public List<BloodComponentDTO> getAvailableComponents() {
-//        return bloodComponentRepository.findByIsApheresisCompatibleTrue()
-//                .stream()
-//                .map(mapper::toDTO)
-//                .toList();
-//    }
-//
-//
-//    public List<BloodComponentDTO> getAll() {
-//        return bloodComponentRepository.findAll()
-//                .stream()
-//                .map(mapper::toDTO)
-//                .collect(Collectors.toList());
-//    }
-//
-//    public BloodComponentDTO create(BloodComponentDTO dto) {
-//        BloodComponent entity = mapper.toEntity(dto);
-//        return mapper.toDTO(bloodComponentRepository.save(entity));
-//    }
-//
-//    public BloodComponentDTO update(Long id, BloodComponentDTO dto) {
-//        BloodComponent existing = bloodComponentRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Không tìm thấy thành phần máu"));
-//
-//        existing.setName(dto.getName());
-//        existing.setCode(dto.getCode());
-//        existing.setStorageTemp(dto.getStorageTemp());
-//        existing.setStorageDays(dto.getStorageDays());
-//        existing.setUsage(dto.getUsage());
-//        existing.setIsApheresisCompatible(dto.getIsApheresisCompatible());
-//
-//        return mapper.toDTO(bloodComponentRepository.save(existing));
-//    }
-//
-//    public void delete(Long id) {
-//        if (!bloodComponentRepository.existsById(id)) {
-//            throw new RuntimeException("Không tìm thấy thành phần máu để xoá");
-//        }
-//        bloodComponentRepository.deleteById(id);
-//    }
-//}
+
 
 package com.quyet.superapp.service;
 
@@ -66,13 +6,6 @@ import com.quyet.superapp.dto.BloodComponentDTO;
 import com.quyet.superapp.dto.BloodComponentFullDTO;
 import com.quyet.superapp.dto.BloodComponentUpdateDTO;
 import com.quyet.superapp.entity.BloodComponent;
-=======
-package com.quyet.superapp.service;
-
-import com.quyet.superapp.dto.BloodComponentDTO;
-import com.quyet.superapp.entity.BloodComponent;
-import com.quyet.superapp.exception.ResourceNotFoundException;
->>>>>>> origin/main
 import com.quyet.superapp.mapper.BloodComponentMapper;
 import com.quyet.superapp.repository.BloodComponentRepository;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BloodComponentService {
 
-<<<<<<< HEAD
     private final BloodComponentRepository bloodComponentRepository;
     private final BloodComponentMapper mapper;
 
@@ -182,7 +114,7 @@ public class BloodComponentService {
     public BloodComponentDTO update(Long id, BloodComponentDTO dto) {
         BloodComponent existing = componentRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thành phần máu"));
->>>>>>> origin/main
+
 
         existing.setName(dto.getName());
         existing.setCode(dto.getCode());
@@ -190,7 +122,7 @@ public class BloodComponentService {
         existing.setStorageDays(dto.getStorageDays());
         existing.setUsage(dto.getUsage());
         existing.setIsApheresisCompatible(dto.getIsApheresisCompatible());
-<<<<<<< HEAD
+
         existing.setType(dto.getType());
         existing.setIsActive(dto.getIsActive());
 
@@ -218,26 +150,3 @@ public class BloodComponentService {
         bloodComponentRepository.save(existing);
     }
 }
-
-=======
-
-        BloodComponent updated = componentRepo.save(existing);
-        return BloodComponentMapper.toDTO(updated);
-    }
-
-    // ❌ Xoá
-    public void delete(Long id) {
-        if (!componentRepo.existsById(id)) {
-            throw new ResourceNotFoundException("Không tồn tại thành phần máu");
-        }
-        componentRepo.deleteById(id);
-    }
-
-    // 🔍 Tìm theo mã code (ví dụ: PRC)
-    public BloodComponentDTO getByCode(String code) {
-        BloodComponent found = componentRepo.findByCode(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy mã thành phần máu: " + code));
-        return BloodComponentMapper.toDTO(found);
-    }
-}
->>>>>>> origin/main
