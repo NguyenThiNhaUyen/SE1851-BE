@@ -30,6 +30,9 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static com.quyet.superapp.constant.MessageConstants.LOGIN_FAILED;
+import static com.quyet.superapp.constant.MessageConstants.LOGIN_SUCCESS;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -60,11 +63,11 @@ public class UserService {
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
             LoginResponseDTO loginResponse = buildLoginResponse(user);
-            return ResponseEntity.ok(new ApiResponseDTO<>(true, "Đăng nhập thành công", loginResponse));
+            return ResponseEntity.ok(new ApiResponseDTO<>(true, LOGIN_SUCCESS , loginResponse));
 
         } catch (AuthenticationException e) {
             log.warn("⚠️ Đăng nhập thất bại với username [{}]: {}", loginRequest.getUsername(), e.getMessage());
-            return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, "Tài khoản hoặc mật khẩu không chính xác"));
+            return ResponseEntity.status(401).body(new ApiResponseDTO<>(false, LOGIN_FAILED ));
         } catch (Exception e) {
             log.error("❌ Lỗi không xác định khi đăng nhập [{}]: {}", loginRequest.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(500).body(new ApiResponseDTO<>(false, "Lỗi hệ thống khi đăng nhập"));
