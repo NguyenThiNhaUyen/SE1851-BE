@@ -17,13 +17,10 @@ import java.time.LocalDate;
 public class ApheresisMachineDTO {
     @NotNull
     private Long id;
-
     @NotBlank
     private String serialNumber;
-
     @NotBlank
     private String manufacturer;
-
     @NotBlank
     private String model;
 
