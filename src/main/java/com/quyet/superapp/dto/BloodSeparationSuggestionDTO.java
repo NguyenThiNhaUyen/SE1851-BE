@@ -30,5 +30,4 @@ public class BloodSeparationSuggestionDTO {
 
     private String note;
 
-
 }
