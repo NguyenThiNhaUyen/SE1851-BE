@@ -1,6 +1,6 @@
 package com.quyet.superapp.service;
 
-<<<<<<< HEAD
+
 import com.quyet.superapp.dto.BloodInventoryAlertDTO;
 import com.quyet.superapp.dto.BloodInventoryDTO;
 import com.quyet.superapp.entity.*;
@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-<<<<<<< HEAD
 public class BloodService {
 
     private final BloodInventoryRepository bloodRepo;
@@ -318,6 +317,5 @@ public class BloodService {
         inventoryRepo.save(inventory);
 
         log.info("✅ Cập nhật kho: {} - {} + {}ml", type.getDescription(), component.getName(), volume);
->>>>>>> origin/main
     }
 }

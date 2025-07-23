@@ -1,7 +1,7 @@
 package com.quyet.superapp.mapper;
 
 import com.quyet.superapp.dto.BloodRequestDTO;
-<<<<<<< HEAD
+
 import com.quyet.superapp.dto.BloodRequestWithExistingPatientDTO;
 import com.quyet.superapp.dto.CreateBloodRequestDTO;
 import com.quyet.superapp.entity.*;
