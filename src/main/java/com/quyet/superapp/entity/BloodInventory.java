@@ -1,11 +1,22 @@
 package com.quyet.superapp.entity;
 
+<<<<<<< HEAD
+import com.quyet.superapp.enums.BloodInventoryStatus;
+import com.quyet.superapp.enums.BloodUnitStatus;
+=======
+>>>>>>> origin/main
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+<<<<<<< HEAD
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+=======
+import java.time.LocalDateTime;
+>>>>>>> origin/main
 
 
 @Entity
@@ -50,4 +61,35 @@ public class BloodInventory {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+<<<<<<< HEAD
+
+    @Column(name = "MinThresholdML")
+    private Integer minThresholdMl;
+
+    @Column(name = "CriticalThresholdML")
+    private Integer criticalThresholdMl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Status", columnDefinition = "VARCHAR(20)")
+    private BloodInventoryStatus status;
+
+    @Column(name = "ExpiredAt")
+    private LocalDateTime expiredAt;
+
+    @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    private List<BloodUnit> bloodUnits;
+
+    public int getAvailableBagCount() {
+        if (bloodUnits == null) return 0;
+        return (int) bloodUnits.stream()
+                .filter(unit -> unit.getStatus() == BloodUnitStatus.STORED &&
+                        (unit.getExpiryDate() == null || unit.getExpiryDate().isAfter(LocalDate.now())))
+                .count();
+    }
+
+
+
+=======
+>>>>>>> origin/main
 }

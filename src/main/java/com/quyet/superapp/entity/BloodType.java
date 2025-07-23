@@ -5,12 +5,19 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/main
 @Entity
 @Table(name = "BloodTypes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+<<<<<<< HEAD
+@Builder
+=======
+>>>>>>> origin/main
 public class BloodType {
 
     @Id
@@ -18,8 +25,25 @@ public class BloodType {
     @Column(name = "BloodTypeID")
     private Long bloodTypeId;
 
+<<<<<<< HEAD
+    @Column(name = "Description", columnDefinition = "NVARCHAR(20)", nullable = false)
+    private String description; // A, B, AB, O
+
+    @Column(name = "Rh", columnDefinition = "VARCHAR(10)", nullable = false)
+    private String rh; // "+" hoặc "-"
+
+    @Column(name = "Note", columnDefinition = "NVARCHAR(100)")
+    private String note; // ví dụ: "Phổ biến", "Rất hiếm", "Toàn năng"
+
+    @Column(name = "IsActive", nullable = false, columnDefinition = "BIT DEFAULT 1")
+    private Boolean isActive = true;
+
+    @Column(name = "Code", columnDefinition = "VARCHAR(10)", nullable = false, unique = true)
+    private String code; // A+, B-, AB+, O- ...
+=======
     @Column(name = "Description", columnDefinition = "NVARCHAR(10)", nullable = false)
     private String description; // VD: A+, B-, AB+
+>>>>>>> origin/main
 
     @OneToMany(mappedBy = "bloodType", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -44,4 +68,20 @@ public class BloodType {
     @OneToMany(mappedBy = "recipientType", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CompatibilityRule> recipientRules;
+<<<<<<< HEAD
+
+    @PrePersist
+    @PreUpdate
+    public void generateCode() {
+        if (description != null && rh != null) {
+            this.code = (description + rh).toUpperCase().replaceAll("\\s+", "");
+        }
+    }
+    @Override
+    public String toString() {
+        return code;
+    }
+
+=======
+>>>>>>> origin/main
 }

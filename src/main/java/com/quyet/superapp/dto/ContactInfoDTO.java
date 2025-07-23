@@ -1,5 +1,13 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+import lombok.Data;
+
+@Data
+public class ContactInfoDTO {
+    private String email;
+    private String phone;
+=======
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -35,4 +43,5 @@ public class ContactInfoDTO {
     private boolean hasInsurance;
     private String insuranceCardNumber;
     private LocalDate insuranceValidTo;
+>>>>>>> origin/main
 }

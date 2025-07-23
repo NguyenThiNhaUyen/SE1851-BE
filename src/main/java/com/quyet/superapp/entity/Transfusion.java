@@ -41,4 +41,16 @@ public class Transfusion {
     @Column(name = "volume_taken_ml")
     private Integer volumeTakenMl;
 
+<<<<<<< HEAD
+    @Column(name = "recipient_name", columnDefinition = "NVARCHAR(100)")
+    private String recipientName;
+
+    @Column(name = "recipient_phone", columnDefinition = "NVARCHAR(20)")
+    private String recipientPhone;
+
+    @Column(name = "approved_by", columnDefinition = "NVARCHAR(50)")
+    private String approvedBy;
+
+=======
+>>>>>>> origin/main
 }

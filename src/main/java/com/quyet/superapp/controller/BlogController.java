@@ -7,7 +7,6 @@ import com.quyet.superapp.service.BlogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/blogs")
 @RequiredArgsConstructor
-@Validated
+
 public class BlogController {
 
     private final BlogService blogService;
@@ -26,13 +25,16 @@ public class BlogController {
     }
 
 
+
     @GetMapping("/by-id")
     public ResponseEntity<BlogResponseDTO> getBlogById(@RequestParam Long id) {
+
 
         return ResponseEntity.ok(blogService.getById(id));
     }
 
     @PostMapping("/create")
+
 
     public ResponseEntity<BlogResponseDTO> createBlog(@RequestBody @Valid BlogRequestDTO blogDto) {
         return ResponseEntity.ok(blogService.save(blogDto));
@@ -40,6 +42,7 @@ public class BlogController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteBlog(@RequestParam Long id) {
+
         blogService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
