@@ -1,10 +1,16 @@
 package com.quyet.superapp.controller;
 
+<<<<<<< HEAD
+import com.quyet.superapp.dto.CreateLabTestRequest;
+import com.quyet.superapp.dto.LabTestResultDTO;
+import com.quyet.superapp.service.LabTestService;
+=======
 import com.quyet.superapp.dto.ApiResponseDTO;
 import com.quyet.superapp.dto.CreateLabTestRequest;
 import com.quyet.superapp.dto.LabTestResultDTO;
 import com.quyet.superapp.service.LabTestService;
 import jakarta.validation.Valid;
+>>>>>>> origin/main
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +25,36 @@ public class LabTestController {
 
     private final LabTestService labTestService;
 
+<<<<<<< HEAD
+    @PostMapping
+    public ResponseEntity<LabTestResultDTO> createLabTest(@RequestBody CreateLabTestRequest request) {
+        LabTestResultDTO result = labTestService.createLabTestResult(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    @GetMapping("/{bloodUnitId}")
+    public ResponseEntity<LabTestResultDTO> getByBloodUnit(@PathVariable Long bloodUnitId) {
+        return labTestService.getByBloodUnit(bloodUnitId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/check/{bloodUnitId}")
+    public ResponseEntity<Boolean> checkTested(@PathVariable Long bloodUnitId) {
+        return ResponseEntity.ok(labTestService.isTested(bloodUnitId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LabTestResultDTO>> getAll() {
+        List<LabTestResultDTO> results = labTestService.getAllResults();
+        return ResponseEntity.ok(results);
+    }
+
+    @DeleteMapping("/{labTestResultId}")
+    public ResponseEntity<Void> deleteResult(@PathVariable Long labTestResultId) {
+        labTestService.deleteResult(labTestResultId);
+        return ResponseEntity.noContent().build();
+=======
     /**
      * 🧪 Tạo kết quả xét nghiệm cho một đơn vị máu.
      * – Kiểm tra đơn vị máu có tồn tại không
@@ -69,5 +105,6 @@ public class LabTestController {
     public ResponseEntity<ApiResponseDTO<Void>> deleteResult(@RequestParam Long labTestResultId) {
         labTestService.deleteResult(labTestResultId);
         return ResponseEntity.ok(ApiResponseDTO.success("Xoá kết quả xét nghiệm thành công", null));
+>>>>>>> origin/main
     }
 }

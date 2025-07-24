@@ -36,6 +36,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
 
@@ -45,13 +46,25 @@ public class SecurityConfig {
         return provider;
     }
 
+
     // Nếu cần dùng AuthenticationManager ở chỗ khác (ví dụ login), bạn có thể expose nó
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
+        return builder.build();
+    }
+
+
+
         var builder = http.getSharedObject(AuthenticationManagerBuilder.class);
         builder.authenticationProvider(authenticationProvider());
         return builder.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -60,7 +73,6 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Đổi đúng port FE của bạn
 
-        //configuration.setAllowedOrigins(List.of("http://localhost:5173"));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -75,8 +87,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+
                 // ✅ Gắn Provider để xử lý xác thực username/password
                 .authenticationProvider(authenticationProvider())
+
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
@@ -100,14 +114,15 @@ public class SecurityConfig {
     }
 
 
+
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/**",
             "/api/verify-otp",
             "/api/forgot",
             "/api/change-password",
             "/api/blog/**",
-            "/api/public/**",
-            
+            "/api/public/**"
+
     };
     private static final String[] MEMBER_ENDPOINTS = {
             "/api/user/**",
@@ -126,6 +141,12 @@ public class SecurityConfig {
             "/api/staff/requests/**",
             "/api/blood-requests/**",
             "/api/donation/confirm",
+
+            "/api/separation/**",// ✅ Thêm dòng này
+            "/api/urgent-requests/**",
+            "/api/blood-inventory/**",
+            "/api/blood/**",
+
             //"/api/separation/**",// ✅ Thêm dòng này
             "/api/urgent-requests/**",
             "/api/blood-inventory/**",
@@ -134,6 +155,7 @@ public class SecurityConfig {
             "/api/separation-orders/**",
             "/api/separation-details/**",
             "/api/separation-statistics/**"
+
     };
     private static final String[] ADMIN_ENDPOINTS = {
             "/api/admin",
@@ -148,7 +170,7 @@ public class SecurityConfig {
             "/api/donation/**",
             "/api/transfusion/**",
             "/api/urgent-requests/**",
+            "/api/test-email/**"
             "/api/donation/confirm"
-
     };
 }

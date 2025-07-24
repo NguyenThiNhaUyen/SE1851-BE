@@ -1,5 +1,7 @@
 package com.quyet.superapp.enums;
 
-public enum DonationType { //chưa sử dụng
+
+public enum DonationType {
+
     WHOLE_BLOOD, APHERESIS
 }

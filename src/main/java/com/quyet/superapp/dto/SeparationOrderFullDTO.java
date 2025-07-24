@@ -10,7 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeparationOrderFullDTO {
-
     private SeparationOrderDTO order;
     private List<BloodUnitDTO> units;
 }

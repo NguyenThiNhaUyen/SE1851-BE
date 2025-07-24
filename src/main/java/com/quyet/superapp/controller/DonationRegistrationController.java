@@ -7,13 +7,11 @@ import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.dto.HealthCheckFailureLogDTO;
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.enums.HealthCheckFailureReason;
-import com.quyet.superapp.service.DonationRegistrationService;
-import com.quyet.superapp.service.HealthCheckFailureLogService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +20,76 @@ import java.util.List;
 @RequestMapping("/api/donation")
 @RequiredArgsConstructor
 @Validated
+
 public class DonationRegistrationController {
 
     private final DonationRegistrationService donationRegistrationService;
     private final HealthCheckFailureLogService healthCheckFailureLogService;
 
+    // ✅ Đăng ký hiến máu (chỉ đặt lịch, chưa xác nhận)
+    @PostMapping("/register/{userId}")
+    public ResponseEntity<DonationRegistrationDTO> registerDonation(
+            @PathVariable Long userId,
+            @RequestBody DonationRegistrationDTO dto) {
+        return ResponseEntity.ok(donationRegistrationService.register(userId, dto));
+    }
+
+    // ✅ Lấy tất cả đơn đăng ký hiến máu
+    @GetMapping
+    public ResponseEntity<List<DonationRegistrationDTO>> getAllRegistrations() {
+        return ResponseEntity.ok(donationRegistrationService.getAllDTO());
+    }
+
+    // ✅ Lấy đơn đăng ký theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<DonationRegistrationDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(donationRegistrationService.getDTOById(id));
+    }
+
+    // ✅ Xác nhận đơn đăng ký (chuyển trạng thái -> CONFIRMED)
+    @PutMapping("/confirm")
+    public ResponseEntity<DonationRegistrationDTO> confirmRegistration(
+            @RequestParam("register_id") Long id) {
+        return ResponseEntity.ok(donationRegistrationService.confirm(id));
+    }
+
+    //thêm unhappycase
+    @GetMapping("/pending")
+    public List<DonationRegistrationDTO> getPendingRegistrations() {
+        return donationRegistrationService.getByStatus(DonationStatus.PENDING);
+    }
+
+    //hủy đơn nếu không đến
+    @PutMapping("/cancel")
+    public ResponseEntity<DonationRegistrationDTO> cancelRegistration(@RequestParam("register_id") Long id) {
+        return ResponseEntity.ok(donationRegistrationService.markAsCancelled(id));
+    }
+
+
+    // ❌ Đánh dấu đơn không đủ điều kiện sức khỏe và ghi log
+    @PutMapping("/fail-health")
+    public ResponseEntity<DonationRegistrationDTO> failDueToHealth(
+            @RequestParam("register_id") Long id,
+            @RequestParam("reason") String reason,
+            @RequestParam(value = "staff_note", required = false) String staffNote) {
+        return ResponseEntity.ok(donationRegistrationService.markAsFailedHealth(id, reason, staffNote));
+    }
+
+    // ✅ Lấy danh sách log kiểm tra sức khỏe không đạt theo ID đăng ký
+    @GetMapping("/health-log")
+    public ResponseEntity<List<HealthCheckFailureLogDTO>> getHealthLogByRegistration(@RequestParam("register_id") Long registrationId) {
+        return ResponseEntity.ok(healthCheckFailureLogService.getLogsByRegistrationId(registrationId));
+    }
+
+    @PostMapping("/confirm-donation")
+    public ResponseEntity<String> confirmDonation(@RequestParam("register_id") Long regId) {
+        donationRegistrationService.createDonationIfEligible(regId);
+        return ResponseEntity.ok("Đã tạo bản ghi hiến máu thành công.");
+    }
+
+
     /**
-     * ✅ Thành viên gửi đơn đăng ký hiến máu
+     * ✅ Member gửi đơn đăng ký hiến máu
      */
     @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("/register")
@@ -111,4 +172,5 @@ public class DonationRegistrationController {
     public ResponseEntity<?> markDonated(@RequestParam("register_id") Long regId) {
         return donationRegistrationService.markAsDonated(regId);
     }
+
 }

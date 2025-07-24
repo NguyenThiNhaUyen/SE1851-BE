@@ -5,11 +5,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+<<<<<<< HEAD
+import java.time.LocalDateTime;
+
+=======
+>>>>>>> origin/main
 @Entity
 @Table(name = "Users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+<<<<<<< HEAD
+@Builder
+=======
+>>>>>>> origin/main
 public class User {
 
     @Id
@@ -17,6 +26,10 @@ public class User {
     @Column(name = "User_Id")
     private Long userId;
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     @Column(name = "UserName", columnDefinition = "VARCHAR(100)", nullable = false, unique = true)
     private String username;
 
@@ -24,12 +37,20 @@ public class User {
     private String password;
 
     @Column(name = "IsEnable")
+<<<<<<< HEAD
+    private boolean enable;
+=======
     private boolean isEnable;
+>>>>>>> origin/main
 
     @Column(name = "Email", columnDefinition = "VARCHAR(50)", nullable = false, unique = true)
     private String email;
 
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Role_Id")
     private Role role;
@@ -44,4 +65,18 @@ public class User {
     @JsonIgnore // ✅ TRÁNH vòng lặp khi trả về user → profile → user...
     private UserProfile userProfile;
 
+<<<<<<< HEAD
+    public UserProfile getProfile() {
+        return userProfile;
+    }
+
+    public User(Long userId) {
+        this.userId = userId;
+    }
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+=======
+>>>>>>> origin/main
 }

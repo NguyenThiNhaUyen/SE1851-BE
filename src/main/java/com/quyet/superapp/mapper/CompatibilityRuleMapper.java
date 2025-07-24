@@ -3,7 +3,8 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.CompatibilityRuleDTO;
 import com.quyet.superapp.entity.CompatibilityRule;
 
-public class CompatibilityRuleMapper { //chưa sử dung
+<<<<<<< HEAD
+public class CompatibilityRuleMapper {
     public static CompatibilityRuleDTO toDTO(CompatibilityRule rule) {
         return new CompatibilityRuleDTO(
                 rule.getCompatibilityRuleId(),

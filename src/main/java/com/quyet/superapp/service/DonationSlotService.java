@@ -73,17 +73,6 @@ public class DonationSlotService {
         }
     }
 
-//    public void incrementRegistrationCount(Long slotId) {
-//        DonationSlot slot = donationSlotRepository.findById(slotId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy slot"));
-//
-//        if (slot.getRegisteredCount() >= slot.getMaxCapacity()) {
-//            throw new IllegalStateException("Slot này đã đầy");
-//        }
-//
-//        slot.setRegisteredCount(slot.getRegisteredCount() + 1);
-//        donationSlotRepository.save(slot);
-//    }
 
     @Transactional
     public DonationSlot assignSlotToRegistration(DonationRegistration registration, Long slotId) {

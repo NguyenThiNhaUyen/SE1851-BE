@@ -19,6 +19,10 @@ public class VnPaymentController {
 
     private final VnPaymentService service;
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     @GetMapping
     public List<VnPayment> getAll() {
         return service.getAll();
@@ -31,6 +35,10 @@ public class VnPaymentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
     @PostMapping("/create")
     public VnPayment create(@RequestBody VnPayment payment) {
         return service.save(payment);

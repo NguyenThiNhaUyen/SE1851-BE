@@ -1,9 +1,12 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+=======
 import com.quyet.superapp.entity.Donation;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +17,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApheresisProcedureResultDTO {
+<<<<<<< HEAD
+    private Long separationOrderId;
+    private String operator;
+    private String machineSerial;
+    private LocalDateTime performedAt;
+
+    private Integer redCells;
+    private Integer plasma;
+    private Integer platelets;
+
+    private String unitCodesCombined;
+    private String note;
+=======
 
     private Long apheresisProcedureResultId;
 
@@ -35,4 +51,5 @@ public class ApheresisProcedureResultDTO {
 
     @NotBlank
     private String performedBy;
+>>>>>>> origin/main
 }

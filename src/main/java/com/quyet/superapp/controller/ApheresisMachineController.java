@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/apheresis-machines")
 @Validated
+
 public class ApheresisMachineController {
 
     private final ApheresisMachineService apheresisMachineService;
@@ -27,8 +29,10 @@ public class ApheresisMachineController {
     }
 
     // ✅ Lấy chi tiết máy theo ID
+
     @GetMapping("/by-id")
     public ResponseEntity<ApheresisMachineDTO> getById(@RequestParam Long id) {
+
         return apheresisMachineService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -36,20 +40,25 @@ public class ApheresisMachineController {
 
     // ✅ Tạo máy mới
     @PostMapping
+
     public ResponseEntity<ApheresisMachineDTO> create( @RequestBody ApheresisMachineDTO dto) {
+
         return ResponseEntity.ok(apheresisMachineService.create(dto));
     }
 
     // ✅ Cập nhật máy
     @PutMapping
     public ResponseEntity<ApheresisMachineDTO> update(@RequestParam  Long id,
+
                                                       @RequestBody ApheresisMachineDTO dto) {
         return ResponseEntity.ok(apheresisMachineService.update(id, dto));
     }
 
     // ✅ Xoá máy theo ID
+
     @DeleteMapping
     public ResponseEntity<Void> delete(@RequestParam  Long id) {
+
         apheresisMachineService.delete(id);
         return ResponseEntity.noContent().build();
     }

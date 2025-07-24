@@ -13,16 +13,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Validated
+
 public class AuthController {
 
     private final UserService userService;
 
 
      @PostMapping("/login")
+
      public ResponseEntity<ApiResponseDTO<?>> Login(@RequestBody LoginRequestDTO loginRequest){
          return userService.login(loginRequest);
      }
@@ -42,6 +44,7 @@ public class AuthController {
     public ResponseEntity<ApiResponseDTO<?>> getCurrentUser() {
         return userService.getCurrentUserProfile();
     }
+
     // ✅ Gửi mã OTP qua email
     @PostMapping("/send-otp")
     public ResponseEntity<ApiResponseDTO<?>> sendOtp(@RequestParam String email) {

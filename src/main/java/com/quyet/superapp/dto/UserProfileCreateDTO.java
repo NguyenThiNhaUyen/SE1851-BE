@@ -1,5 +1,15 @@
 package com.quyet.superapp.dto;
 
+<<<<<<< HEAD
+import lombok.Data;
+
+@Data
+public class UserProfileCreateDTO {
+    private String fullName;
+    private ContactInfoDTO contactInfo;
+    private String citizenId;
+    private String staffPosition; // ✅ dùng để set là "Doctor"
+=======
 import com.quyet.superapp.dto.ContactInfoDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -46,4 +56,5 @@ public class UserProfileCreateDTO {
     private boolean hasInsurance;
     private String insuranceCardNumber;
     private LocalDate insuranceValidTo;
+>>>>>>> origin/main
 }

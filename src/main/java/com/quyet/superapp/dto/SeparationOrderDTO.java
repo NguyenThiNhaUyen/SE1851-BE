@@ -1,7 +1,10 @@
 package com.quyet.superapp.dto;
 
 import com.quyet.superapp.enums.SeparationMethod;
+<<<<<<< HEAD
+=======
 import jakarta.validation.constraints.NotNull;
+>>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +15,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeparationOrderDTO {
+<<<<<<< HEAD
+    private Long separationOrderId;
+    private Long bloodBagId; // Túi máu được tách
+    private Long performedById; // Nhân viên thực hiện
+    private Long apheresisMachineId; // 👈 MÁY ĐÃ DÙNG ĐỂ TÁCH
+    private LocalDateTime performedAt;
+    private SeparationMethod separationType;
+=======
     @NotNull(message = "Separation order ID không thể null")
     private Long separationOrderId;
 
@@ -30,5 +41,6 @@ public class SeparationOrderDTO {
     @NotNull(message = "Phương pháp tách máu không thể null")
     private SeparationMethod separationType;
 
+>>>>>>> origin/main
     private String note;
 }
