@@ -5,19 +5,18 @@ import com.quyet.superapp.repository.TransfusionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-=======
+
 import java.util.List;
->>>>>>> origin/main
+
 
 @Service
 @RequiredArgsConstructor
 public class TransfusionService {
     private final TransfusionRepository repo;
-<<<<<<< HEAD
+
 
     public List<Transfusion> findAll() {
         return repo.findAll();
@@ -32,10 +31,4 @@ public class TransfusionService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bản ghi truyền máu với ID: " + id));
     }
 }
-=======
-    public List<Transfusion> findAll() {
-        return repo.findAll();
-    }
-}
 
->>>>>>> origin/main
