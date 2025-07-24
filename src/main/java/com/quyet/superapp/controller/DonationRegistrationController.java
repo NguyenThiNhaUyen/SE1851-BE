@@ -1,11 +1,5 @@
 package com.quyet.superapp.controller;
 
-<<<<<<< HEAD
-import com.quyet.superapp.dto.DonationRegistrationDTO;
-import com.quyet.superapp.dto.HealthCheckFailureLogDTO;
-import com.quyet.superapp.enums.DonationStatus;
-import com.quyet.superapp.repository.DonationRegistrationRepository;
-=======
 import com.quyet.superapp.config.jwt.UserPrincipal;
 import com.quyet.superapp.constant.MessageConstants;
 import com.quyet.superapp.dto.ApiResponseDTO;
@@ -13,17 +7,11 @@ import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.dto.HealthCheckFailureLogDTO;
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.enums.HealthCheckFailureReason;
->>>>>>> origin/main
-import com.quyet.superapp.service.DonationRegistrationService;
-import com.quyet.superapp.service.HealthCheckFailureLogService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-<<<<<<< HEAD
-=======
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
->>>>>>> origin/main
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,16 +19,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/donation")
 @RequiredArgsConstructor
-<<<<<<< HEAD
-=======
 @Validated
->>>>>>> origin/main
+
 public class DonationRegistrationController {
 
     private final DonationRegistrationService donationRegistrationService;
     private final HealthCheckFailureLogService healthCheckFailureLogService;
 
-<<<<<<< HEAD
     // ✅ Đăng ký hiến máu (chỉ đặt lịch, chưa xác nhận)
     @PostMapping("/register/{userId}")
     public ResponseEntity<DonationRegistrationDTO> registerDonation(
@@ -103,7 +88,6 @@ public class DonationRegistrationController {
     }
 
 
-=======
     /**
      * ✅ Member gửi đơn đăng ký hiến máu
      */
@@ -188,5 +172,5 @@ public class DonationRegistrationController {
     public ResponseEntity<?> markDonated(@RequestParam("register_id") Long regId) {
         return donationRegistrationService.markAsDonated(regId);
     }
->>>>>>> origin/main
+
 }

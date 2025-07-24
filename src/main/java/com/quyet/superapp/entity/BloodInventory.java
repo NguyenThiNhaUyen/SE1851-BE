@@ -1,16 +1,12 @@
 package com.quyet.superapp.entity;
 
-<<<<<<< HEAD
 import com.quyet.superapp.enums.BloodInventoryStatus;
 import com.quyet.superapp.enums.BloodUnitStatus;
-=======
->>>>>>> origin/main
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,9 +83,4 @@ public class BloodInventory {
                         (unit.getExpiryDate() == null || unit.getExpiryDate().isAfter(LocalDate.now())))
                 .count();
     }
-
-
-
-=======
->>>>>>> origin/main
 }
