@@ -1,10 +1,7 @@
 package com.quyet.superapp.dto;
 
-<<<<<<< HEAD
-=======
 import com.quyet.superapp.entity.BloodType;
 import jakarta.validation.constraints.*;
->>>>>>> origin/main
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,23 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DonationRegistrationDTO {
-<<<<<<< HEAD
-    private Long registrationId;
-    private LocalDateTime scheduledDate;
-    private String location;
-
-    private Long bloodTypeId;               // ✅ sửa thành ID
-    private String bloodTypeDescription;    // ✅ nếu cần hiển thị tên nhóm máu
-    private String status;
-
-    // Thông tin người dùng
-    private String fullName;
-    private LocalDate dob;
-    private String gender;
-    private String phone;
-    private Long addressId;
-    private String addressFull;
-=======
 
     private Long registrationId;
 
@@ -61,13 +41,10 @@ public class DonationRegistrationDTO {
     private Long addressId;
     private String addressFull;
 
->>>>>>> origin/main
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long userId;
     private String email;
-<<<<<<< HEAD
-=======
     private Long slotId;
     private DonationSlotDTO slot;
 
@@ -77,5 +54,4 @@ public class DonationRegistrationDTO {
     @Min(200)
     @Max(550)
     private Integer estimatedVolume; // (ml)
->>>>>>> origin/main
 }

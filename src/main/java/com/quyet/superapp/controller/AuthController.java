@@ -13,18 +13,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-
+@Validated
 public class AuthController {
 
     private final UserService userService;
 
 
      @PostMapping("/login")
-
      public ResponseEntity<ApiResponseDTO<?>> Login(@RequestBody LoginRequestDTO loginRequest){
          return userService.login(loginRequest);
      }
@@ -70,10 +68,10 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<ApiResponseDTO<?>> refreshToken(
-            @RequestHeader("Authorization") String bearerToken) {
-        String refreshToken = bearerToken.replace("Bearer ", "");
+    public ResponseEntity<ApiResponseDTO<?>> refreshToken(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
         return userService.refreshToken(refreshToken);
     }
+
 
 }

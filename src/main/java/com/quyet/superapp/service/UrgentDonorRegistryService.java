@@ -1,6 +1,7 @@
 package com.quyet.superapp.service;
 
 
+
 import com.quyet.superapp.enums.BloodComponentType;
 import com.quyet.superapp.mapper.NearbyDonorMapper;
 import com.quyet.superapp.mapper.UrgentDonorSearchMapper;
@@ -33,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.time.temporal.ChronoUnit;
 
+
 import com.quyet.superapp.dto.UrgentDonorRegistrationDTO;
 import com.quyet.superapp.dto.UrgentDonorResponseDTO;
 import com.quyet.superapp.entity.*;
@@ -43,6 +45,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UrgentDonorRegistryService {
@@ -52,6 +55,7 @@ public class UrgentDonorRegistryService {
     private final UrgentDonorRegistryRepository urgentDonorRegistryRepository;
     private final UserProfileRepository userProfileRepository;
     private final AddressService addressService;
+
     private final UrgentDonorMapper urgentDonorMapper;
     private final EmailService emailService;
     private final UrgentDonorRegistryRepository urgentDonorRegistryRepo;
@@ -501,6 +505,7 @@ public class UrgentDonorRegistryService {
 
 
 
+
     /**
      * Đăng ký người hiến máu khẩn cấp.
      */
@@ -539,18 +544,19 @@ public class UrgentDonorRegistryService {
 
     public List<UrgentDonorRegistry> findNearbyDonors(double lat, double lng, double radiusKm) {
 
+
         return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm);
     }
 
     public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
         return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm)
+
         return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm);
     }
 
     public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
         return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm)
-
-                .stream()
+   .stream()
                 .filter(d -> d.getBloodType().getBloodTypeId().equals(bloodTypeId))
                 .map(d -> {
                     UserProfile profile = d.getDonor().getUserProfile();
@@ -559,9 +565,11 @@ public class UrgentDonorRegistryService {
                             profile.getFullName(),
                             d.getBloodType().getDescription(),
 
+
                             profile.getLocation(),
                             profile.getPhone(),
                             profile.getAddress()
+
 
                             d.getLocation(),
                             profile.getPhone(),
@@ -572,6 +580,7 @@ public class UrgentDonorRegistryService {
                 })
                 .toList();
     }
+
 
 
     public List<UnverifiedDonorDTO> getUnverifiedDonors() {

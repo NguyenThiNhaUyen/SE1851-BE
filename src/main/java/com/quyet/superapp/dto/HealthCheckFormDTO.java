@@ -1,9 +1,6 @@
 package com.quyet.superapp.dto;
 
-<<<<<<< HEAD
-=======
 import jakarta.validation.constraints.*;
->>>>>>> origin/main
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,17 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class HealthCheckFormDTO {
-<<<<<<< HEAD
-    private Long id;
-    private Long registrationId;
-
-    private Double bodyTemperature;
-    private Integer heartRate;
-    private Integer bloodPressureSys;
-    private Integer bloodPressureDia;
-    private Double weightKg;
-
-=======
     @NotNull(message = "ID không thể null")
     private Long id;
 
@@ -54,7 +40,6 @@ public class HealthCheckFormDTO {
     private Double HeightCm;
 
 
->>>>>>> origin/main
     private Boolean hasFever;
     private Boolean tookAntibioticsRecently;
     private Boolean hasChronicIllness;
@@ -62,11 +47,6 @@ public class HealthCheckFormDTO {
     private Boolean hadRecentTattooOrSurgery;
     private Boolean hasRiskySexualBehavior;
 
-<<<<<<< HEAD
-    private Boolean isEligible;
-    private String notesByStaff;
-
-=======
     @NotNull(message = "Trạng thái đủ điều kiện không thể null")
     private Boolean isEligible;
     private String notesByStaff;
@@ -78,5 +58,4 @@ public class HealthCheckFormDTO {
     private Boolean hivPositive;
     private Boolean syphilisPositive;
 
->>>>>>> origin/main
 }

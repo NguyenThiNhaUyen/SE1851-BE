@@ -3,6 +3,9 @@ package com.quyet.superapp.service;
 import com.quyet.superapp.dto.UrgentRequestDTO;
 import com.quyet.superapp.entity.UrgentRequest;
 import com.quyet.superapp.entity.User;
+
+import com.quyet.superapp.enums.RequestStatus;
+
 import com.quyet.superapp.mapper.UrgentRequestMapper;
 import com.quyet.superapp.repository.UrgentRequestRepository;
 import com.quyet.superapp.repository.UserRepository;
@@ -49,6 +52,10 @@ public class UrgentRequestService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+
+    public List<UrgentRequestDTO> getByStatus(RequestStatus status) {
+
         return urgentRepo.findByStatus(status)
                 .stream()
                 .map(mapper::toDto)

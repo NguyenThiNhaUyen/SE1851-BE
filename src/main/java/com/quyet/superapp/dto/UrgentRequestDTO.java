@@ -1,20 +1,5 @@
 package com.quyet.superapp.dto;
 
-<<<<<<< HEAD
-import com.quyet.superapp.enums.BloodRequestStatus;
-import lombok.Data;
-
-import java.time.LocalDate;
-
-@Data
-public class UrgentRequestDTO {
-    private Long urgentRequestId;
-    private String hospitalName;
-    private String bloodType;
-    private int units;
-    private LocalDate requestDate;
-    private BloodRequestStatus status;
-=======
 import com.quyet.superapp.enums.RequestStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -45,7 +30,6 @@ public class UrgentRequestDTO {
     private RequestStatus status;
 
     @NotNull(message = "ID người yêu cầu không thể null")
->>>>>>> origin/main
     private Long requesterId;
 }
 

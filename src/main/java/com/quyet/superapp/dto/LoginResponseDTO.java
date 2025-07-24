@@ -15,8 +15,6 @@ public class LoginResponseDTO {
     private String role;
     private boolean enable;
     private String accessToken;
-<<<<<<< HEAD
-=======
     private String refreshToken;
 
     // 🩺 Profile Info (gửi kèm khi login)
@@ -25,5 +23,4 @@ public class LoginResponseDTO {
     private String gender;
     private String emergencyContact;
 
->>>>>>> origin/main
 }

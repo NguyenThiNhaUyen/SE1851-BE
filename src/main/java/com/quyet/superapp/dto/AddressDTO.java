@@ -1,15 +1,5 @@
 package com.quyet.superapp.dto;
 
-<<<<<<< HEAD
-import lombok.Data;
-
-@Data
-public class AddressDTO {
-    private String addressStreet; // Ví dụ: "12 Nguyễn Huệ"
-    private Long wardId;          // chỉ dùng wardId ở phía gửi request
-    private String ward;
-    private String district;
-=======
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,6 +21,5 @@ public class AddressDTO {
     @NotBlank
     private String district;
     @NotBlank
->>>>>>> origin/main
     private String city;
 }

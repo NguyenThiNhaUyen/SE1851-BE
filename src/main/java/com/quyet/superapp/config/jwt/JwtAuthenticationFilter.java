@@ -27,16 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-
-        // ✅ Bỏ qua kiểm tra token nếu là public endpoint
-        String uri = req.getRequestURI();
-        if (uri.startsWith("/api/auth/") || uri.startsWith("/api/verify-otp") ||
-                uri.startsWith("/api/forgot") || uri.startsWith("/api/change-password") ||
-                uri.startsWith("/api/public") || uri.startsWith("/api/blog")) {
-            chain.doFilter(req, res);
-            return;
-        }
-
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
@@ -63,9 +53,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
-
-
         chain.doFilter(req, res);
     }
-
 }

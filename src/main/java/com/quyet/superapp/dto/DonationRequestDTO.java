@@ -1,10 +1,7 @@
 package com.quyet.superapp.dto;
 
 import com.quyet.superapp.enums.DonationStatus;
-<<<<<<< HEAD
-=======
 import jakarta.validation.constraints.*;
->>>>>>> origin/main
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,21 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DonationRequestDTO {
-<<<<<<< HEAD
-    private Long donationId;
-    private Long userId;
-    private Long registrationId;
-    private Long bloodTypeId;
-    private Long componentId;
-    private LocalDate donationDate;
-    private Integer volumeMl;
-    private String location;
-    private String notes;
-    private Double weight;
-    private DonationStatus status;
-
-    private LocalDateTime createdAt;
-=======
     @NotNull(message = "Donation ID không thể null")
     private Long donationId;
 
@@ -68,7 +50,6 @@ public class DonationRequestDTO {
     private LocalDateTime createdAt;
 
     @NotNull(message = "Ngày cập nhật không thể null")
->>>>>>> origin/main
     private LocalDateTime updatedAt;
 }
 

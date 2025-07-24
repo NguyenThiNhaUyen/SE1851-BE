@@ -1,11 +1,8 @@
 package com.quyet.superapp.dto;
 
-<<<<<<< HEAD
-=======
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
->>>>>>> origin/main
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,10 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ChatLogDTO {
     private Long chatId;
-<<<<<<< HEAD
-    private Long userId;
-    private String message;
-=======
     @NotNull(message = "ID người dùng không được để trống")
     private Long userId;
 
@@ -27,7 +20,6 @@ public class ChatLogDTO {
     private String message;
 
     @NotBlank(message = "Người gửi không được để trống")
->>>>>>> origin/main
     private String sender;
     private LocalDateTime createdAt;
 }
