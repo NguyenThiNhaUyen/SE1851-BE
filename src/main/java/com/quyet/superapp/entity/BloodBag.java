@@ -1,20 +1,14 @@
 package com.quyet.superapp.entity;
 
 import com.quyet.superapp.enums.BloodBagStatus;
-<<<<<<< HEAD
-=======
 import com.quyet.superapp.enums.RhType;
->>>>>>> origin/main
 import com.quyet.superapp.enums.TestStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-<<<<<<< HEAD
-=======
 import java.time.LocalDate;
->>>>>>> origin/main
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,14 +30,9 @@ public class BloodBag {
     @JoinColumn(name = "blood_type_id")
     private BloodType bloodType;
 
-<<<<<<< HEAD
-    @Column(name = "rh", nullable = false, length = 2)
-    private String rh;
-=======
     @Enumerated(EnumType.STRING)
     @Column(name = "rh", nullable = false, length = 10)
     private RhType rh;
->>>>>>> origin/main
 
     @Column(name = "volume", nullable = false)
     private Integer volume;
@@ -62,13 +51,6 @@ public class BloodBag {
     @Column(name = "status", nullable = false)
     private BloodBagStatus status;
 
-<<<<<<< HEAD
-    @Column(name = "donor_id", nullable = false)
-    private String donorId;
-
-    @Column(name = "note")
-    private String note;
-=======
     @ManyToOne
     @JoinColumn(name = "donor_id", referencedColumnName = "user_id")
     private User donor;
@@ -79,5 +61,4 @@ public class BloodBag {
     @OneToOne
     @JoinColumn(name = "donation_id")
     private Donation donation;
->>>>>>> origin/main
 }

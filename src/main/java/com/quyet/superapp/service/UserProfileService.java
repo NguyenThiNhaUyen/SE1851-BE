@@ -1,5 +1,8 @@
 package com.quyet.superapp.service;
 
+
+import com.quyet.superapp.dto.*;
+
 import com.quyet.superapp.dto.UrgentDonorRegistrationDTO;
 import com.quyet.superapp.dto.UserProfileDTO;
 import com.quyet.superapp.entity.BloodType;
@@ -9,13 +12,19 @@ import com.quyet.superapp.entity.UserProfile;
 import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.entity.address.Ward;
 
+import com.quyet.superapp.mapper.AddressMapper;
+import com.quyet.superapp.mapper.UserProfileMapper;
+
 import com.quyet.superapp.exception.ResourceNotFoundException;
 import com.quyet.superapp.mapper.AddressMapper;
 import com.quyet.superapp.repository.BloodTypeRepository;
+
 import com.quyet.superapp.repository.UserProfileRepository;
 import com.quyet.superapp.repository.UserRepository;
 import com.quyet.superapp.repository.address.AddressRepository;
 import com.quyet.superapp.repository.address.WardRepository;
+
+
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,6 +41,7 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final WardRepository wardRepository;
+
     public List<UserProfile> getAllProfiles() {
         return userProfileRepository.findAll();
     }
@@ -40,6 +50,7 @@ public class UserProfileService {
         return userProfileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ người dùng với ID: " + userId));
     }
+
 
     // ✅ Tạo mới hồ sơ từ DTO
     @Transactional
@@ -57,6 +68,7 @@ public class UserProfileService {
             throw new IllegalStateException("Người dùng đã có hồ sơ. Vui lòng cập nhật.");
         }
 
+
         UserProfile profile = mapDTOtoEntity(dto, user);
         return userProfileRepository.save(profile);
 
@@ -64,6 +76,7 @@ public class UserProfileService {
 
     // ✅ Cập nhật hồ sơ
     public UserProfile updateProfile(Long userId, UserProfileDTO dto) {
+
         validateUniqueFields(dto.getCitizenId(), dto.getContactInfo().getEmail(), null);
         Address address = resolveAddress(dto.getAddressId(), dto.getAddress());
         UserProfile profile = UserProfileMapper.fromCreateDTO(dto, user, address);
@@ -76,6 +89,7 @@ public class UserProfileService {
 
         UserProfile profile = user.getUserProfile();
         if (profile == null) {
+
             profile = new UserProfile();
             profile.setUser(user);
         }
@@ -83,6 +97,7 @@ public class UserProfileService {
         validateUniqueFields(dto.getCitizenId(), dto.getEmail(), profile);
 
         updateEntityFromDTO(profile, dto);
+
 
             throw new IllegalStateException("Hồ sơ không tồn tại. Vui lòng tạo mới.");
         }
@@ -95,6 +110,7 @@ public class UserProfileService {
     }
 
     public UserProfile createFromRegistration(User user, UrgentDonorRegistrationDTO dto, Address address) {
+
 
         if (user == null) {
             throw new IllegalArgumentException("User không được null khi tạo UserProfile");
@@ -118,6 +134,7 @@ public class UserProfileService {
 
 
     // ✅ Lấy hồ sơ theo username (dùng trong xác thực)
+
         UserProfile profile = new UserProfile();
         profile.setUser(user);
         profile.setFullName(dto.getFullName());
@@ -142,7 +159,6 @@ public class UserProfileService {
         return userProfileRepository.save(profile);
     }
 
-
     public void deleteById(Long id) {
         userProfileRepository.deleteById(id);
     }
@@ -150,6 +166,7 @@ public class UserProfileService {
     public Optional<UserProfile> getById(Long id) {
         return userProfileRepository.findById(id);
     }
+
 
     // 🔧 Helper: Tạo entity từ DTO
     private UserProfile mapDTOtoEntity(UserProfileDTO dto, User user) {
@@ -171,6 +188,7 @@ public class UserProfileService {
 
         if (dto.getDob() == null) {
             throw new IllegalArgumentException("Ngày sinh không được để trống");
+
     // ✅ Tách xử lý địa chỉ dùng chung
     private Address resolveAddress(Long addressId, AddressDTO dto) {
         if (addressId != null) {
@@ -210,6 +228,9 @@ public class UserProfileService {
         profile.setFullName(dto.getFullName());
         profile.setDob(dto.getDob());
         profile.setGender(dto.getGender());
+
+        profile.setPhone(dto.getPhone());
+
         profile.setEmail(dto.getEmail());
         profile.setLastDonationDate(dto.getLastDonationDate());
         profile.setRecoveryTime(dto.getRecoveryTime());
@@ -255,7 +276,7 @@ public class UserProfileService {
         }
     }
 }
-=======
+
         profile.setBloodType(dto.getBloodType());
 
         if (dto.getAddressId() != null) {
@@ -268,4 +289,3 @@ public class UserProfileService {
     }
 }
 
->>>>>>> origin/main

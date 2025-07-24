@@ -3,27 +3,6 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.BloodBagDTO;
 import com.quyet.superapp.entity.BloodBag;
 import com.quyet.superapp.entity.BloodType;
-<<<<<<< HEAD
-
-public class BloodBagMapper {
-    public static BloodBagDTO toDTO(BloodBag entity) {
-        return new BloodBagDTO(
-                entity.getBloodBagId(),
-                entity.getBagCode(),
-                entity.getBloodType() != null ? String.valueOf(entity.getBloodType().getBloodTypeId()) : null,
-                entity.getRh(),
-                entity.getVolume(),
-                entity.getHematocrit(),
-                entity.getCollectedAt(),
-                entity.getTestStatus(),
-                entity.getStatus(),
-                entity.getDonorId(),
-                entity.getNote()
-        );
-    }
-
-    public static BloodBag fromDTO(BloodBagDTO dto, BloodType bloodType) {
-=======
 import com.quyet.superapp.entity.User;
 
 public class BloodBagMapper {
@@ -58,7 +37,6 @@ public class BloodBagMapper {
     }
 
     public static BloodBag fromDTO(BloodBagDTO dto, BloodType bloodType, User donor) {
->>>>>>> origin/main
         BloodBag entity = new BloodBag();
         entity.setBloodBagId(dto.getBloodBagId());
         entity.setBagCode(dto.getBagCode());
@@ -69,17 +47,10 @@ public class BloodBagMapper {
         entity.setCollectedAt(dto.getCollectedAt());
         entity.setTestStatus(dto.getTestStatus());
         entity.setStatus(dto.getStatus());
-<<<<<<< HEAD
-        entity.setDonorId(dto.getDonorId());
-=======
         entity.setDonor(donor); // ✅ donor entity phải được fetch ở service
->>>>>>> origin/main
         entity.setNote(dto.getNote());
         return entity;
     }
 }
-<<<<<<< HEAD
-=======
 
 
->>>>>>> origin/main

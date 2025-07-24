@@ -17,8 +17,4 @@ public class BlogRequestDTO {
 
     @NotNull
     private Long authorId;
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 }

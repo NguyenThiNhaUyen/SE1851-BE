@@ -3,22 +3,15 @@ package com.quyet.superapp.repository;
 import com.quyet.superapp.entity.SeparationOrder;
 import com.quyet.superapp.enums.SeparationMethod;
 import org.springframework.data.jpa.repository.JpaRepository;
-<<<<<<< HEAD
-=======
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
->>>>>>> origin/main
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-<<<<<<< HEAD
-public interface SeparationOrderRepository extends JpaRepository<SeparationOrder, Integer> {
-=======
 public interface SeparationOrderRepository extends JpaRepository<SeparationOrder, Long> {
->>>>>>> origin/main
     // 🔍 Tìm theo loại tách máu (LY_TAM, GAN_TACH, ...)
     List<SeparationOrder> findBySeparationMethod(SeparationMethod method);
 
@@ -33,8 +26,6 @@ public interface SeparationOrderRepository extends JpaRepository<SeparationOrder
 
     // ✅ Kiểm tra đã tách máu từ túi nào đó chưa
     boolean existsByBloodBag_BloodBagId(Long bloodBagId);
-<<<<<<< HEAD
-=======
 
     @Query("SELECT FUNCTION('DATE_FORMAT', o.performedAt, '%Y-%m-%d'), COUNT(o) " +
             "FROM SeparationOrder o " +
@@ -45,5 +36,4 @@ public interface SeparationOrderRepository extends JpaRepository<SeparationOrder
             "FROM SeparationOrder o " +
             "GROUP BY o.bloodBag.bloodType.description")
     List<Object[]> countByBloodType();
->>>>>>> origin/main
 }

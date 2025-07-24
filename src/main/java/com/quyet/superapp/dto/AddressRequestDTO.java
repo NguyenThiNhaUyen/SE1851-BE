@@ -1,17 +1,5 @@
 package com.quyet.superapp.dto;
 
-<<<<<<< HEAD
-import lombok.Data;
-
-@Data
-public class AddressRequestDTO {
-    private String addressStreet;
-    private Long wardId;
-
-    // ✅ Bổ sung tọa độ vị trí
-    private Double latitude;
-    private Double longitude;
-=======
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,5 +16,4 @@ public class AddressRequestDTO {
     private String addressStreet;
 
     private Long wardId;
->>>>>>> origin/main
 }

@@ -3,11 +3,7 @@ package com.quyet.superapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
-<<<<<<< HEAD
-import com.quyet.superapp.enums.BloodRequestStatus;
-=======
 import com.quyet.superapp.enums.RequestStatus;
->>>>>>> origin/main
 
 @Entity
 @Table(name = "UrgentRequest")
@@ -35,11 +31,7 @@ public class UrgentRequest {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Status", columnDefinition = "NVARCHAR(20)")
-<<<<<<< HEAD
-    private BloodRequestStatus status;
-=======
     private RequestStatus status;
->>>>>>> origin/main
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "User_Id")
@@ -48,11 +40,7 @@ public class UrgentRequest {
     @PrePersist
     public void setDefaultStatus() {
         if (status == null) {
-<<<<<<< HEAD
-            status = BloodRequestStatus.PENDING;
-=======
             status = RequestStatus.PENDING;
->>>>>>> origin/main
         }
         if (requestDate == null) {
             requestDate = LocalDate.now();

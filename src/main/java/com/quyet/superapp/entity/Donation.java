@@ -4,7 +4,6 @@ import com.quyet.superapp.enums.DonationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,19 +16,15 @@ import java.util.List;
 @Builder
 public class Donation {
 
-
-
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "Donation_Id")
         private Long donationId;
 
-
         // ❗ Optional nếu luôn lấy từ registration
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "User_Id")
         private User user;
-
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "registration_id")
@@ -65,7 +60,6 @@ public class Donation {
         @Column(name = "status", columnDefinition = "NVARCHAR(20)")
         private DonationStatus status;
 
-
         // ✅ Staff xử lý hiến máu (xác nhận, nhập kết quả...)
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "handled_by_staff_id")
@@ -77,8 +71,15 @@ public class Donation {
         private BloodBag bloodBag;
 
         // ✅ Các đơn vị máu được tách ra từ túi máu của lần hiến này
-                if (this.donationDate == null) {
+        @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL)
+        private List<BloodUnit> bloodUnits;
 
+        @PrePersist
+        protected void onCreate() {
+                this.createdAt = LocalDateTime.now();
+                this.updatedAt = LocalDateTime.now();
+                if (this.collectedAt == null) {
+                        this.collectedAt = LocalDate.now();
                 }
         }
 
@@ -86,17 +87,4 @@ public class Donation {
         protected void onUpdate() {
                 this.updatedAt = LocalDateTime.now();
         }
-
-
-        @Column(name = "recovered_at")
-        private LocalDate recoveryDate;
-
-        @Column(name = "is_emergency")
-        private Boolean isEmergency;
-
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "separated_component_id")
-        private BloodComponent separatedComponent; // 🧪 Thành phần máu thực tế được tách ra
-
-
 }

@@ -110,8 +110,6 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
-<<<<<<< HEAD
-=======
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -134,7 +132,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
->>>>>>> origin/main
     </dependencies>
 
     <build>
@@ -170,12 +167,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-<<<<<<< HEAD
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-=======
->>>>>>> origin/main
                     <annotationProcessorPaths>
                         <!-- Lombok -->
                         <path>

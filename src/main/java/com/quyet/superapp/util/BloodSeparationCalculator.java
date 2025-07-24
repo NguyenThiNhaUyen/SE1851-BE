@@ -2,15 +2,6 @@ package com.quyet.superapp.util;
 
 import com.quyet.superapp.dto.BloodSeparationSuggestionDTO;
 import com.quyet.superapp.entity.BloodBag;
-<<<<<<< HEAD
-import com.quyet.superapp.entity.SeparationPresetConfig;
-import org.springframework.stereotype.Component;
-
-@Component
-public class BloodSeparationCalculator {
-
-    public BloodSeparationSuggestionDTO calculateFromPreset(BloodBag bloodBag, SeparationPresetConfig preset) {
-=======
 import com.quyet.superapp.entity.BloodSeparationSuggestion;
 import com.quyet.superapp.entity.SeparationPresetConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -21,54 +12,19 @@ import org.springframework.stereotype.Component;
 public class BloodSeparationCalculator {
 
     public BloodSeparationSuggestion calculateFromPreset(BloodBag bloodBag, SeparationPresetConfig preset) {
->>>>>>> origin/main
         int volume = bloodBag.getVolume();
         if (volume <= 0) {
             throw new IllegalArgumentException("Thể tích túi máu không hợp lệ.");
         }
-<<<<<<< HEAD
-=======
         if (volume < 250) {
             log.warn("⚠️ Thể tích túi máu ({}ml) nhỏ hơn 250ml – có thể không phù hợp để tách.", volume);
         }
 
->>>>>>> origin/main
 
         String bloodGroup = (bloodBag.getBloodType() != null && bloodBag.getBloodType().getDescription() != null)
                 ? bloodBag.getBloodType().getDescription()
                 : "UNK";
 
-<<<<<<< HEAD
-        // 1. Tính hồng cầu và huyết tương theo tỷ lệ
-        int red = (int) Math.round(volume * preset.getRbcRatio());
-        int plasma = (int) Math.round(volume * preset.getPlasmaRatio());
-
-        // 2. Tính tiểu cầu cố định hoặc phần còn lại
-        int platelets = preset.getPlateletsFixed() > 0 ? preset.getPlateletsFixed() : volume - red - plasma;
-
-        // 3. Cân bằng nếu tổng vượt quá volume
-        int total = red + plasma + platelets;
-        if (total > volume) {
-            int excess = total - volume;
-            plasma = Math.max(0, plasma - excess);
-
-            // Nếu vẫn dư, giảm tiếp platelets
-            total = red + plasma + platelets;
-            if (total > volume) {
-                platelets = Math.max(0, volume - red - plasma);
-            }
-        }
-
-        return new BloodSeparationSuggestionDTO(
-                red,
-                plasma,
-                platelets,
-                "PRC-" + bloodGroup,
-                "FFP-" + bloodGroup,
-                "PLT-" + bloodGroup,
-                String.format("Preset: %s - %s - %skg", preset.getMethod(), preset.getGender(), preset.getMinWeight())
-        );
-=======
         // 1. Tính thể tích theo preset
         int red = (int) Math.round(volume * preset.getRbcRatio());
         int plasma = (int) Math.round(volume * preset.getPlasmaRatio());
@@ -116,6 +72,5 @@ public class BloodSeparationCalculator {
         ));
 
         return suggestion;
->>>>>>> origin/main
     }
 }
