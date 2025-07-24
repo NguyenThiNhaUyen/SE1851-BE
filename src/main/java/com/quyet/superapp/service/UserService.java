@@ -1,7 +1,7 @@
 package com.quyet.superapp.service;
 
 import com.quyet.superapp.config.jwt.JwtTokenProvider;
-<<<<<<< HEAD
+
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.entity.address.Address;
@@ -16,7 +16,7 @@ import com.quyet.superapp.repository.*;
 import com.quyet.superapp.repository.address.AddressRepository;
 import com.quyet.superapp.repository.address.WardRepository;
 import jakarta.transaction.Transactional;
-=======
+
 import com.quyet.superapp.config.jwt.UserPrincipal;
 import com.quyet.superapp.constant.MessageConstants;
 import com.quyet.superapp.dto.*;
@@ -31,7 +31,7 @@ import com.quyet.superapp.repository.address.*;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
->>>>>>> origin/main
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,13 +44,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-<<<<<<< HEAD
+
 import java.util.*;
 import java.util.stream.Collectors;
-=======
+
 import java.time.temporal.ChronoUnit;
 import java.util.*;
->>>>>>> origin/main
+
 
 import static com.quyet.superapp.constant.MessageConstants.LOGIN_FAILED;
 import static com.quyet.superapp.constant.MessageConstants.LOGIN_SUCCESS;
@@ -68,7 +68,7 @@ public class UserService {
     private final AddressRepository addressRepository;
     private final WardRepository wardRepository;
     private final UserProfileRepository userProfileRepository;
-<<<<<<< HEAD
+
     private final AddressMapper addressMapper;
     private final DonorProfileRepository donorProfileRepository;
 
@@ -79,7 +79,7 @@ public class UserService {
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()
-=======
+
     private final RedisOtpService redisOtpService;
     private final EmailService emailService;
 
@@ -89,13 +89,13 @@ public class UserService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(), loginRequest.getPassword()
->>>>>>> origin/main
+
                     )
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = userRepository.findByUsername(loginRequest.getUsername())
-<<<<<<< HEAD
+
                     .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
 
             String jwt = tokenProvider.createToken(user.getUsername(), user.getUserId());
@@ -332,7 +332,7 @@ public class UserService {
                 .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
     }
-=======
+
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
             LoginResponseDTO loginResponse = buildLoginResponse(user);
@@ -571,6 +571,7 @@ public class UserService {
         );
     }
 
->>>>>>> origin/main
+
+
 }
 

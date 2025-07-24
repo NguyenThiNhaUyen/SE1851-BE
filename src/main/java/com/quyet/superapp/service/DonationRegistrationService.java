@@ -1,6 +1,6 @@
 package com.quyet.superapp.service;
 
-<<<<<<< HEAD
+
 import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.entity.address.Address;
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-=======
+
 import com.quyet.superapp.config.jwt.UserPrincipal;
 import com.quyet.superapp.constant.MessageConstants;
 import com.quyet.superapp.dto.ApiResponseDTO;
@@ -21,6 +21,11 @@ import com.quyet.superapp.dto.DonationRegistrationDTO;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.enums.HealthCheckFailureReason;
+
+
+import com.quyet.superapp.enums.SlotStatus;
+
+
 import com.quyet.superapp.event.EmailNotificationEvent;
 import com.quyet.superapp.exception.MemberException;
 import com.quyet.superapp.mapper.DonationRegistrationMapper;
@@ -32,13 +37,16 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
->>>>>>> origin/main
+
+import java.util.Comparator;
+
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-<<<<<<< HEAD
+
 public class DonationRegistrationService {
 
     private final DonationRegistrationRepository donationRegistrationRepository;
@@ -240,7 +248,7 @@ public class DonationRegistrationService {
         healthCheckFailureLogService.saveLog(registrationId, reason, staffNote);
 
         return DonationRegistrationMapper.toDTO(reg);
-=======
+
 @Slf4j
 public class DonationRegistrationService {
 
@@ -252,6 +260,9 @@ public class DonationRegistrationService {
     private final DonationRegistrationValidator validator;
     private final DonationSlotService slotService;
     private final BloodBagService bloodBagService;
+
+    private final DonationSlotRepository  donationSlotRepository;
+
     private final RecoveryReminderService recoveryReminderService;
     private final EmailService emailService;
     private final UserProfileService userProfileService;
@@ -261,13 +272,42 @@ public class DonationRegistrationService {
         User user = findUser(userId);
         validator.validateRegistrationRequest(user, dto);
 
+
+        // ✅ Nếu slotId không được cung cấp → tìm slot phù hợp theo ngày và location
+        DonationSlot assignedSlot;
+        if (dto.getSlotId() == null) {
+            if (dto.getScheduledDate() == null || dto.getLocation() == null) {
+                throw new MemberException("SLOT_REQUIRED", "Bạn cần chọn ngày và địa điểm hiến máu.");
+            }
+
+            // Tìm danh sách slot theo ngày và địa điểm
+            List<DonationSlot> availableSlots = donationSlotRepository
+                    .findBySlotDateAndLocationAndStatus(dto.getScheduledDate(), dto.getLocation(), SlotStatus.ACTIVE)
+                    .stream()
+                    .filter(slot -> slot.getRegisteredCount() < slot.getMaxCapacity())
+                    .sorted(Comparator.comparing(DonationSlot::getStartTime))
+                    .collect(Collectors.toList());
+
+            if (availableSlots.isEmpty()) {
+                throw new MemberException("NO_AVAILABLE_SLOT", "Không còn slot trống phù hợp vào ngày và địa điểm đã chọn.");
+            }
+
+            assignedSlot = availableSlots.get(0); // chọn slot phù hợp sớm nhất
+        } else {
+            slotService.validateSlotAvailable(dto.getSlotId());
+            assignedSlot = slotService.assignSlotToRegistration(new DonationRegistration(), dto.getSlotId());
+        }
+
+
         userProfileService.updateOrCreateFromRegistration(user, dto);
 
         validateSlotAndAssign(dto, user);
 
         DonationRegistration reg = DonationRegistrationMapper.toEntity(dto, user);
+        reg.setSlot(assignedSlot);
         reg.setStatus(DonationStatus.PENDING);
-        slotService.assignSlotToRegistration(reg, dto.getSlotId());
+        reg.setReadyDate(assignedSlot.getSlotDate());
+        reg.setLocation(assignedSlot.getLocation());
 
         registrationRepo.save(reg);
         emailService.sendPreDonationInstructionEmail(user, dto.getScheduledDate());
@@ -275,7 +315,12 @@ public class DonationRegistrationService {
         return buildSuccess(DonationRegistrationMapper.toDTO(reg), MessageConstants.DONATION_REGISTERED);
     }
 
+
+
+    // ✅ Xác nhận đơn đăng ký
+
     // ✅ Xác nhận đơn hiến máu (STAFF/ADMIN)
+
     public ResponseEntity<?> confirm(Long regId, UserPrincipal principal) {
         User staff = findUser(principal.getUserId());
         ensureStaffPrivileges(staff);
@@ -408,6 +453,6 @@ public class DonationRegistrationService {
 
     private ResponseEntity<?> buildSuccess(Object data, String message) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, message, data));
->>>>>>> origin/main
+
     }
 }
