@@ -18,4 +18,7 @@ public interface DonationSlotRepository extends JpaRepository<DonationSlot, Long
             int maxCapacity
     );
     List<DonationSlot> findByStatusAndRegisteredCountLessThan(SlotStatus status, int registeredCount);
+
+    List<DonationSlot> findBySlotDateAndLocationAndStatus(LocalDate slotDate, String location, SlotStatus status);
+
 }

@@ -67,10 +67,10 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<ApiResponseDTO<?>> refreshToken(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
+    public ResponseEntity<ApiResponseDTO<?>> refreshToken(
+            @RequestHeader("Authorization") String bearerToken) {
+        String refreshToken = bearerToken.replace("Bearer ", "");
         return userService.refreshToken(refreshToken);
     }
-
 
 }

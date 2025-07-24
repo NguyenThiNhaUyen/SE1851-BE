@@ -297,5 +297,4 @@ public class UserService {
                 profile != null ? profile.getEmergencyContact() : null
         );
     }
-
 }

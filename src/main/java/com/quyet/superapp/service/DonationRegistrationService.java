@@ -10,6 +10,7 @@ import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.enums.DonationStatus;
 import com.quyet.superapp.enums.HealthCheckFailureReason;
 
+import com.quyet.superapp.enums.SlotStatus;
 import com.quyet.superapp.event.EmailNotificationEvent;
 import com.quyet.superapp.exception.MemberException;
 
@@ -25,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,7 @@ public class DonationRegistrationService {
     private final DonationRegistrationValidator validator;
     private final DonationSlotService slotService;
     private final BloodBagService bloodBagService;
+    private final DonationSlotRepository  donationSlotRepository;
 
     // ✅ Đăng ký hiến máu
     public ResponseEntity<?> register(Long userId, DonationRegistrationDTO dto) {
@@ -52,20 +55,42 @@ public class DonationRegistrationService {
         validator.validateRegistrationRequest(user, dto);
         updateOrCreateUserProfile(user, dto);
 
+        // ✅ Nếu slotId không được cung cấp → tìm slot phù hợp theo ngày và location
+        DonationSlot assignedSlot;
         if (dto.getSlotId() == null) {
-            throw new MemberException("SLOT_REQUIRED", "Bạn cần chọn khung giờ hiến máu.");
+            if (dto.getScheduledDate() == null || dto.getLocation() == null) {
+                throw new MemberException("SLOT_REQUIRED", "Bạn cần chọn ngày và địa điểm hiến máu.");
+            }
+
+            // Tìm danh sách slot theo ngày và địa điểm
+            List<DonationSlot> availableSlots = donationSlotRepository
+                    .findBySlotDateAndLocationAndStatus(dto.getScheduledDate(), dto.getLocation(), SlotStatus.ACTIVE)
+                    .stream()
+                    .filter(slot -> slot.getRegisteredCount() < slot.getMaxCapacity())
+                    .sorted(Comparator.comparing(DonationSlot::getStartTime))
+                    .collect(Collectors.toList());
+
+            if (availableSlots.isEmpty()) {
+                throw new MemberException("NO_AVAILABLE_SLOT", "Không còn slot trống phù hợp vào ngày và địa điểm đã chọn.");
+            }
+
+            assignedSlot = availableSlots.get(0); // chọn slot phù hợp sớm nhất
+        } else {
+            slotService.validateSlotAvailable(dto.getSlotId());
+            assignedSlot = slotService.assignSlotToRegistration(new DonationRegistration(), dto.getSlotId());
         }
 
-        slotService.validateSlotAvailable(dto.getSlotId());
-
         DonationRegistration reg = DonationRegistrationMapper.toEntity(dto, user);
+        reg.setSlot(assignedSlot);
         reg.setStatus(DonationStatus.PENDING);
-        slotService.assignSlotToRegistration(reg, dto.getSlotId());
+        reg.setReadyDate(assignedSlot.getSlotDate());
+        reg.setLocation(assignedSlot.getLocation());
 
         registrationRepo.save(reg);
 
         return ResponseEntity.ok(new ApiResponseDTO<>(true, MessageConstants.DONATION_REGISTERED, DonationRegistrationMapper.toDTO(reg)));
     }
+
 
     // ✅ Xác nhận đơn đăng ký
     public ResponseEntity<?> confirm(Long regId, UserPrincipal principal) {
