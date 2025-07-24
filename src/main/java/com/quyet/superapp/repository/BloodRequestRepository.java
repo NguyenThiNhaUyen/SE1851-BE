@@ -1,4 +1,3 @@
-<<<<<<< HEAD
     package com.quyet.superapp.repository;
 
     import com.quyet.superapp.dto.BloodRequestSummaryDTO;

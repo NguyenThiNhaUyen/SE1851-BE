@@ -3,11 +3,7 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.NotificationDTO;
 import com.quyet.superapp.entity.Notification;
 
-<<<<<<< HEAD
 public class NotificationMapper {
-=======
-public class NotificationMapper { //chưa sử dụng
->>>>>>> origin/main
     public static NotificationDTO toDTO(Notification noti) {
         return new NotificationDTO(
                 noti.getNotificationId(),
