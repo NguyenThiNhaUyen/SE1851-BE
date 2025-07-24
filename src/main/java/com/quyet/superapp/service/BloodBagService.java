@@ -56,12 +56,18 @@ public class BloodBagService {
     public BloodBagDTO update(Long id, UpdateBloodBagRequest req) {
         BloodBag bag = bloodBagRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy túi máu với ID " + id));
-
+        if (req.getBloodType() != null) {
+            BloodType type = bloodTypeRepository.findById(req.getBloodType())
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhóm máu"));
+            bag.setBloodType(type);
+        }
+        if (req.getRh() != null) bag.setRh(req.getRh());
         if (req.getVolume() != null) bag.setVolume(req.getVolume());
         if (req.getHematocrit() != null) bag.setHematocrit(req.getHematocrit());
         if (req.getStatus() != null) bag.setStatus(req.getStatus());
         if (req.getTestStatus() != null) bag.setTestStatus(req.getTestStatus());
         if (req.getNote() != null) bag.setNote(req.getNote());
+        bloodBagRepository.save(bag);
 
         return BloodBagMapper.toDTO(bag);
     }

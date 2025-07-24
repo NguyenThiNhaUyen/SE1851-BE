@@ -147,6 +147,14 @@ public class SeparationOrderController {
                 )
         );
     }
+    @PutMapping("/update-suggestion")
+    public ResponseEntity<Void> updateSeparationSuggestion(
+            @RequestParam Long bloodBagId,
+            @RequestBody BloodSeparationSuggestionDTO dto
+    ) {
+        separationOrderService.updateSeparationByBloodBagId(bloodBagId, dto);
+        return ResponseEntity.ok().build();
+    }
 
 
 }

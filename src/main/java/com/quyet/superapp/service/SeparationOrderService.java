@@ -3,6 +3,7 @@ package com.quyet.superapp.service;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.enums.*;
+import com.quyet.superapp.mapper.BloodSeparationSuggestionMapper;
 import com.quyet.superapp.mapper.BloodUnitMapper;
 import com.quyet.superapp.repository.*;
 import com.quyet.superapp.util.*;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +29,8 @@ public class SeparationOrderService {
     private final BloodComponentRepository bloodComponentRepository;
     private final BloodUnitRepository bloodUnitRepository;
     private final BloodInventoryService bloodInventoryService; // ✅ Thêm để cập nhật tồn kho máu
+    private final BloodSeparationSuggestionRepository bloodSeparationSuggestionRepository;
+
 
     // ✅ Dùng trong tạo nhanh (manual) có sinh đơn vị máu (tự động theo tỉ lệ mặc định)
 
@@ -44,6 +48,7 @@ public class SeparationOrderService {
         bag.setStatus(BloodBagStatus.SEPARATED);
         bloodBagRepository.save(bag);
 
+        // ✅ Gợi ý DTO để trả về client
         BloodSeparationSuggestionDTO suggestion = new BloodSeparationSuggestionDTO(
                 redCellsMl, plasmaMl, plateletsMl,
                 "PRC-" + bag.getBloodType().getDescription(),
@@ -52,6 +57,18 @@ public class SeparationOrderService {
                 "Manual separation input by operator"
         );
 
+        // 🔴 LƯU SUGGESTION vào DB
+        BloodSeparationSuggestion suggestionEntity = new BloodSeparationSuggestion();
+        suggestionEntity.setBloodBag(bag);
+        suggestionEntity.setSeparationOrder(order);
+        suggestionEntity.setRedCellsMl(redCellsMl);
+        suggestionEntity.setPlasmaMl(plasmaMl);
+        suggestionEntity.setPlateletsMl(plateletsMl);
+        suggestionEntity.setSuggestedAt(LocalDateTime.now());
+        suggestionEntity.setSuggestedBy(operator);
+        bloodSeparationSuggestionRepository.save(suggestionEntity);
+
+        // ✅ Tạo các đơn vị máu
         createBloodUnitsFromSuggestion(suggestion, bag, order);
         List<BloodUnitDTO> dtoUnits = getDTOUnits(order);
 
@@ -64,6 +81,7 @@ public class SeparationOrderService {
                 bag.getStatus().toString()
         );
     }
+
 
 
     // ✅ Tạo từ gợi ý preset
@@ -226,6 +244,41 @@ public class SeparationOrderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void updateSeparationByBloodBagId(Long bloodBagId, BloodSeparationSuggestionDTO dto) {
+        BloodBag bag = getBloodBagValidated(bloodBagId);
+
+        // 🔍 Lấy SeparationOrder từ suggestion
+        SeparationOrder order = bloodSeparationSuggestionRepository.findByBloodBag_BloodBagId(bloodBagId)
+                .stream()
+                .findFirst()
+                .map(BloodSeparationSuggestion::getSeparationOrder)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lệnh tách máu qua suggestion"));
+
+        // ❌ Xoá BloodUnit cũ
+        List<BloodUnit> oldUnits = bloodUnitRepository.findBySeparationOrder(order);
+        for (BloodUnit unit : oldUnits) {
+            bloodUnitRepository.delete(unit);
+        }
+
+        // ✅ Tạo mới BloodUnit
+        createBloodUnitsFromSuggestion(dto, bag, order);
+
+        // ✅ Cập nhật lại Suggestion
+        bloodSeparationSuggestionRepository.findByBloodBag_BloodBagId(bloodBagId)
+                .stream().findFirst().ifPresent(suggestion -> {
+                    suggestion.setRedCellsMl(dto.getRedCellsMl());
+                    suggestion.setPlasmaMl(dto.getPlasmaMl());
+                    suggestion.setPlateletsMl(dto.getPlateletsMl());
+                    suggestion.setRedCellsCode(dto.getRedCellLabel());
+                    suggestion.setPlasmaCode(dto.getPlasmaLabel());
+                    suggestion.setPlateletsCode(dto.getPlateletsLabel());
+                    suggestion.setDescription(dto.getNote());
+                    suggestion.setSuggestedAt(LocalDateTime.now());
+                    bloodSeparationSuggestionRepository.save(suggestion);
+                });
+    }
+
     // --------------------------------------------
     // 🔍 Truy vấn đơn giản
     // --------------------------------------------
@@ -252,5 +305,11 @@ public class SeparationOrderService {
 
     public List<SeparationOrder> findBetween(LocalDateTime start, LocalDateTime end) {
         return separationOrderRepository.findByPerformedAtBetween(start, end);
+    }
+    public Optional<BloodSeparationSuggestionDTO> getSuggestionByBloodBagId(Long bloodBagId) {
+        return bloodSeparationSuggestionRepository.findByBloodBag_BloodBagId(bloodBagId)
+                .stream()
+                .findFirst()
+                .map(BloodSeparationSuggestionMapper::toDTO);
     }
 }

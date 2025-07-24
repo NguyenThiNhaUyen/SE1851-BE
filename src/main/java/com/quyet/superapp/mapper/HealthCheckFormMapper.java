@@ -5,13 +5,14 @@ import com.quyet.superapp.entity.DonationRegistration;
 import com.quyet.superapp.entity.HealthCheckForm;
 
 public class HealthCheckFormMapper {
-    public static HealthCheckForm toEntity(HealthCheckFormDTO dto, DonationRegistration reg, boolean isEligible) {
+    public static HealthCheckForm toEntity(HealthCheckFormDTO dto, DonationRegistration reg) {
         return HealthCheckForm.builder()
                 .registration(reg)
                 .bodyTemperature(dto.getBodyTemperature())
                 .heartRate(dto.getHeartRate())
                 .bloodPressureSys(dto.getBloodPressureSys())
                 .bloodPressureDia(dto.getBloodPressureDia())
+                .heightCm(dto.getHeightCm())
                 .weightKg(dto.getWeightKg())
                 .hasFever(dto.getHasFever())
                 .tookAntibioticsRecently(dto.getTookAntibioticsRecently())
@@ -19,7 +20,7 @@ public class HealthCheckFormMapper {
                 .isPregnantOrBreastfeeding(dto.getIsPregnantOrBreastfeeding())
                 .hadRecentTattooOrSurgery(dto.getHadRecentTattooOrSurgery())
                 .hasRiskySexualBehavior(dto.getHasRiskySexualBehavior())
-                .isEligible(isEligible)
+                .isEligible(dto.getIsEligible())
                 .notesByStaff(dto.getNotesByStaff())
                 .build();
     }
@@ -32,6 +33,7 @@ public class HealthCheckFormMapper {
         dto.setHeartRate(entity.getHeartRate());
         dto.setBloodPressureSys(entity.getBloodPressureSys());
         dto.setBloodPressureDia(entity.getBloodPressureDia());
+        dto.setHeightCm(entity.getHeightCm());
         dto.setWeightKg(entity.getWeightKg());
         dto.setHasFever(entity.getHasFever());
         dto.setTookAntibioticsRecently(entity.getTookAntibioticsRecently());

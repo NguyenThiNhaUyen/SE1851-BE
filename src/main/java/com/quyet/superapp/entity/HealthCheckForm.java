@@ -36,6 +36,9 @@ public class HealthCheckForm {
     @Column(name = "blood_pressure_dia")
     private Integer bloodPressureDia;   // Huyết áp tâm trương
 
+    @Column(name = "height_cm")
+    private Double heightCm; // Chiều cao (cm)
+
     @Column(name = "weight_kg")
     private Double weightKg;     // Cân nặng (kg)
 

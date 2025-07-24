@@ -35,7 +35,7 @@ public class HealthCheckFormDTO {
     @Min(value = 30, message = "Cân nặng phải ít nhất 30 kg")
     @Max(value = 200, message = "Cân nặng phải dưới 200 kg")
     private Double weightKg;
-    private Integer heightCm;
+    private Double heightCm;
     private Boolean hasFever;
     private Boolean tookAntibioticsRecently;
     private Boolean hasChronicIllness;
@@ -43,7 +43,7 @@ public class HealthCheckFormDTO {
     private Boolean hadRecentTattooOrSurgery;
     private Boolean hasRiskySexualBehavior;
 
-    @NotNull(message = "Trạng thái đủ điều kiện không thể null")
+
     private Boolean isEligible;
     private String notesByStaff;
 

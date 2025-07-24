@@ -30,27 +30,26 @@ public class HealthCheckFormService {
         DonationRegistration reg = registrationRepository.findById(dto.getRegistrationId())
                 .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký."));
 
-        boolean isEligible = evaluate(dto);
-
-        HealthCheckForm entity = HealthCheckFormMapper.toEntity(dto, reg, isEligible);
+        // ❌ Bỏ evaluate()
+        HealthCheckForm entity = HealthCheckFormMapper.toEntity(dto, reg);
         formRepository.save(entity);
 
-        dto.setIsEligible(isEligible);
-
-        if (!isEligible) {
+        // ✅ Dùng kết quả từ người dùng
+        if (Boolean.FALSE.equals(dto.getIsEligible())) {
             reg.setStatus(DonationStatus.CONFIRMED);
             registrationRepository.save(reg);
 
-            // ✅ Ghi log nếu không đủ điều kiện
+            // ✅ Ghi log nếu không đủ điều kiện (do người dùng chọn)
             failureLogService.saveLog(
                     reg.getRegistrationId(),
-                    "Không đạt yêu cầu sức khỏe dựa trên thông số",
+                    "Không đạt yêu cầu sức khỏe (người nhập)",
                     dto.getNotesByStaff() != null ? dto.getNotesByStaff() : "Không có ghi chú"
             );
         }
 
         return dto;
     }
+
 
     public HealthCheckFormDTO getByRegistrationId(Long regId) {
         HealthCheckForm form = formRepository.findByRegistration_RegistrationId(regId);
@@ -83,7 +82,8 @@ public class HealthCheckFormService {
             throw new MemberException("NOT_FOUND", "Chưa có phiếu khám để cập nhật.");
         }
 
-        // Cập nhật các trường mới từ DTO
+        // Cập nhật dữ liệu
+        form.setHeightCm(dto.getHeightCm());
         form.setWeightKg(dto.getWeightKg());
         form.setBloodPressureSys(dto.getBloodPressureSys());
         form.setBloodPressureDia(dto.getBloodPressureDia());
@@ -95,25 +95,13 @@ public class HealthCheckFormService {
         form.setIsPregnantOrBreastfeeding(dto.getIsPregnantOrBreastfeeding());
         form.setHadRecentTattooOrSurgery(dto.getHadRecentTattooOrSurgery());
         form.setHasRiskySexualBehavior(dto.getHasRiskySexualBehavior());
+        form.setIsEligible(dto.getIsEligible());
 
-        // Đánh giá lại điều kiện
-        boolean eligible = evaluate(dto);
-        form.setIsEligible(eligible);
+        formRepository.save(form); // ✅ QUAN TRỌNG
 
-        formRepository.save(form);
-
-        // Cập nhật lại trạng thái đơn nếu cần
-        DonationRegistration reg = form.getRegistration();
-        if (!eligible) {
-            reg.setStatus(DonationStatus.CONFIRMED);
-        } else {
-            reg.setStatus(DonationStatus.CONFIRMED); // hoặc để nguyên tùy nghiệp vụ
-        }
-        registrationRepository.save(reg);
-
-        dto.setIsEligible(eligible);
         return dto;
     }
+
     public HealthCheckFormDTO getOrCreateByRegistrationId(Long regId) {
         HealthCheckForm existing = formRepository.findByRegistration_RegistrationId(regId);
         if (existing != null) {

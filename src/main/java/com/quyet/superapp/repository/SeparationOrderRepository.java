@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SeparationOrderRepository extends JpaRepository<SeparationOrder, Integer> {
@@ -24,4 +25,6 @@ public interface SeparationOrderRepository extends JpaRepository<SeparationOrder
 
     // ✅ Kiểm tra đã tách máu từ túi nào đó chưa
     boolean existsByBloodBag_BloodBagId(Long bloodBagId);
+    Optional<SeparationOrder> findFirstByBloodBag_BloodBagId(Long bloodBagId);
+
 }

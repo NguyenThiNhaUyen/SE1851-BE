@@ -15,4 +15,6 @@ public class UpdateBloodBagRequest {
     private TestStatus testStatus; // ví dụ cập nhật sau khi xét nghiệm
     private BloodBagStatus status; // ví dụ: USED, EXPIRED...
     private String note; // ghi chú mới (nếu cần)
+    private Long bloodType;
+    private String rh;
 }
