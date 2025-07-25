@@ -93,6 +93,7 @@ public class ApheresisMachineService {
                 .collect(Collectors.toList());
     }
 
+
     /**
      * Danh sách máy cần bảo trì trước ngày được truyền vào
      */

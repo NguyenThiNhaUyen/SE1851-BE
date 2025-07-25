@@ -8,19 +8,14 @@ import com.quyet.superapp.entity.User;
 import com.quyet.superapp.entity.UserProfile;
 import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.entity.address.Ward;
-
 import com.quyet.superapp.mapper.AddressMapper;
 import com.quyet.superapp.mapper.UserProfileMapper;
-
-import com.quyet.superapp.exception.ResourceNotFoundException;
 
 import com.quyet.superapp.repository.UserProfileRepository;
 import com.quyet.superapp.repository.UserRepository;
 import com.quyet.superapp.repository.address.AddressRepository;
 import com.quyet.superapp.repository.address.WardRepository;
 
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -47,6 +42,7 @@ public class UserProfileService {
     }
 
 
+
     // ✅ Tạo mới hồ sơ từ DTO
     @Transactional
     public UserProfile createProfile(Long userId, UserProfileDTO dto) {
@@ -59,9 +55,15 @@ public class UserProfileService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
 
+    public UserProfile createProfile(Long userId, UserProfileCreateDTO dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
+
+
             if (user.getUserProfile() != null) {
                 throw new IllegalStateException("Người dùng đã có hồ sơ. Vui lòng cập nhật.");
             }
+
 
 
             UserProfile profile = mapDTOtoEntity(dto, user);
@@ -78,9 +80,17 @@ public class UserProfileService {
             return userProfileRepository.save(profile);
         }
 
+        validateUniqueFields(dto.getCitizenId(), dto.getContactInfo().getEmail(), null);
+        Address address = resolveAddress(dto.getAddressId(), dto.getAddress());
+        UserProfile profile = UserProfileMapper.fromCreateDTO(dto, user, address);
+        return userProfileRepository.save(profile);
+    }
+
+
         public UserProfile updateProfile(Long userId, UserProfileUpdateDTO dto) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
+
 
             UserProfile profile = user.getUserProfile();
             if (profile == null) {
@@ -100,11 +110,9 @@ public class UserProfileService {
         validateUniqueFields(dto.getCitizenId(), dto.getEmail(), profile);
         Address address = resolveAddress(dto.getAddressId(), dto.getAddress());
         UserProfileMapper.updateEntityFromDTO(profile, dto, address);
-
         return userProfileRepository.save(profile);
     }
 
-    public UserProfile createFromRegistration(User user, UrgentDonorRegistrationDTO dto, Address address) {
 
 
         if (user == null) {
@@ -131,6 +139,7 @@ public class UserProfileService {
     // ✅ Lấy hồ sơ theo username (dùng trong xác thực)
 
     UserProfile profile = new UserProfile();
+
         profile.setUser(user);
         profile.setFullName(dto.getFullName());
         profile.setDob(dto.getDob());
@@ -141,7 +150,17 @@ public class UserProfileService {
         profile.setLocation(dto.getLocation());
         profile.setAddress(address);
         return userProfileRepository.save(profile);
+
 }
+
+    }
+
+    public UserProfile getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .flatMap(userProfileRepository::findByUser)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy hồ sơ của người dùng: " + username));
+    }
+
 
 
 public UserProfile getByUsername(String username) {
@@ -153,6 +172,7 @@ public UserProfile getByUsername(String username) {
 public UserProfile save(UserProfile profile) {
     return userProfileRepository.save(profile);
 }
+
 
 public void deleteById(Long id) {
     userProfileRepository.deleteById(id);
@@ -175,6 +195,18 @@ private UserProfile mapDTOtoEntity(UserProfileDTO dto, User user) {
 private void updateEntityFromDTO(UserProfile profile, UserProfileDTO dto) {
     if (dto.getFullName() == null || dto.getFullName().isBlank()) {
         throw new IllegalArgumentException("Họ tên không được để trống");
+
+    // ✅ Tách xử lý địa chỉ dùng chung
+    private Address resolveAddress(Long addressId, AddressDTO dto) {
+        if (addressId != null) {
+            return addressRepository.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ"));
+        } else if (dto != null && dto.getWardId() != null) {
+            Ward ward = wardRepository.findById(dto.getWardId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy phường/xã"));
+            return AddressMapper.toEntity(dto, ward);
+        } else {
+            throw new IllegalArgumentException("Địa chỉ không hợp lệ hoặc thiếu thông tin")
     }
 
     if (dto.getCitizenId() == null || !dto.getCitizenId().matches("\\d{12}")) {
@@ -273,6 +305,26 @@ private void updateEntityFromDTO(UserProfile profile, UserProfileDTO dto) {
     }
 
     profile.setBloodType(dto.getBloodType());
+
+    public void updateOrCreateFromRegistration(User user, DonationRegistrationDTO dto) {
+        UserProfile profile = user.getUserProfile();
+        if (profile == null) {
+            profile = new UserProfile();
+            profile.setUser(user);
+        }
+
+        profile.setFullName(dto.getFullName());
+        profile.setDob(dto.getDob());
+        profile.setGender(dto.getGender());
+        profile.setPhone(dto.getPhone());
+        profile.setBloodType(dto.getBloodType());
+
+        if (dto.getAddressId() != null) {
+            Address address = addressRepository.findById(dto.getAddressId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ"));
+            profile.setAddress(address);
+        }
+
 
     if (dto.getAddressId() != null) {
         Address address = addressRepository.findById(dto.getAddressId())

@@ -7,8 +7,6 @@ import com.quyet.superapp.mapper.NearbyDonorMapper;
 import com.quyet.superapp.mapper.UrgentDonorSearchMapper;
 import com.quyet.superapp.util.HospitalLocation;
 import org.springframework.beans.factory.annotation.Value; // ✅ Đúng!
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.transaction.annotation.Transactional;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.dto.VerifiedUrgentDonorDTO;
 import com.quyet.superapp.entity.*;
@@ -38,11 +36,8 @@ import java.time.temporal.ChronoUnit;
 import com.quyet.superapp.dto.UrgentDonorRegistrationDTO;
 import com.quyet.superapp.dto.UrgentDonorResponseDTO;
 import com.quyet.superapp.entity.*;
-import com.quyet.superapp.entity.address.Address;
+
 import com.quyet.superapp.repository.*;
-import com.quyet.superapp.service.AddressService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -167,32 +162,6 @@ public class UrgentDonorRegistryService {
         return result;
     }
 
-
-
-
-
-
-    public List<UrgentDonorSearchResultDTO> searchNearbyDonors(Long bloodTypeId, Long componentId, double maxDistanceKm) {
-        List<UrgentDonorRegistry> candidates = urgentDonorRegistryRepository
-                .findByBloodType_BloodTypeIdAndBloodComponent_BloodComponentIdAndIsVerifiedTrueAndIsAvailableTrue(bloodTypeId, componentId);
-
-        double hospitalLat = HospitalLocation.LATITUDE;
-        double hospitalLng = HospitalLocation.LONGITUDE;
-
-        return candidates.stream()
-                .map(donor -> {
-                    double distance = GeoUtils.calculateDistanceKm(hospitalLat, hospitalLng, donor.getLatitude(), donor.getLongitude());
-                    return new Object[]{donor, distance};
-                })
-                .filter(arr -> (double) arr[1] <= maxDistanceKm)
-                .sorted(Comparator.comparingDouble(arr -> (double) arr[1])) // ✅ sort theo khoảng cách
-                .map(arr -> urgentDonorSearchMapper.toDTO((UrgentDonorRegistry) arr[0], (double) arr[1]))
-                .collect(Collectors.toList());
-    }
-
-
-
-
     public List<NearbyDonorDTO> findNearbyVerifiedDonors(BloodRequest request, double radiusKm) {
         if (request == null || request.getBloodType() == null) {
             throw new IllegalArgumentException("BloodRequest hoặc BloodType không hợp lệ.");
@@ -207,10 +176,6 @@ public class UrgentDonorRegistryService {
         return findNearbyVerifiedDonors(hospitalLat, hospitalLng, bloodTypeId, radiusKm);
     }
 
-
-    public List<NearbyDonorDTO> findNearbyVerifiedDonors(double radiusKm) {
-        return findNearbyVerifiedDonors(hospitalLat, hospitalLng, null, radiusKm);
-    }
 
     public List<NearbyDonorDTO> findNearbyVerifiedDonors(
             double lat,
@@ -471,8 +436,6 @@ public class UrgentDonorRegistryService {
         // log.info("✅ User {} đã đăng ký hiến máu khẩn cấp với level {}", user.getId(), level);
     }
 
-
-
     // Đăng ký đầy đủ (có vị trí và địa chỉ)
     public void registerOrUpdateUrgentDonor(Long userId, UrgentDonorRegistrationDTO dto) {
         User user = userRepository.findById(userId)
@@ -500,11 +463,6 @@ public class UrgentDonorRegistryService {
 
         urgentDonorRegistryRepo.save(registry);
     }
-
-
-
-
-
 
     /**
      * Đăng ký người hiến máu khẩn cấp.
@@ -548,11 +506,6 @@ public class UrgentDonorRegistryService {
         return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm);
     }
 
-    public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
-        return urgentDonorRegistryRepository.findNearbyVerifiedDonors(lat, lng, radiusKm)
-
-        return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm);
-    }
 
     public List<UrgentDonorResponseDTO> filterDonorsByBloodTypeAndDistance(Long bloodTypeId, double lat, double lng, double radiusKm) {
         return urgentDonorRegistryRepository.findNearbyDonors(lat, lng, radiusKm)
@@ -582,13 +535,6 @@ public class UrgentDonorRegistryService {
     }
 
 
-
-    public List<UnverifiedDonorDTO> getUnverifiedDonors() {
-        return urgentDonorRegistryRepository.findUnverifiedDonors()
-                .stream()
-                .map(urgentDonorMapper::toUnverifiedDTO)
-                .toList();
-    }
 
     public List<VerifiedUrgentDonorDTO> getVerifiedUrgentDonors() {
         return urgentDonorRegistryRepository.findByIsVerifiedTrueAndIsAvailableTrue()
@@ -718,24 +664,6 @@ public class UrgentDonorRegistryService {
         return "✅ Đã cập nhật trạng thái readiness thành công";
     }
 
-    public List<ReadinessChangeLogDTO> getReadinessChangeLogsByUserIdAndDate(
-            Long userId, LocalDate from, LocalDate to) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng"));
-
-        LocalDateTime fromDate = from != null ? from.atStartOfDay() : null;
-        LocalDateTime toDate = to != null ? to.atTime(23, 59, 59) : null;
-
-        return readinessChangeLogRepository.findByUserAndDateRange(user, fromDate, toDate).stream()
-                .map(log -> new ReadinessChangeLogDTO(
-                        log.getFromLevel(),        // ✅ field đúng
-                        log.getToLevel(),          // ✅ field đúng
-                        log.getChangedAt()
-                ))
-                .toList();
-
-    }
     public CurrentUrgentDonorStatusDTO getCurrentUrgentStatus(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng"));

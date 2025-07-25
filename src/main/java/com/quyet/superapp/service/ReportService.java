@@ -35,6 +35,7 @@ public class ReportService {
         reportRepository.deleteById(id);
     }
 
+
     public Report update(Long id, Report updatedReport) {
         return reportRepository.findById(id)
                 .map(existing -> {
