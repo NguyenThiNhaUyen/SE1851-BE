@@ -25,7 +25,7 @@ import com.quyet.superapp.repository.address.AddressRepository;
 import com.quyet.superapp.repository.address.WardRepository;
 
 
-
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -54,12 +54,6 @@ public class UserProfileService {
 
     // ✅ Tạo mới hồ sơ từ DTO
     @Transactional
-    public UserProfile createProfile(Long userId, UserProfileDTO dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
-
-        validateUniqueFields(dto.getCitizenId(), dto.getEmail(), null);
-
     public UserProfile createProfile(Long userId, UserProfileCreateDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
@@ -72,15 +66,6 @@ public class UserProfileService {
         UserProfile profile = mapDTOtoEntity(dto, user);
         return userProfileRepository.save(profile);
 
-    }
-
-    // ✅ Cập nhật hồ sơ
-    public UserProfile updateProfile(Long userId, UserProfileDTO dto) {
-
-        validateUniqueFields(dto.getCitizenId(), dto.getContactInfo().getEmail(), null);
-        Address address = resolveAddress(dto.getAddressId(), dto.getAddress());
-        UserProfile profile = UserProfileMapper.fromCreateDTO(dto, user, address);
-        return userProfileRepository.save(profile);
     }
 
     public UserProfile updateProfile(Long userId, UserProfileUpdateDTO dto) {
@@ -266,26 +251,8 @@ public class UserProfileService {
         }
     }
 
-    private void validateUniqueFields(String citizenId, String email, UserProfile currentProfile) {
-        if (citizenId != null && (currentProfile == null || !citizenId.equals(currentProfile.getCitizenId())) && userProfileRepository.existsByCitizenId(citizenId)) {
-            throw new IllegalArgumentException("CCCD đã tồn tại trong hệ thống");
-        }
-
-        if (email != null && (currentProfile == null || !email.equals(currentProfile.getEmail())) && userProfileRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email đã tồn tại trong hệ thống");
-        }
-    }
 }
 
-        profile.setBloodType(dto.getBloodType());
 
-        if (dto.getAddressId() != null) {
-            Address address = addressRepository.findById(dto.getAddressId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ"));
-            profile.setAddress(address);
-        }
-
-        userProfileRepository.save(profile);
-    }
 }
 
