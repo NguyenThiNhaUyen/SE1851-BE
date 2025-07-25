@@ -18,7 +18,7 @@ public class BloodComponent {
     @Column(name = "Blood_Component_ID")
     private Long bloodComponentId;
 
-    @Column(name = "NameBloodComponent", columnDefinition = "NVARCHAR(50)")
+    @Column(name = "NameBloodComponent", columnDefinition = "NVARCHAR(50)", unique = true)
     private String name;
 
     @Column(name = "Code", columnDefinition = "VARCHAR(10)")

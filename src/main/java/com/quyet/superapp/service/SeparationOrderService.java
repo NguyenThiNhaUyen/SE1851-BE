@@ -219,20 +219,30 @@ public class SeparationOrderService {
     }
 
     // 🔧 Tạo đơn vị máu cụ thể
-    private void createUnit(int volume, String componentName,
-                            BloodBag bag, SeparationOrder order) {
+    private void createUnit(int volume, String componentName, BloodBag bag, SeparationOrder order) {
         if (volume <= 0) return;
-        var component = bloodComponentRepository.findByName(componentName)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thành phần máu: " + componentName));
-        String componentCode = switch (componentName) {
+
+        List<BloodComponent> matchingComponents =
+                bloodComponentRepository.findAll().stream()
+                        .filter(c -> c.getName() != null && c.getName().equalsIgnoreCase(componentName))
+                        .toList();
+
+        if (matchingComponents.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy thành phần máu: " + componentName);
+        }
+
+        BloodComponent component = matchingComponents.get(0); // lấy cái đầu tiên match ignore-case
+
+        String componentCode = switch (componentName.toUpperCase()) {
             case "HỒNG CẦU" -> "RBC";
             case "HUYẾT TƯƠNG" -> "PLAS";
             case "TIỂU CẦU" -> "PLT";
             default -> "UNK";
         };
+
         String unitCode = CodeGeneratorUtil.generateUniqueUnitCode(bag, componentCode, bloodUnitRepository);
 
-        var unit = new BloodUnit();
+        BloodUnit unit = new BloodUnit();
         unit.setQuantityMl(volume);
         unit.setComponent(component);
         unit.setBloodBag(bag);
@@ -245,6 +255,8 @@ public class SeparationOrderService {
         bloodUnitRepository.save(unit);
         bloodInventorySyncService.syncInventory(unit);
     }
+
+
 
     // ✅ Lấy danh sách DTO các đơn vị máu của một lệnh tách
     private List<BloodUnitDTO> getDTOUnits(SeparationOrder order) {
