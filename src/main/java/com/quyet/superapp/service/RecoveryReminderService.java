@@ -138,6 +138,8 @@ public class RecoveryReminderService {
         );
     }
 
+
+
     private BloodComponentType inferBloodComponentFromDonation(Donation donation) {
         if (donation.getComponent() != null && donation.getComponent().getType() != null) {
             return donation.getComponent().getType();

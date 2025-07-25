@@ -98,13 +98,17 @@ public class RedisOtpService {
     /**
      * ✅ Đánh dấu đã xác minh OTP đăng ký
      */
+
     public void markRegisterOtpVerified(String email) {
         redisTemplate.opsForValue().set(buildVerifiedKey(email), "true", REGISTER_OTP_FLAG_TTL);
         log.info("📌 Đánh dấu đã xác minh OTP đăng ký cho [{}]", email);
     }
+
     /**
      * ✅ Kiểm tra xem đã xác minh OTP đăng ký chưa
      */
+
+
     public boolean isRegisterOtpVerified(String email) {
         String result = redisTemplate.opsForValue().get(buildVerifiedKey(email));
         boolean verified = "true".equals(result);

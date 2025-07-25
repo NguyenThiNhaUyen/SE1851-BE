@@ -406,12 +406,12 @@ public class SeparationOrderService {
     //            - Nếu hệ thống hỗ trợ "soft delete" thì nên cập nhật trạng thái thay vì gọi delete().
     //            - Hiện tại dùng hard-delete trực tiếp từ repository.
     @Transactional
-
-
     public void softDeleteOrder(Long id) {
         SeparationOrder order = separationOrderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lệnh tách máu"));
         separationOrderRepository.delete(order);
     }
+
+
 
 }

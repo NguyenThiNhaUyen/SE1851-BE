@@ -117,7 +117,6 @@ public class UserProfileService {
         return userProfileRepository.save(profile);
     }
 
-
     // ✅ Lấy hồ sơ theo username (dùng trong xác thực)
 
         UserProfile profile = new UserProfile();

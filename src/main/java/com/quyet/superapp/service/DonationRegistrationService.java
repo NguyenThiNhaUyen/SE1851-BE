@@ -188,6 +188,7 @@ public class DonationRegistrationService {
         ));
     }
 
+
     private ResponseEntity<?> buildSuccess(Object data, String message) {
         return ResponseEntity.ok(new ApiResponseDTO<>(true, message, data));
     }
