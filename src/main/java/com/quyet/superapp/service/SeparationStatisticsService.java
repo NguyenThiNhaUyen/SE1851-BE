@@ -58,6 +58,14 @@ public class SeparationStatisticsService {
         }).toList();
     }
 
+
+    public List<SeparationCountDTO> getSeparationCountPerDay() {
+        return separationOrderRepository.countSeparationByDay()
+                .stream()
+                .map(obj -> new SeparationCountDTO((String) obj[0], (Long) obj[1]))
+                .toList();
+    }
+
     public List<RejectedUnitStatsDTO> getRejectedUnitsStats(int volumeThreshold) {
         List<BloodSeparationDetail> all = detailRepository.findAll();
 
@@ -73,12 +81,6 @@ public class SeparationStatisticsService {
             double percent = total == 0 ? 0.0 : (rejected * 100.0 / total);
             return new RejectedUnitStatsDTO(entry.getKey(), total, rejected, percent);
         }).toList();
-    }
-    public List<SeparationCountDTO> getSeparationCountPerDay() {
-        return separationOrderRepository.countSeparationByDay()
-                .stream()
-                .map(obj -> new SeparationCountDTO((String) obj[0], (Long) obj[1]))
-                .toList();
     }
 
     public List<BloodTypeSeparationStatsDTO> getStatsByBloodType() {

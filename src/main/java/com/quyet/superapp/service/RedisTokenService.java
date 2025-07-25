@@ -31,14 +31,5 @@
         }
 
 
-    //    public Long getUserIdByVerificationToken(String token) {
-    //        String userIdStr = redisTemplate.opsForValue().get("email-verify:" + token);
-    //        return userIdStr != null ? Long.parseLong(userIdStr) : null;
-    //    }
-    //
-    //    public void deleteEmailVerificationToken(String token) {
-    //        redisTemplate.delete("email-verify:" + token);
-    //    }
-
 
     }
