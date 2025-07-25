@@ -26,15 +26,6 @@ public class TransfusionService {
     }
 
 
-
-    public List<Transfusion> findAll() {
-        return repo.findAll();
-    }
-
-    public List<Transfusion> filterTransfusions(Long recipientId, LocalDateTime fromDate, LocalDateTime toDate) {
-        return repo.filterTransfusions(recipientId, fromDate, toDate);
-    }
-
     public Transfusion findById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bản ghi truyền máu với ID: " + id));

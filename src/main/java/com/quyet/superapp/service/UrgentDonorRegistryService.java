@@ -436,8 +436,6 @@ public class UrgentDonorRegistryService {
         // log.info("✅ User {} đã đăng ký hiến máu khẩn cấp với level {}", user.getId(), level);
     }
 
-
-
     // Đăng ký đầy đủ (có vị trí và địa chỉ)
     public void registerOrUpdateUrgentDonor(Long userId, UrgentDonorRegistrationDTO dto) {
         User user = userRepository.findById(userId)
@@ -465,7 +463,6 @@ public class UrgentDonorRegistryService {
 
         urgentDonorRegistryRepo.save(registry);
     }
-
 
     /**
      * Đăng ký người hiến máu khẩn cấp.
