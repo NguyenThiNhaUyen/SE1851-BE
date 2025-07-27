@@ -1,6 +1,7 @@
 package com.quyet.superapp.service;
 
 import com.quyet.superapp.entity.Report;
+import com.quyet.superapp.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

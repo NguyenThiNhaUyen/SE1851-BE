@@ -1,3 +1,4 @@
+
 package com.quyet.superapp.mapper;
 
 import com.quyet.superapp.dto.BloodSeparationSuggestionDTO;
@@ -19,9 +20,7 @@ public class BloodSeparationSuggestionMapper {
         return dto;
     }
 
-    /**
-     * Tạo entity từ DTO + dữ liệu hệ thống
-     */
+
     public static BloodSeparationSuggestion fromDTO(BloodSeparationSuggestionDTO dto, User generatedBy) {
         BloodSeparationSuggestion entity = new BloodSeparationSuggestion();
         entity.setRedCells(dto.getRedCellsMl());
@@ -35,4 +34,7 @@ public class BloodSeparationSuggestionMapper {
         entity.setCreatedAt(LocalDateTime.now());
         return entity;
     }
+
+
 }
+
