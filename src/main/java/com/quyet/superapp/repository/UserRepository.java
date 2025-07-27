@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    long countByIsEnableTrue();
+
 
     Optional<User> findByUsername(String username);
 

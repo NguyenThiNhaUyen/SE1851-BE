@@ -16,8 +16,6 @@ public interface BloodUnitRepository extends JpaRepository<BloodUnit, Long> {
     // Lấy danh sách theo trạng thái (ví dụ: AVAILABLE)
     List<BloodUnit> findByStatus(BloodUnitStatus status);
 
-    // Lấy tất cả đơn vị máu theo loại thành phần (Plasma, RBC...)
-    List<BloodUnit> findByComponent_BloodComponentId(Long componentId);
 
     // Tìm các đơn vị máu sắp hết hạn
     List<BloodUnit> findByExpirationDateBefore(LocalDate expiryDate);

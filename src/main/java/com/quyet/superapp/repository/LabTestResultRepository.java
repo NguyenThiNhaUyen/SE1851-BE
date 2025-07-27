@@ -16,12 +16,5 @@ public interface LabTestResultRepository extends JpaRepository<LabTestResult, Lo
     // Kiểm tra xem đơn vị máu đã được xét nghiệm chưa
     boolean existsByBloodUnit_BloodUnitId(Long bloodUnitId);
 
-    // Tìm các kết quả xét nghiệm bởi một nhân viên cụ thể
-    List<LabTestResult> findByTestedBy_UserId(Long userId);
 
-    // Tìm tất cả kết quả trong khoảng thời gian
-    List<LabTestResult> findByTestedAtBetween(LocalDateTime start, LocalDateTime end);
-
-    // Tìm tất cả kết quả đạt chuẩn
-    List<LabTestResult> findByPassedTrue();
 }

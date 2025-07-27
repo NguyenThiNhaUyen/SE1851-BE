@@ -17,8 +17,6 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
     List<Donation> findByUser_UserId(Long userId);
     List<Donation> findByBloodUnitsIsEmpty();
     List<Donation> findByStatus(DonationStatus status);
-    // Lấy danh sách hiến máu theo ngày
-    List<Donation> findByCollectedAt(LocalDate date);
 
     // Lọc Donation theo khoảng ngày
     List<Donation> findByCollectedAtBetween(LocalDate start, LocalDate end);
