@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class SeparationOrderService {
     private final BloodSeparationSuggestionRepository bloodSeparationSuggestionRepository;
     private final BloodInventorySyncService bloodInventorySyncService;
     private final DonationRepository donationRepository;
+    private final Clock clock;
 
     // ✅ Tạo lệnh tách máu thủ công (manual) có sinh đơn vị máu từ volume mặc định
     @Transactional
@@ -222,25 +224,11 @@ public class SeparationOrderService {
     private void createUnit(int volume, String componentName, BloodBag bag, SeparationOrder order) {
         if (volume <= 0) return;
 
-        List<BloodComponent> matchingComponents =
-                bloodComponentRepository.findAll().stream()
-                        .filter(c -> c.getName() != null && c.getName().equalsIgnoreCase(componentName))
-                        .toList();
+        BloodComponentCodeEnum codeEnum = BloodComponentCodeEnum.fromName(componentName);
+        BloodComponent component = bloodComponentRepository.findByNameIgnoreCase(componentName)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thành phần máu: " + componentName));
 
-        if (matchingComponents.isEmpty()) {
-            throw new IllegalArgumentException("Không tìm thấy thành phần máu: " + componentName);
-        }
-
-        BloodComponent component = matchingComponents.get(0); // lấy cái đầu tiên match ignore-case
-
-        String componentCode = switch (componentName.toUpperCase()) {
-            case "HỒNG CẦU" -> "RBC";
-            case "HUYẾT TƯƠNG" -> "PLAS";
-            case "TIỂU CẦU" -> "PLT";
-            default -> "UNK";
-        };
-
-        String unitCode = CodeGeneratorUtil.generateUniqueUnitCode(bag, componentCode, bloodUnitRepository);
+        String unitCode = CodeGeneratorUtil.generateUniqueUnitCode(bag, codeEnum.name(), bloodUnitRepository);
 
         BloodUnit unit = new BloodUnit();
         unit.setQuantityMl(volume);
@@ -249,12 +237,13 @@ public class SeparationOrderService {
         unit.setBloodType(bag.getBloodType());
         unit.setSeparationOrder(order);
         unit.setStatus(BloodUnitStatus.AVAILABLE);
-        unit.setCreatedAt(LocalDateTime.now());
+        unit.setCreatedAt(LocalDateTime.now(clock));
         unit.setUnitCode(unitCode);
 
         bloodUnitRepository.save(unit);
         bloodInventorySyncService.syncInventory(unit);
     }
+
 
 
 
@@ -409,9 +398,9 @@ public class SeparationOrderService {
     public void softDeleteOrder(Long id) {
         SeparationOrder order = separationOrderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lệnh tách máu"));
-        separationOrderRepository.delete(order);
+        order.setDeleted(true);
+        separationOrderRepository.save(order);
     }
-
 
 
 }

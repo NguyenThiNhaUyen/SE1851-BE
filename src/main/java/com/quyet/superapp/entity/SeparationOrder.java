@@ -3,13 +3,19 @@ package com.quyet.superapp.entity;
 import com.quyet.superapp.enums.SeparationMethod;
 import com.quyet.superapp.enums.SeparationPattern;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @Table(name = "separation_order")
+@Where(clause = "deleted = false")
+@AllArgsConstructor
+@NoArgsConstructor
 public class SeparationOrder {
 
     @Id
@@ -50,5 +56,8 @@ public class SeparationOrder {
 
     @Column(name = "PresetVersion")
     private String presetVersion;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 
 }

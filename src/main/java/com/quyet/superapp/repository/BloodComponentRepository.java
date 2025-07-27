@@ -10,7 +10,7 @@
     @Repository
     public interface BloodComponentRepository extends JpaRepository<BloodComponent,Long> {
         // Tìm theo tên thành phần máu: "Hồng cầu", "Huyết tương", "Tiểu cầu"
-        Optional<BloodComponent> findByName(String name);
+        Optional<BloodComponent> findByNameIgnoreCase(String name);
 
         // (tuỳ chọn) Tìm theo code y tế: PRC, FFP, PLT
         Optional<BloodComponent> findByCode(String code);
