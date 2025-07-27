@@ -19,6 +19,5 @@ public interface UrgentRequestRepository extends JpaRepository<UrgentRequest, Lo
     // ✅ Thống kê theo trạng thái (ví dụ: Pending bao nhiêu cái)
     long countByStatus(RequestStatus status); // ⚠ Đổi String → enum
 
-    // 🔍 Tìm tất cả yêu cầu PENDING để admin duyệt
-    List<UrgentRequest> findAllByStatus(RequestStatus status);
+
 }

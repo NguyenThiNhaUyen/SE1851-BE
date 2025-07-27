@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 
 public interface VnPaymentRepository extends JpaRepository<VnPayment, Long> {
-    long countByStatus(String status);
+
 }

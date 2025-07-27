@@ -8,7 +8,4 @@ import java.util.Optional;
 
 public interface BloodTypeRepository extends JpaRepository<BloodType, Long> {
     // Có thể thêm custom query nếu cần, ví dụ:
-
-    // ✅ Repository
-    Optional<BloodType> findByDescription(String description);
 }

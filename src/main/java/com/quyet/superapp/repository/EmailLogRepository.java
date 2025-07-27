@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
-    List<EmailLog> findByUser_UserId(Long userId);
+
 }

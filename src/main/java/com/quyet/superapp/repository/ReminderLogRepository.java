@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ReminderLogRepository extends JpaRepository<ReminderLog, Long> {
 
-    List<ReminderLog> findByUser_UserId(Long userId);
+
     boolean existsByUserAndReminderSentAtBetween(User user, LocalDateTime start, LocalDateTime end);
 
 }
