@@ -39,7 +39,11 @@ public class UserProfileMapper {
         dto.setInsuranceCardNumber(profile.getInsuranceCardNumber());
         dto.setInsuranceValidTo(profile.getInsuranceValidTo());
 
-        // ✅ Địa chỉ đầy đủ
+        // ✅ Địa chỉ
+            dto.setAddressId(profile.getAddress().getAddressId()); // ✅ Thêm dòng này
+
+
+        // ✅ Địa chỉ đầy đủ nếu đủ thông tin ward/district/city
         if (profile.getAddress() != null && profile.getAddress().getWard() != null) {
             Address addr = profile.getAddress();
             Ward ward = addr.getWard();
