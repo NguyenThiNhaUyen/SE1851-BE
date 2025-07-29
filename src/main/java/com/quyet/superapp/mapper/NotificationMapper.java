@@ -3,7 +3,9 @@ package com.quyet.superapp.mapper;
 import com.quyet.superapp.dto.NotificationDTO;
 import com.quyet.superapp.entity.Notification;
 
-public class NotificationMapper { //chưa sử dụng
+
+public class NotificationMapper {
+
     public static NotificationDTO toDTO(Notification noti) {
         return new NotificationDTO(
                 noti.getNotificationId(),
