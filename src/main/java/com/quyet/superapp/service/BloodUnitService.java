@@ -14,61 +14,79 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BloodUnitService {
 
-    private final BloodUnitRepository bloodUnitRepo;
-    private final BloodTypeRepository bloodTypeRepo;
-    private final BloodComponentRepository componentRepo;
-    private final BloodBagRepository bagRepo;
+    private final BloodUnitRepository bloodUnitRepository;
+    private final BloodTypeRepository bloodTypeRepository;
+    private final BloodComponentRepository componentRepository;
+    private final BloodBagRepository bloodBagRepository;
 
-    // 🔍 Lấy toàn bộ đơn vị máu
+    /**
+     * Lấy toàn bộ đơn vị máu trong hệ thống.
+     */
     public List<BloodUnit> getAllUnits() {
-        return bloodUnitRepo.findAll();
+        return bloodUnitRepository.findAll();
     }
 
-    // 🔍 Lấy theo ID
+    /**
+     * Lấy đơn vị máu theo ID.
+     * @throws ResourceNotFoundException nếu không tìm thấy đơn vị máu.
+     */
     public BloodUnit getById(Long id) {
-        return bloodUnitRepo.findById(id)
+        return bloodUnitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn vị máu với ID: " + id));
     }
 
-    // 🔍 Lấy theo mã code (để tra cứu)
+    /**
+     * Lấy đơn vị máu theo mã code.
+     * @throws ResourceNotFoundException nếu không tìm thấy đơn vị máu.
+     */
     public BloodUnit getByUnitCode(String code) {
-        return bloodUnitRepo.findByUnitCode(code)
+        return bloodUnitRepository.findByUnitCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn vị máu với mã: " + code));
     }
 
-    // 🗃️ Lưu đơn vị máu – gán các entity liên kết theo ID
+    /**
+     * Tạo hoặc cập nhật đơn vị máu.
+     * Tự động ánh xạ các entity liên quan từ ID: nhóm máu, thành phần, túi máu.
+     */
     public BloodUnit saveUnit(BloodUnit unit, Long bloodTypeId, Long componentId, Long bloodBagId) {
-        BloodType bloodType = bloodTypeRepo.findById(bloodTypeId)
+        BloodType bloodType = bloodTypeRepository.findById(bloodTypeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy nhóm máu với ID: " + bloodTypeId));
 
-        BloodComponent component = componentRepo.findById(componentId)
+        BloodComponent component = componentRepository.findById(componentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thành phần máu với ID: " + componentId));
 
-        BloodBag bloodBag = bagRepo.findById(bloodBagId)
+        BloodBag bloodBag = bloodBagRepository.findById(bloodBagId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy túi máu với ID: " + bloodBagId));
 
         unit.setBloodType(bloodType);
         unit.setComponent(component);
         unit.setBloodBag(bloodBag);
 
-        return bloodUnitRepo.save(unit);
+        return bloodUnitRepository.save(unit);
     }
 
-    // ❌ Xóa theo ID
+    /**
+     * Xoá đơn vị máu theo ID.
+     * @throws ResourceNotFoundException nếu không tồn tại đơn vị máu.
+     */
     public void deleteById(Long id) {
-        if (!bloodUnitRepo.existsById(id)) {
+        if (!bloodUnitRepository.existsById(id)) {
             throw new ResourceNotFoundException("Không tồn tại đơn vị máu với ID: " + id);
         }
-        bloodUnitRepo.deleteById(id);
+        bloodUnitRepository.deleteById(id);
     }
 
-    // 🔍 Tìm đơn vị máu theo trạng thái
+    /**
+     * Lấy danh sách đơn vị máu theo trạng thái.
+     */
     public List<BloodUnit> findByStatus(BloodUnitStatus status) {
-        return bloodUnitRepo.findByStatus(status);
+        return bloodUnitRepository.findByStatus(status);
     }
 
-    // 🔍 Tìm các đơn vị máu sắp hết hạn
+    /**
+     * Lấy danh sách đơn vị máu có ngày hết hạn trước ngày chỉ định.
+     */
     public List<BloodUnit> findExpiringBefore(LocalDate date) {
-        return bloodUnitRepo.findByExpirationDateBefore(date);
+        return bloodUnitRepository.findByExpirationDateBefore(date);
     }
 }

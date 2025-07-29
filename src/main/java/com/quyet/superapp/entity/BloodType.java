@@ -44,4 +44,8 @@ public class BloodType {
     @OneToMany(mappedBy = "recipientType", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CompatibilityRule> recipientRules;
+
+    public String getDisplayName() {
+        return description; // hoặc return description.toUpperCase(); nếu muốn chuẩn hóa
+    }
 }

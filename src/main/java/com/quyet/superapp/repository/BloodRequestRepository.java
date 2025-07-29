@@ -18,22 +18,6 @@
 
     public interface BloodRequestRepository extends JpaRepository<BloodRequest, Long> {
 
-        @Query("""
-    SELECT new com.quyet.superapp.dto.BloodRequestSummaryDTO(
-        br.id,
-        p.fullName,
-        p.bloodGroup,
-        bc.name,
-        p.age,
-        br.quantityMl,
-        br.triageLevel,
-        br.status,
-        br.createdAt
-    )
-    FROM BloodRequest br
-    JOIN br.patient p
-    JOIN br.component bc
-""")
         List<BloodRequestSummaryDTO> findAllSummaryRequests();
 
 
