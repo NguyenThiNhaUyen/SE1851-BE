@@ -18,66 +18,78 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DonationService {
 
-    private final DonationRepository repository;
+    private final DonationRepository donationRepository;
     private final RecoveryRuleRepository recoveryRuleRepository;
 
-
+    /**
+     * Lấy toàn bộ bản ghi hiến máu
+     */
     public List<Donation> getAll() {
-        return repository.findAll();
+        return donationRepository.findAll();
     }
 
+    /**
+     * Tìm lượt hiến máu theo ID
+     */
     public Optional<Donation> getById(Long id) {
-        return repository.findById(id);
+        return donationRepository.findById(id);
     }
 
+    /**
+     * Lưu hoặc cập nhật lượt hiến máu
+     */
     public Donation save(Donation donation) {
-        return repository.save(donation);
+        return donationRepository.save(donation);
     }
 
+    /**
+     * Xóa lượt hiến máu theo ID
+     */
     public void deleteById(Long id) {
-        repository.deleteById(id);
+        donationRepository.deleteById(id);
     }
 
-    // ✅ Lấy tất cả đơn hiến máu theo userId
+    /**
+     * Lấy danh sách hiến máu theo userId
+     */
     public List<Donation> getByUserId(Long userId) {
-        return repository.findByUser_UserId(userId);
+        return donationRepository.findByUser_UserId(userId);
     }
 
-    // ✅ Đếm số lượt hiến máu theo ngày (LocalDate chuẩn hóa)
+    /**
+     * Đếm số lượt hiến trong ngày
+     */
     public long countByDate(LocalDate date) {
-        return repository.countByCollectedAt(date);
+        return donationRepository.countByCollectedAt(date);
     }
 
-    // ✅ Lấy các đơn hiến máu chưa được phân tách (chưa có BloodUnit)
+    /**
+     * Lấy danh sách lượt hiến chưa phân tách thành BloodUnit
+     */
     public List<Donation> getUnseparatedDonations() {
-        return repository.findByBloodUnitsIsEmpty();
+        return donationRepository.findByBloodUnitsIsEmpty();
     }
 
+    /**
+     * Lấy lịch sử hiến máu của user, có tính ngày phục hồi
+     */
     public List<DonationHistoryDTO> getHistoryByUserId(Long userId) {
         LocalDate today = LocalDate.now();
 
-        return repository.findByUser_UserId(userId).stream()
-                .map(d -> {
-                    // Lấy loại thành phần máu
-                    BloodComponentType componentType = d.getComponent() != null && d.getComponent().getType() != null
-                            ? d.getComponent().getType()
-                            : BloodComponentType.RBC; // fallback nếu chưa rõ → toàn phần
-
-                    // Lấy số ngày phục hồi
-                    int recoveryDays = recoveryRuleRepository.findByComponentType(componentType)
-                            .map(RecoveryRule::getRecoveryDays)
-                            .orElse(60); // fallback mặc định
-
-                    LocalDate recoveryDate = d.getCollectedAt().plusDays(recoveryDays);
-                    boolean isRecovered = recoveryDate.isBefore(today);
+        return donationRepository.findByUser_UserId(userId).stream()
+                .map(donation -> {
+                    BloodComponentType componentType = getComponentType(donation);
+                    int recoveryDays = getRecoveryDays(componentType);
+                    LocalDate recoveryDate = donation.getCollectedAt().plusDays(recoveryDays);
+                    boolean isRecovered = !recoveryDate.isAfter(today); // true nếu <= today
 
                     return DonationHistoryDTO.builder()
-                            .donationDate(d.getCollectedAt())
-                            .location(d.getLocation())
-                            .volumeMl(d.getVolumeMl())
-                            .bloodGroup(d.getBloodType() != null ? d.getBloodType().getDescription() : "Chưa rõ")
-                            .component(d.getComponent() != null ? d.getComponent().getName() : "Chưa tách")
-                            .status(d.getStatus() != null ? d.getStatus().name() : "Không rõ")
+                            .donationDate(donation.getCollectedAt())
+                            .location(donation.getLocation())
+                            .volumeMl(donation.getVolumeMl())
+                            .bloodGroup(donation.getBloodType() != null ? donation.getBloodType().getDescription() : "Chưa rõ")
+                            .component(donation.getComponent() != null ? donation.getComponent().getName() : "Chưa tách")
+                            .status(donation.getStatus() != null ? donation.getStatus().name() : "Không rõ")
                             .recoveryDate(recoveryDate)
                             .isRecovered(isRecovered)
                             .build();
@@ -85,8 +97,29 @@ public class DonationService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Lấy các lượt hiến máu theo khoảng ngày
+    /**
+     * Lấy danh sách lượt hiến theo khoảng thời gian
+     */
     public List<Donation> getDonationsBetween(LocalDate start, LocalDate end) {
-        return repository.findByCollectedAtBetween(start, end);
+        return donationRepository.findByCollectedAtBetween(start, end);
+    }
+
+    /**
+     * Trích xuất loại thành phần máu từ Donation (nếu không có → mặc định RBC)
+     */
+    private BloodComponentType getComponentType(Donation donation) {
+        if (donation.getComponent() != null && donation.getComponent().getType() != null) {
+            return donation.getComponent().getType();
+        }
+        return BloodComponentType.RBC;
+    }
+
+    /**
+     * Tìm số ngày phục hồi dựa trên loại thành phần máu (nếu không có → 60)
+     */
+    private int getRecoveryDays(BloodComponentType type) {
+        return recoveryRuleRepository.findByComponentType(type)
+                .map(RecoveryRule::getRecoveryDays)
+                .orElse(60);
     }
 }
