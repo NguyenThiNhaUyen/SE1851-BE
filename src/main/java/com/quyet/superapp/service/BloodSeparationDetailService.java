@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service xử lý các thao tác liên quan đến chi tiết tách máu (BloodSeparationDetail).
@@ -17,41 +16,41 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BloodSeparationDetailService {
 
-    private final BloodSeparationDetailRepository detailRepo;
+    private final BloodSeparationDetailRepository separationDetailRepo;
 
     /**
      * Lấy danh sách chi tiết tách máu theo ID kết quả tách máu.
-     * @param resultId ID kết quả tách máu
-     * @return Danh sách DTO chi tiết
+     *
+     * @param resultId ID của kết quả tách máu
+     * @return Danh sách chi tiết dưới dạng DTO
      */
     public List<BloodSeparationDetailFullDTO> getByResultId(Long resultId) {
-        return detailRepo.findByResult_SeparationResultId(resultId)
-                .stream()
+        return separationDetailRepo.findByResult_SeparationResultId(resultId).stream()
                 .map(BloodSeparationDetailMapper::toFullDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
      * Lấy danh sách chi tiết tách máu theo mã túi máu.
-     * @param bagCode Mã túi máu
-     * @return Danh sách DTO chi tiết
+     *
+     * @param bagCode Mã của túi máu
+     * @return Danh sách chi tiết dưới dạng DTO
      */
     public List<BloodSeparationDetailFullDTO> getByBagCode(String bagCode) {
-        return detailRepo.findByResult_Order_BloodBag_BagCode(bagCode)
-                .stream()
+        return separationDetailRepo.findByResult_Order_BloodBag_BagCode(bagCode).stream()
                 .map(BloodSeparationDetailMapper::toFullDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
-     * Lấy danh sách chi tiết tách máu theo loại thành phần (tiểu cầu, huyết tương...).
+     * Lấy danh sách chi tiết tách máu theo loại thành phần máu (ví dụ: huyết tương, tiểu cầu,...).
+     *
      * @param type Loại thành phần máu
-     * @return Danh sách DTO chi tiết
+     * @return Danh sách chi tiết dưới dạng DTO
      */
     public List<BloodSeparationDetailFullDTO> getByComponentType(BloodComponentType type) {
-        return detailRepo.findByComponentType(type)
-                .stream()
+        return separationDetailRepo.findByComponentType(type).stream()
                 .map(BloodSeparationDetailMapper::toFullDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
