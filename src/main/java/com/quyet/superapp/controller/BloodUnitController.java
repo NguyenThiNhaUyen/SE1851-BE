@@ -97,5 +97,10 @@ public class BloodUnitController {
         BloodUnit updated = service.markAsUsed(id);
         return ResponseEntity.ok(BloodUnitMapper.toDTO(updated));
     }
+    @PutMapping("/{id}/mark-expired")
+    public ResponseEntity<BloodUnitDTO> markUnitAsExpired(@PathVariable Long id) {
+        BloodUnit updated = service.markAsExpired(id);
+        return ResponseEntity.ok(BloodUnitMapper.toDTO(updated));
+    }
 
 }

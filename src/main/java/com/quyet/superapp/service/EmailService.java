@@ -8,6 +8,7 @@ import com.quyet.superapp.entity.User;
 import com.quyet.superapp.repository.EmailLogRepository;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -71,29 +73,30 @@ public class EmailService {
      * Gửi email và lưu log (subject/body/type).
      */
     public void sendEmail(User user, String subject, String content, String type) {
-        EmailLog log = new EmailLog();
-        log.setUser(user);
-        log.setRecipientEmail(user.getEmail());
-        log.setSubject(subject);
-        log.setBody(content);
-        log.setType(type);
-        log.setSentAt(LocalDateTime.now());
+        EmailLog emailLog = new EmailLog();
+        emailLog.setUser(user);
+        emailLog.setRecipientEmail(user.getEmail());
+        emailLog.setSubject(subject);
+        emailLog.setBody(content);
+        emailLog.setType(type);
+        emailLog.setSentAt(LocalDateTime.now());
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
             helper.setTo(user.getEmail());
             helper.setSubject(subject);
-            helper.setText(content, true);
+            helper.setText(content, true); // HTML
             mailSender.send(message);
 
-            log.setStatus("SUCCESS");
+            emailLog.setStatus("SUCCESS");
+            log.info("📧 Email gửi thành công đến: {}", user.getEmail());
         } catch (Exception e) {
-            log.setStatus("FAILED");
-            log.setBody("ERROR: " + e.getMessage());
+            emailLog.setStatus("FAILED");
+            log.error("❌ Gửi email thất bại đến {}: {}", user.getEmail(), e.getMessage(), e);
         }
 
-        emailLogRepository.save(log);
+        emailLogRepository.save(emailLog);
     }
 
     /**
@@ -132,4 +135,5 @@ public class EmailService {
 
         sendEmail(user, "🩸 Tổng hợp cảnh báo kho máu", htmlContent.toString(), "ALERT");
     }
+
 }

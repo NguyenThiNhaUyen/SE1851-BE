@@ -1,11 +1,13 @@
 package com.quyet.superapp.service;
 
 import com.quyet.superapp.config.jwt.JwtTokenProvider;
+import com.quyet.superapp.config.jwt.UserPrincipal;
 import com.quyet.superapp.constant.MessageConstants;
 import com.quyet.superapp.dto.*;
 import com.quyet.superapp.entity.*;
 import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.entity.address.Ward;
+import com.quyet.superapp.enums.EmailType;
 import com.quyet.superapp.enums.RoleEnum;
 import com.quyet.superapp.exception.MemberException;
 import com.quyet.superapp.exception.MultiFieldException;
@@ -46,6 +48,8 @@ public class UserService {
     private final UserProfileRepository userProfileRepository;
     private final AddressMapper addressMapper;
     private final DonorProfileRepository donorProfileRepository;
+    private final RedisOtpService redisOtpService;
+    private final EmailService emailService;
 
     /**
      * Đăng nhập và trả về LoginResponseDTO gồm JWT
@@ -88,6 +92,11 @@ public class UserService {
         profile.setHasInsurance(hasInsurance);
         profile.setInsuranceCardNumber(cardNumber);
         profile.setInsuranceValidTo(validTo);
+    }
+
+    public ResponseEntity<ApiResponseDTO<?>> logout(UserPrincipal principal) {
+        log.info("👋 Người dùng {} đã logout", principal.getUsername());
+        return ResponseEntity.ok(new ApiResponseDTO<>(true, "Đăng xuất thành công"));
     }
 
 
@@ -162,6 +171,59 @@ public class UserService {
             log.error("Đăng ký thất bại cho username [{}]: {}", request.getUsername(), e.getMessage());
             return ResponseEntity.internalServerError().body("Đăng ký thất bại");
         }
+    }
+    public String sendResetPasswordOtp(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống."));
+
+        String otp = redisOtpService.generateOtp(email);
+
+        String displayName = (user.getUserProfile() != null && user.getUserProfile().getFullName() != null)
+                ? user.getUserProfile().getFullName()
+                : user.getUsername();
+
+        // ✅ Nội dung email
+        String content = "<p>Xin chào <b>" + displayName + "</b>,</p>"
+                + "<p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình.</p>"
+                + "<p>Mã OTP của bạn là: <b style='color:red; font-size: 18px'>" + otp + "</b></p>"
+                + "<p>Mã OTP chỉ có hiệu lực trong <b>5 phút</b>. Vui lòng không chia sẻ mã này với bất kỳ ai.</p>"
+                + "<br><p>Trân trọng,<br>Hệ thống Hỗ trợ Hiến máu</p>";
+
+        // ✅ Gửi email
+        emailService.sendEmail(user, "Mã OTP đặt lại mật khẩu", content, EmailType.RESET_PASSWORD.name());
+
+        // ✅ Trả về OTP để hiển thị trong response khi test
+        return otp;
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        if (!redisOtpService.validateOtp(email, otp)) {
+            throw new RuntimeException("Mã OTP không hợp lệ hoặc đã hết hạn.");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email này."));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        String content = "<p>Bạn đã đổi mật khẩu thành công.</p>";
+        emailService.sendEmail(user, "Đổi mật khẩu thành công", content, EmailType.SYSTEM.name());
+    }
+
+    public void changePassword(UserPrincipal principal, ChangePasswordDTO dto) {
+        User user = userRepository.findById(principal.getUserId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new RuntimeException("Mật khẩu xác nhận không khớp.");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+
+        String content = "<p>Bạn vừa đổi mật khẩu thành công.</p>";
+        emailService.sendEmail(user, "Đổi mật khẩu", content, EmailType.SYSTEM.name());
     }
 
 

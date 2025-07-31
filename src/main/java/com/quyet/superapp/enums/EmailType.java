@@ -21,6 +21,10 @@ public enum EmailType {
 
     SYSTEM_ANNOUNCEMENT,              // 📢 Gửi thông báo nội bộ toàn hệ thống
 
-    DONATION_REMINDER
+    DONATION_REMINDER,
+    REGISTER,
+    RESET_PASSWORD,
+    SYSTEM,
+    VERIFY_EMAIL
     }
 

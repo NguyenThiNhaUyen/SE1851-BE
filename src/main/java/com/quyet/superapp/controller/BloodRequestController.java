@@ -221,7 +221,7 @@ public class BloodRequestController {
      * Dùng cho màn hình dashboard để xử lý hoặc theo dõi
      */
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<List<BloodRequestDTO>> getAllRequestsForAdmin() {
         List<BloodRequestDTO> list = requestService.getAllRequests();
         return ResponseEntity.ok(list);

@@ -83,5 +83,11 @@ public class BloodUnitService {
         unit.setStatus(BloodUnitStatus.USED);
         return repository.save(unit);
     }
+    public BloodUnit markAsExpired(Long unitId) {
+        BloodUnit unit = getById(unitId);
+        unit.setStatus(BloodUnitStatus.EXPIRED);
+        return repository.save(unit);
+    }
+
 
 }
