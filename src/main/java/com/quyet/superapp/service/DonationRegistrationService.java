@@ -10,6 +10,7 @@ import com.quyet.superapp.repository.*;
 import com.quyet.superapp.repository.address.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import static com.quyet.superapp.constant.MessageConstants.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,16 +32,16 @@ public class DonationRegistrationService {
     private final DonationRegistrationMapper donationRegistrationMapper;
     public void createRegularRegistration(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
 
         // Check trùng đăng ký PENDING
         if (donationRegistrationRepository.existsByUser_UserIdAndStatus(userId, DonationStatus.PENDING)) {
-            throw new MemberException("DUPLICATE_PENDING", "Bạn đã có đơn đăng ký đang chờ.");
+            throw new MemberException("DUPLICATE_PENDING", DUPLICATE_PENDING);
         }
 
         UserProfile profile = user.getUserProfile();
         if (profile == null) {
-            throw new MemberException("MISSING_PROFILE", "Bạn cần cập nhật hồ sơ trước khi đăng ký hiến máu.");
+            throw new MemberException("MISSING_PROFILE", MISSING_PROFILE);
         }
 
         // Tạo đơn mới
@@ -61,12 +62,12 @@ public class DonationRegistrationService {
 
         // Kiểm tra trùng đăng ký (đang chờ xác nhận)
         if (donationRegistrationRepository.existsByUser_UserIdAndStatus(userId, DonationStatus.PENDING)) {
-            throw new MemberException("DUPLICATE_PENDING", "Bạn đã có một đơn đăng ký đang chờ xác nhận.");
+            throw new MemberException("DUPLICATE_PENDING", DUPLICATE_PENDING);
         }
 
         // ✅ Kiểm tra slot đã đủ chưa
         if (isSlotFull(dto.getScheduledDate(), dto.getSlotId())) {
-            throw new MemberException("SLOT_FULL", "⛔ Slot đã đủ 10 người, vui lòng chọn khung giờ khác.");
+            throw new MemberException("SLOT_FULL", SLOT_FULL);
         }
 
         // Tạo hoặc cập nhật UserProfile nếu chưa có
@@ -77,11 +78,11 @@ public class DonationRegistrationService {
             profile.setDob(dto.getReadyDate());
             profile.setGender(dto.getGender());
             BloodType bloodType = bloodTypeRepository.findById(dto.getBloodTypeId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm máu với ID: " + dto.getBloodTypeId()));
+                    .orElseThrow(() -> new RuntimeException(BLOOD_TYPE_NOT_FOUND + dto.getBloodTypeId()));
             profile.setBloodType(bloodType);
             if (dto.getAddressId() != null) {
                 Address address = addressRepository.findById(dto.getAddressId())
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ với ID: " + dto.getAddressId()));
+                        .orElseThrow(() -> new RuntimeException(ADDRESS_NOT_FOUND + dto.getAddressId()));
                 profile.setAddress(address);
             }
             profile.setPhone(dto.getPhone());
@@ -110,7 +111,7 @@ public class DonationRegistrationService {
     public DonationRegistrationDTO getDTOById(Long id) {
         return donationRegistrationRepository.findById(id)
                 .map(donationRegistrationMapper::toDTO)
-                .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký"));
+                .orElseThrow(() -> new MemberException("NOT_FOUND", DONATION_REGISTRATION_NOT_FOUND));
     }
 
     public List<DonationRegistrationDTO> getByUserId(Long userId) {
@@ -122,17 +123,17 @@ public class DonationRegistrationService {
     public DonationRegistrationDTO confirm(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
-                        "Không tìm thấy đơn đăng ký có ID = " + registrationId));
+                        DONATION_REGISTRATION_NOT_FOUND + registrationId));
 
         if (reg.getStatus() != DonationStatus.PENDING) {
-            throw new MemberException("INVALID_STATUS", "Đơn đăng ký không ở trạng thái chờ xác nhận.");
+            throw new MemberException("INVALID_STATUS", INVALID_CONFIRM_STATUS);
         }
 
         reg.setStatus(DonationStatus.CONFIRMED);
         donationRegistrationRepository.save(reg);
 
         // ✅ Gửi email xác nhận
-        String subject = "Xác nhận hiến máu thành công";
+        String subject =  DONATION_CONFIRMED_EMAIL_SUBJECT;
         String content = String.format(
                 "<h3>Chào %s</h3><p>Đơn đăng ký hiến máu của bạn vào ngày <b>%s</b> đã được xác nhận.</p><p>Cảm ơn bạn vì nghĩa cử cao đẹp!</p>",
                 reg.getUser().getUsername(), reg.getReadyDate());
@@ -144,25 +145,25 @@ public class DonationRegistrationService {
     // ✅ Tạo bản ghi hiến máu nếu đạt sức khỏe
     public Donation createDonationIfEligible(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
-                .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy đơn đăng ký."));
+                .orElseThrow(() -> new MemberException("NOT_FOUND", DONATION_REGISTRATION_NOT_FOUND));
 
         if (reg.getStatus() != DonationStatus.CONFIRMED) {
-            throw new MemberException("INVALID_STATUS", "Chỉ tạo bản ghi hiến máu khi đơn đã được xác nhận.");
+            throw new MemberException("INVALID_STATUS", INVALID_REGISTRATION_STATUS);
         }
 
         // Kiểm tra phiếu khám
         HealthCheckForm form = healthCheckFormRepository.findByRegistration_RegistrationId(registrationId);
         if (form == null || !Boolean.TRUE.equals(form.getIsEligible())) {
-            throw new MemberException("NOT_ELIGIBLE", "Người hiến máu không đạt yêu cầu sức khỏe.");
+            throw new MemberException("NOT_ELIGIBLE", HEALTH_NOT_ELIGIBLE);
         }
 
         // Tránh trùng bản ghi
         if (donationRepository.existsByRegistration_RegistrationId(registrationId)) {
-            throw new MemberException("DUPLICATE_DONATION", "Đã tồn tại bản ghi hiến máu cho đơn này.");
+            throw new MemberException("DUPLICATE_DONATION", DONATION_ALREADY_EXISTS);
         }
 
         BloodType bloodType = bloodTypeRepository.findByDescription(reg.getBloodType())
-                .orElseThrow(() -> new MemberException("NOT_FOUND", "Không tìm thấy nhóm máu: " + reg.getBloodType()));
+                .orElseThrow(() -> new MemberException("NOT_FOUND", BLOOD_TYPE_NOT_FOUND_WITH_DESC + reg.getBloodType()));
 
         Donation donation = new Donation();
         donation.setUser(reg.getUser());
@@ -193,28 +194,13 @@ public class DonationRegistrationService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ Đánh dấu đơn là HỦY (người hiến không đến)
-    public DonationRegistrationDTO markAsCancelled(Long registrationId) {
-        DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
-                .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
-                        "Không tìm thấy đơn đăng ký có ID = " + registrationId));
-
-        if (reg.getStatus() != DonationStatus.CONFIRMED) {
-            throw new MemberException("INVALID_STATUS", "Chỉ có thể hủy đơn đã xác nhận.");
-        }
-
-        reg.setStatus(DonationStatus.CANCELLED);
-        donationRegistrationRepository.save(reg);
-        return donationRegistrationMapper.toDTO(reg);
-    }
-
     // ✅ Đánh dấu KHÔNG ĐẠT sức khỏe
     public DonationRegistrationDTO markAsFailedHealth(Long registrationId, String reason, String staffNote) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
-                .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND", "Không tìm thấy đơn đăng ký có ID = " + registrationId));
+                .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND", DONATION_REGISTRATION_NOT_FOUND + registrationId));
 
         if (reg.getStatus() != DonationStatus.CONFIRMED) {
-            throw new MemberException("INVALID_STATUS", "Chỉ đánh dấu không đạt sức khỏe khi đơn đã được xác nhận.");
+            throw new MemberException("INVALID_STATUS", INVALID_REGISTRATION_STATUS);
         }
 
         reg.setStatus(DonationStatus.FAILED_HEALTH);
@@ -229,10 +215,10 @@ public class DonationRegistrationService {
     public DonationRegistrationDTO markAsDonated(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
-                        "Không tìm thấy đơn đăng ký có ID = " + registrationId));
+                        DONATION_REGISTRATION_NOT_FOUND + registrationId));
 
         if (reg.getStatus() != DonationStatus.CONFIRMED) {
-            throw new MemberException("INVALID_STATUS", "Chỉ những đơn đã xác nhận mới được đánh dấu là đã hiến.");
+            throw new MemberException("INVALID_STATUS", ONLY_CONFIRMED_CAN_BE_DONATED);
         }
 
         reg.setStatus(DonationStatus.DONATED);
@@ -241,13 +227,14 @@ public class DonationRegistrationService {
         return donationRegistrationMapper.toDTO(saved);
     }
 
+    // ✅ Đánh dấu đơn là HỦY (người hiến không đến)
     public DonationRegistrationDTO cancel(Long registrationId) {
         DonationRegistration reg = donationRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new MemberException("REGISTRATION_NOT_FOUND",
-                        "Không tìm thấy đơn đăng ký có ID = " + registrationId));
+                        DONATION_REGISTRATION_NOT_FOUND + registrationId));
 
         if (reg.getStatus() == DonationStatus.CANCELLED || reg.getStatus() == DonationStatus.DONATED) {
-            throw new MemberException("INVALID_STATUS", "Không thể hủy đơn ở trạng thái hiện tại.");
+            throw new MemberException("INVALID_STATUS", CANNOT_CANCEL_CURRENT_STATE);
         }
 
         reg.setStatus(DonationStatus.CANCELLED);

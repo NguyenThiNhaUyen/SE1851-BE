@@ -20,7 +20,7 @@ public class DonationService {
 
     private final DonationRepository repository;
     private final DonationHistoryRepository donationHistoryRepository;
-    private final DonationHistoryMapper donationHistoryMapper;
+
 
 
     public List<Donation> getAll() {
@@ -63,7 +63,6 @@ public class DonationService {
 
         return Math.max(daysLeft, 0); // Không âm
     }
-
 
 
     // ✅ Kiểm tra người dùng đã đủ thời gian để hiến lại thành phần máu cụ thể hay chưa

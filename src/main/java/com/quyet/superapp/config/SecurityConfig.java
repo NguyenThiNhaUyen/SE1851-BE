@@ -95,7 +95,10 @@ public class SecurityConfig {
             "/api/forgot",
             "/api/change-password",
             "/api/blog/**",
-            "/api/public/**"
+            "/api/public/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
     private static final String[] MEMBER_ENDPOINTS = {
             "/api/user/**",

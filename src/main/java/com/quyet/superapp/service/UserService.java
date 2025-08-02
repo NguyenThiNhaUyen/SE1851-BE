@@ -9,7 +9,6 @@ import com.quyet.superapp.entity.address.Address;
 import com.quyet.superapp.entity.address.Ward;
 import com.quyet.superapp.enums.EmailType;
 import com.quyet.superapp.enums.RoleEnum;
-import com.quyet.superapp.exception.MemberException;
 import com.quyet.superapp.exception.MultiFieldException;
 import com.quyet.superapp.exception.ResourceNotFoundException;
 import com.quyet.superapp.mapper.AddressMapper;
@@ -65,7 +64,7 @@ public class UserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = userRepository.findByUsername(loginRequest.getUsername())
-                    .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                    .orElseThrow(() -> new RuntimeException(MessageConstants.USER_NOT_FOUND));
 
             // Tạo token JWT
             String jwt = tokenProvider.createToken(user.getUsername(), user.getUserId());
@@ -83,7 +82,7 @@ public class UserService {
 
         } catch (AuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Tài khoản hoặc mật khẩu không đúng");
+            return ResponseEntity.badRequest().body(MessageConstants.LOGIN_FAILED);
         }
     }
 
@@ -98,8 +97,6 @@ public class UserService {
         log.info("👋 Người dùng {} đã logout", principal.getUsername());
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Đăng xuất thành công"));
     }
-
-
 
     /**
      * Đăng ký tài khoản mới
@@ -127,12 +124,12 @@ public class UserService {
 
             Role role = roleRepository.findByName(
                     String.valueOf(RoleEnum.valueOf(Optional.ofNullable(request.getRole()).map(String::toUpperCase).orElse("MEMBER")))
-            ).orElseThrow(() -> new RuntimeException("Không tìm thấy vai trò"));
+            ).orElseThrow(() -> new RuntimeException(MessageConstants.ROLE_NOT_FOUND));
 
             Address address = null;
             if (request.getAddress() != null && request.getAddress().getWardId() != null) {
                 Ward ward = wardRepository.findById(request.getAddress().getWardId())
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy phường/xã phù hợp"));
+                        .orElseThrow(() -> new RuntimeException(MessageConstants.WARD_NOT_FOUND));
 
                 address = new Address();
                 address.setAddressStreet(request.getAddress().getAddressStreet());
@@ -165,11 +162,11 @@ public class UserService {
             user.setUserProfile(profile);
             userRepository.save(user);
 
-            return ResponseEntity.ok("Đăng ký thành công");
+            return ResponseEntity.ok(MessageConstants.REGISTER_SUCCESS);
 
         } catch (Exception e) {
             log.error("Đăng ký thất bại cho username [{}]: {}", request.getUsername(), e.getMessage());
-            return ResponseEntity.internalServerError().body("Đăng ký thất bại");
+            return ResponseEntity.internalServerError().body(MessageConstants.REGISTER_FAILED);
         }
     }
     public String sendResetPasswordOtp(String email) {
